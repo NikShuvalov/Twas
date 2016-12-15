@@ -3,6 +3,7 @@ package shuvalov.nikita.twas;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -28,16 +29,20 @@ public class ProfileDetailActivity extends AppCompatActivity {
         if (mId.equals(MainActivity.HTC_PHONE_ANDROID_ID)){
             myRef = firebaseDatabase.getReference(MainActivity.SAMSUNG_PHONE_ANDROID_ID);
         }else{
-            myRef = firebaseDatabase.getReference(MainActivity.SAMSUNG_PHONE_ANDROID_ID);
+            myRef = firebaseDatabase.getReference(MainActivity.HTC_PHONE_ANDROID_ID);
 
         }
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                dataSnapshot.getValue();
-//                mBioText.setText(stalkedProfile.getBio());
-//                mNameText.setText(stalkedProfile.getName());
-//                mDOBTest.setText(stalkedProfile.getDOB());
+                String bio = dataSnapshot.child("bio").getValue().toString();
+                String name = dataSnapshot.child("name").getValue().toString();
+                String dob = dataSnapshot.child("dob").getValue().toString();
+                Profile stalkedProfile = new Profile(name, bio, dob);
+                Log.d("ProfileDetailActivity", "onDataChange: "+bio);
+                mBioText.setText(stalkedProfile.getBio());
+                mNameText.setText(stalkedProfile.getName());
+                mDOBTest.setText(stalkedProfile.getDOB());
             }
 
             @Override

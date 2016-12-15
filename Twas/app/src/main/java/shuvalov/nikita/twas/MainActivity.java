@@ -1,8 +1,6 @@
 package shuvalov.nikita.twas;
 
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -175,8 +173,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         subscribing=true;
     }
 
+
     @Override
-    protected void onStop() {
+    protected void onDestroy() {
         if(publishing){
             Nearby.Messages.unpublish(mGoogleApiClient,mActiveMessage);
         }
@@ -186,6 +185,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if(mGoogleApiClient!=null){
             mGoogleApiClient.disconnect();
         }
-        super.onStop();
+        super.onDestroy();
     }
 }
