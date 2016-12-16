@@ -3,6 +3,7 @@ package shuvalov.nikita.twas;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +22,7 @@ public class FirebaseLogInActivity extends AppCompatActivity {
 
     private EditText mEmailEntry, mPasswordEntry;
     private Button mSignIn;
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +30,13 @@ public class FirebaseLogInActivity extends AppCompatActivity {
         setContentView(R.layout.activity_firebase_log_in);
 
         findViews();
+
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("Sign In");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -64,6 +73,8 @@ public class FirebaseLogInActivity extends AppCompatActivity {
         mEmailEntry= (EditText)findViewById(R.id.email_entry);
         mPasswordEntry = (EditText)findViewById(R.id.password_entry);
         mSignIn = (Button)findViewById(R.id.log_in_button);
+        mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
+
     }
 
     @Override

@@ -29,9 +29,11 @@
             android:name="com.google.android.gms.nearby.connection.SERVICE_ID"
             android:value="@string/service_id"/>
 
-        <activity android:name=".ProfileDetailActivity">
+        <activity android:name=".ProfileDetailActivity"
+                  android:parentActivityName=".MainActivity">
         </activity>
-        <activity android:name=".FirebaseLogInActivity">
+        <activity android:name=".FirebaseLogInActivity"
+            android:parentActivityName=".MainActivity">
         </activity>
     </application>
 

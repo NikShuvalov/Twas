@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -29,12 +30,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     GoogleApiClient mGoogleApiClient;
     Message mActiveMessage;
     MessageListener mActiveListener;
-
+    Toolbar mToolbar;
     Button mSendButt, mRetrieveButton;
     EditText mEditText, mBioEntry, mDobEntry;
     TextView mDisplayText;
-    boolean googleAPIconnected, publishing, subscribing; //Might need a singleton for this.
 
+    NearbyHelper mNearbyHelper;
     String mFoundId;
 
 
@@ -42,11 +43,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     DatabaseReference mRef;
     FirebaseDatabase mFirebaseDatabase;
 
+
     private static final String MESSAGES_API_KEY = "AIzaSyB19mT541M39gddQhee5ehQy45G3FpV3MU";
     public static final String HTC_PHONE_ANDROID_ID = "41cc7ed0cfee3d4c";
     public static final String SAMSUNG_PHONE_ANDROID_ID = "669ec9813b4c140";
 
     String mId;
+    String[] navOptions= new String[]{"Profile","Home", "Settings","SoapBox Feed","Invite Friends", "Donate", "About"};
 
 
     @Override
@@ -54,14 +57,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mNearbyHelper = NearbyHelper.getInstance();
+
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         mRef = mFirebaseDatabase.getReference(mId);
 
-        googleAPIconnected=false;
-        publishing=false;
-        subscribing=false;
 
         mSendButt = (Button)findViewById(R.id.send_butt);
         mRetrieveButton = (Button)findViewById(R.id.retrieve_button);
@@ -69,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mDisplayText = (TextView)findViewById(R.id.display_text);
         mDobEntry = (EditText)findViewById(R.id.dob_entry);
         mBioEntry = (EditText)findViewById(R.id.bio_entry);
+        mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("Home");
 
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -112,7 +117,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onClick(View view) {
                 mActiveMessage = new Message(mEditText.getText().toString().getBytes());
-                mProfile = new Profile(mEditText.getText().toString(),mBioEntry.getText().toString(),mDobEntry.getText().toString());
+                mProfile = new Profile(mEditText.getText().toString(),
+                        mBioEntry.getText().toString(),
+                        mDobEntry.getText().toString());
                 mRef.setValue(mProfile);
             }
         });
@@ -134,14 +141,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(@Nullable Bundle connectionHint) {
-        googleAPIconnected=true;
+        NearbyHelper.getInstance().setGoogleApiConnected(true);
         publish();
         subscribe();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        googleAPIconnected=false;
+        NearbyHelper.getInstance().setGoogleApiConnected(false);
 
     }
 
@@ -160,9 +167,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void publish(){
         Message message = new Message(mId.getBytes());
-        if(googleAPIconnected){
+        if(mNearbyHelper.isGoogleApiConnected()){
             Nearby.Messages.publish(mGoogleApiClient, message);
-            publishing=true;
+            mNearbyHelper.setPublishing(true);
         }else{
             Toast.makeText(this, "Not connected to Google Cloud", Toast.LENGTH_SHORT).show();
             Log.d("MainActivity", "publish: failed");
@@ -170,18 +177,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
     public void subscribe(){
         Nearby.Messages.subscribe(mGoogleApiClient, mActiveListener);
-        subscribing=true;
+        mNearbyHelper.setSubscribing(true);
     }
 
 
     @Override
     protected void onDestroy() {
-        if(publishing){
-            Nearby.Messages.unpublish(mGoogleApiClient,mActiveMessage);
-        }
-        if(subscribing){
-            Nearby.Messages.unsubscribe(mGoogleApiClient,mActiveListener);
-        }
+//        if(mNearbyHelper.isPublishing()){
+//            Nearby.Messages.unpublish(mGoogleApiClient,mActiveMessage);
+//        }
+//        if(mNearbyHelper.isSubscribing()){
+//            Nearby.Messages.unsubscribe(mGoogleApiClient,mActiveListener);
+//        }
         if(mGoogleApiClient!=null){
             mGoogleApiClient.disconnect();
         }
