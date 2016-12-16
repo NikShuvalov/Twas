@@ -23,15 +23,9 @@ public class ProfileDetailActivity extends AppCompatActivity {
 
         findViews();
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        String mId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        String foundProfile = getIntent().getStringExtra(MainActivity.FOUND_ID_INTENT); //Get the id that was based in the intent to find it in the firebase database.
+        DatabaseReference myRef =  firebaseDatabase.getReference(foundProfile);
 
-        DatabaseReference myRef;
-        if (mId.equals(MainActivity.HTC_PHONE_ANDROID_ID)){
-            myRef = firebaseDatabase.getReference(MainActivity.SAMSUNG_PHONE_ANDROID_ID);
-        }else{
-            myRef = firebaseDatabase.getReference(MainActivity.HTC_PHONE_ANDROID_ID);
-
-        }
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -40,9 +34,7 @@ public class ProfileDetailActivity extends AppCompatActivity {
                 String dob = dataSnapshot.child("dob").getValue().toString();
                 Profile stalkedProfile = new Profile(name, bio, dob);
                 Log.d("ProfileDetailActivity", "onDataChange: "+bio);
-                mBioText.setText(stalkedProfile.getBio());
-                mNameText.setText(stalkedProfile.getName());
-                mDOBTest.setText(stalkedProfile.getDOB());
+                bindDataToViews(stalkedProfile);
             }
 
             @Override
@@ -56,5 +48,11 @@ public class ProfileDetailActivity extends AppCompatActivity {
         mBioText = (TextView)findViewById(R.id.bio_text);
         mNameText = (TextView)findViewById(R.id.name_text);
         mDOBTest = (TextView)findViewById(R.id.dob_text);
+    }
+
+    public void bindDataToViews(Profile profile){
+        mBioText.setText(profile.getBio());
+        mNameText.setText(profile.getName());
+        mDOBTest.setText(profile.getDOB());
     }
 }

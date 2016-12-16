@@ -25,6 +25,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+    public static final String FOUND_ID_INTENT = "Found id";
     GoogleApiClient mGoogleApiClient;
     Message mActiveMessage;
     MessageListener mActiveListener;
@@ -32,8 +33,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     Button mSendButt, mRetrieveButton;
     EditText mEditText, mBioEntry, mDobEntry;
     TextView mDisplayText;
-    boolean googleAPIconnected, publishing, subscribing;
+    boolean googleAPIconnected, publishing, subscribing; //Might need a singleton for this.
 
+    String mFoundId;
 
 
     Profile mProfile;
@@ -80,9 +82,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onFound(Message message) {
                 super.onFound(message);
-                String received = new String(message.getContent());
-                mDisplayText.setText(received);
-                Toast.makeText(MainActivity.this, received, Toast.LENGTH_SHORT).show();
+                mFoundId = new String(message.getContent());//ToDo: The ID should be stored in some way so that the user can access that id's profile.
+                mDisplayText.setText(mFoundId);
+                Toast.makeText(MainActivity.this, mFoundId, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -115,17 +117,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
+
+        //ToDo: After making prototype, instead of button, probably using a recyclerView to populate the profile blurbs and add onClickListeners to that.
         mRetrieveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent debugIntent = new Intent(MainActivity.this, FirebaseLogInActivity.class);
                 Intent intent  = new Intent(MainActivity.this, ProfileDetailActivity.class);
-                startActivity(intent);
-
-
-                //Go to Next Activity
-                //Retrieve Profile data
-                //AsyncTask in new activity
-                //Make a class to hold a profile or singleton that holds all the profiles you have access to.
+                intent.putExtra(FOUND_ID_INTENT,mFoundId);//ToDo: Once I have some way of displaying each Id's blurb, this will take in the id for that profile to be passed to the detail activity.
+                startActivity(debugIntent);//ToDo:Change back to normal intent after testing.
             }
         });
 
