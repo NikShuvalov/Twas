@@ -4,6 +4,9 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -16,11 +19,15 @@ public class FirebaseLogInActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
+    private EditText mEmailEntry, mPasswordEntry;
+    private Button mSignIn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_firebase_log_in);
 
+        findViews();
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -33,7 +40,30 @@ public class FirebaseLogInActivity extends AppCompatActivity {
                 }
             }
         };
-        signInUserWithEmail("nshuvalov89@gmail.com","HelloWorld");
+        mSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mEmailEntry.getText().toString().isEmpty()){
+                    mEmailEntry.setError("Can't be empty");
+                }
+                if(mPasswordEntry.getText().toString().isEmpty()){
+                    mPasswordEntry.setError("Password field is empty");
+                }else{
+                    String email = mEmailEntry.getText().toString();
+                    String password = mPasswordEntry.getText().toString();
+
+                    mEmailEntry.setText("");
+                    mPasswordEntry.setText("");
+                    signInUserWithEmail(email,password);
+                }
+            }
+        });
+    }
+
+    public void findViews(){
+        mEmailEntry= (EditText)findViewById(R.id.email_entry);
+        mPasswordEntry = (EditText)findViewById(R.id.password_entry);
+        mSignIn = (Button)findViewById(R.id.log_in_button);
     }
 
     @Override

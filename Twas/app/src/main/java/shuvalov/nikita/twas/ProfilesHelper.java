@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 
 public class ProfilesHelper {
-    ArrayList<Profile> mStalkedProfiles;
+    ArrayList<Profile> mProfileCollection;
 
     private static ProfilesHelper mProfilesHelper;
 
@@ -18,10 +18,14 @@ public class ProfilesHelper {
         return mProfilesHelper;
     }
     private ProfilesHelper(){
-        mStalkedProfiles = new ArrayList<>();
+        mProfileCollection = new ArrayList<>();
     }
 
     public ArrayList<Profile> getStalkedProfiles() {
-        return mStalkedProfiles;
+        return mProfileCollection;
+    }
+
+    public void addProfileToCollection(Profile profile){
+        mProfileCollection.add(profile);
     }
 }
