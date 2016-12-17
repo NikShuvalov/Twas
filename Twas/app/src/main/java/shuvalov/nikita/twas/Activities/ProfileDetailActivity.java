@@ -1,6 +1,5 @@
-package shuvalov.nikita.twas;
+package shuvalov.nikita.twas.Activities;
 
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +10,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import shuvalov.nikita.twas.PoJos.Profile;
+import shuvalov.nikita.twas.R;
 
 public class ProfileDetailActivity extends AppCompatActivity {
 

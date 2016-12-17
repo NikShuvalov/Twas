@@ -1,7 +1,6 @@
-package shuvalov.nikita.twas;
+package shuvalov.nikita.twas.Activities;
 
 import android.content.Intent;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -21,20 +20,26 @@ import com.google.android.gms.nearby.messages.BleSignal;
 import com.google.android.gms.nearby.messages.Distance;
 import com.google.android.gms.nearby.messages.Message;
 import com.google.android.gms.nearby.messages.MessageListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import shuvalov.nikita.twas.AppConstants;
+import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
+import shuvalov.nikita.twas.PoJos.Profile;
+import shuvalov.nikita.twas.R;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static final String FOUND_ID_INTENT = "Found id";
 
     Toolbar mToolbar;
-    Button mSendButt, mRetrieveButton;
+    Button mSendButt, mRetrieveButton, mSignOutButton;
     EditText mEditText, mBioEntry, mDobEntry;
     TextView mDisplayText;
     String mFoundId;
 
-    NearbyHelper mNearbyHelper;
+    NearbyManager mNearbyManager;
 
     GoogleApiClient mGoogleApiClient;
     Message mActiveMessage;
@@ -60,9 +65,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mNearbyHelper = NearbyHelper.getInstance();
+        mNearbyManager = shuvalov.nikita.twas.Helpers_Managers.NearbyManager.getInstance();
 
-        Log.d("MainActivity", "onCreate: "+mNearbyHelper.getId());
+        Log.d("MainActivity", "onCreate: "+ mNearbyManager.getId());
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mId = getIntent().getStringExtra(AppConstants.SELF_USER_ID);
@@ -120,6 +125,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
+        mSignOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+                Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+
 
         //ToDo: After making prototype, instead of button, probably using a recyclerView to populate the profile blurbs and add onClickListeners to that.
         mRetrieveButton.setOnClickListener(new View.OnClickListener() {
@@ -142,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mDobEntry = (EditText)findViewById(R.id.dob_entry);
         mBioEntry = (EditText)findViewById(R.id.bio_entry);
         mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
+        mSignOutButton = (Button)findViewById(R.id.sign_out_button);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Home");
     }
@@ -149,14 +164,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(@Nullable Bundle connectionHint) {
-        NearbyHelper.getInstance().setGoogleApiConnected(true);
+        shuvalov.nikita.twas.Helpers_Managers.NearbyManager.getInstance().setGoogleApiConnected(true);
         publish();
         subscribe();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        NearbyHelper.getInstance().setGoogleApiConnected(false);
+        shuvalov.nikita.twas.Helpers_Managers.NearbyManager.getInstance().setGoogleApiConnected(false);
 
     }
 
@@ -175,9 +190,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void publish(){
         Message message = new Message(mId.getBytes());
-        if(mNearbyHelper.isGoogleApiConnected()){
+        if(mNearbyManager.isGoogleApiConnected()){
             Nearby.Messages.publish(mGoogleApiClient, message);
-            mNearbyHelper.setPublishing(true);
+            mNearbyManager.setPublishing(true);
         }else{
             Toast.makeText(this, "Not connected to Google Cloud", Toast.LENGTH_SHORT).show();
             Log.d("MainActivity", "publish: failed");
@@ -185,17 +200,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
     public void subscribe(){
         Nearby.Messages.subscribe(mGoogleApiClient, mActiveListener);
-        mNearbyHelper.setSubscribing(true);
+        mNearbyManager.setSubscribing(true);
     }
 
 
     @Override
     protected void onDestroy() {
         //ToDo: Find out if this is even necessary
-//        if(mNearbyHelper.isPublishing()){
+//        if(mNearbyManager.isPublishing()){
 //            Nearby.Messages.unpublish(mGoogleApiClient,mActiveMessage);
 //        }
-//        if(mNearbyHelper.isSubscribing()){
+//        if(mNearbyManager.isSubscribing()){
 //            Nearby.Messages.unsubscribe(mGoogleApiClient,mActiveListener);
 //        }
         if(mGoogleApiClient!=null){

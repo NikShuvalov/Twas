@@ -1,13 +1,15 @@
-package shuvalov.nikita.twas;
+package shuvalov.nikita.twas.Helpers_Managers;
 
 import java.util.ArrayList;
+
+import shuvalov.nikita.twas.PoJos.Profile;
 
 /**
  * Created by NikitaShuvalov on 12/15/16.
  */
 
 public class ProfilesHelper {
-    ArrayList<Profile> mProfileCollection;
+    ArrayList<Profile> mProfileConnections;
 
     private static ProfilesHelper mProfilesHelper;
 
@@ -18,14 +20,14 @@ public class ProfilesHelper {
         return mProfilesHelper;
     }
     private ProfilesHelper(){
-        mProfileCollection = new ArrayList<>();
+        mProfileConnections = new ArrayList<>();
     }
 
-    public ArrayList<Profile> getStalkedProfiles() {
-        return mProfileCollection;
+    public ArrayList<Profile> getConnections() {
+        return mProfileConnections;
     }
 
     public void addProfileToCollection(Profile profile){
-        mProfileCollection.add(profile);
+        mProfileConnections.add(profile);
     }
 }

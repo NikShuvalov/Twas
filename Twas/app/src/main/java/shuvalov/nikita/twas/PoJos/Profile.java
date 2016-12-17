@@ -1,4 +1,4 @@
-package shuvalov.nikita.twas;
+package shuvalov.nikita.twas.PoJos;
 
 /**
  * Created by NikitaShuvalov on 12/15/16.

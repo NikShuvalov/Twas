@@ -1,4 +1,4 @@
-package shuvalov.nikita.twas;
+package shuvalov.nikita.twas.Activities;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -17,12 +17,16 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import shuvalov.nikita.twas.AppConstants;
+import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
+import shuvalov.nikita.twas.R;
+
 public class FirebaseLogInActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     private EditText mEmailEntry, mPasswordEntry;
-    private Button mSignIn;
+    private Button mSignIn, mSignUp;
     private Toolbar mToolbar;
 
     @Override
@@ -36,8 +40,6 @@ public class FirebaseLogInActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Sign In");
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
-
         mAuth = FirebaseAuth.getInstance();
 
         //ToDo: Once I have a splash loading screen(& set as launch activity), do this check in that activity.
@@ -47,7 +49,7 @@ public class FirebaseLogInActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user!= null){
                     String userId = user.getUid();
-                    NearbyHelper.getInstance().setId(userId);
+                    NearbyManager.getInstance().setId(userId);
                     Toast.makeText(FirebaseLogInActivity.this, "Signed as "+ userId, Toast.LENGTH_SHORT).show();
                     Log.d("AuthStateChanged", "Logged in as "+ user.getUid());
                     Intent intent = new Intent(FirebaseLogInActivity.this, MainActivity.class);
@@ -58,30 +60,44 @@ public class FirebaseLogInActivity extends AppCompatActivity {
                 }
             }
         };
-        mSignIn.setOnClickListener(new View.OnClickListener() {
+
+        View.OnClickListener logInListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mEmailEntry.getText().toString().isEmpty()){
+
+                if (mEmailEntry.getText().toString().isEmpty()) {
                     mEmailEntry.setError("Can't be empty");
                 }
-                if(mPasswordEntry.getText().toString().isEmpty()){
+                if (mPasswordEntry.getText().toString().isEmpty()) {
                     mPasswordEntry.setError("Password field is empty");
-                }else{
+                } else {
                     String email = mEmailEntry.getText().toString();
                     String password = mPasswordEntry.getText().toString();
 
                     mEmailEntry.setText("");
                     mPasswordEntry.setText("");
-                    signInUserWithEmail(email,password);
+                    switch (view.getId()) {
+                        case (R.id.sign_up_button):
+                            createNewUserWithEmail(email,password);
+                            break;
+                        case (R.id.sign_in_button):
+                            signInUserWithEmail(email, password);
+                            break;
+                        default:
+                            Toast.makeText(FirebaseLogInActivity.this, "Well....\n this is embarassing", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
-        });
+        };
+        mSignIn.setOnClickListener(logInListener);
+        mSignUp.setOnClickListener(logInListener);
     }
 
     public void findViews(){
         mEmailEntry= (EditText)findViewById(R.id.email_entry);
         mPasswordEntry = (EditText)findViewById(R.id.password_entry);
-        mSignIn = (Button)findViewById(R.id.log_in_button);
+        mSignUp = (Button)findViewById(R.id.sign_up_button);
+        mSignIn = (Button)findViewById(R.id.sign_in_button);
         mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
 
     }
@@ -104,13 +120,8 @@ public class FirebaseLogInActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d("Log-In Activity", "createUserWithEmail:onComplete:" + task.isSuccessful());
-
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Toast.makeText(FirebaseLogInActivity.this, "An oopsie happened",
+                            Toast.makeText(FirebaseLogInActivity.this, "An Error Occurred",
                                     Toast.LENGTH_SHORT).show();
                         }
 
@@ -123,13 +134,9 @@ public class FirebaseLogInActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d("Sign in", "signInWithEmail:onComplete:" + task.isSuccessful());
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
                             Log.w("Sign in", "signInWithEmail:failed", task.getException());
-                            Toast.makeText(FirebaseLogInActivity.this, "Not sign in good",
+                            Toast.makeText(FirebaseLogInActivity.this, "Password doesn't match username",
                                     Toast.LENGTH_SHORT).show();
                         }
 

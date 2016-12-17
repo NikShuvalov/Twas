@@ -6,7 +6,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="shuvalov.nikita.twas.MainActivity">
+    tools:context="shuvalov.nikita.twas.Activities.MainActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
@@ -64,4 +64,11 @@
         android:text="Retrieve"
         android:layout_below="@id/display_text"
         android:layout_centerHorizontal="true"/>
+    <Button
+        android:id="@+id/sign_out_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/retrieve_button"
+        android:layout_centerHorizontal="true"
+        android:text="sign out"/>
 </RelativeLayout>

@@ -6,7 +6,7 @@
     android:id="@+id/activity_firebase_log_in"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="shuvalov.nikita.twas.FirebaseLogInActivity">
+    tools:context="shuvalov.nikita.twas.Activities.FirebaseLogInActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
@@ -34,10 +34,17 @@
         android:hint="Enter Password (HelloWorld)"/>
 
     <Button
-        android:id="@+id/log_in_button"
+        android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="SIGN IN "
         android:layout_centerInParent="true"/>
+    <Button
+        android:id="@+id/sign_up_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create a new account"
+        android:layout_below="@id/sign_in_button"
+        android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>
