@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public static final String FOUND_ID_INTENT = "Found id";
 
     Toolbar mToolbar;
-    Button mSendButt, mRetrieveButton, mSignOutButton;
+    Button mSendButt, mRetrieveButton, mSignOutButton, mProfileButton;
     EditText mEditText, mBioEntry, mDobEntry;
     TextView mDisplayText;
     String mFoundId;
@@ -139,10 +139,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mRetrieveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent debugIntent = new Intent(MainActivity.this, FirebaseLogInActivity.class);
                 Intent intent  = new Intent(MainActivity.this, ProfileDetailActivity.class);
                 intent.putExtra(FOUND_ID_INTENT,mFoundId);//ToDo: Once I have some way of displaying each Id's blurb, this will take in the id for that profile to be passed to the detail activity.
-                startActivity(debugIntent);//ToDo:Change back to normal intent after testing.
+                startActivity(intent);
+            }
+        });
+
+        mProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent =new Intent(MainActivity.this, SelfProfileActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -157,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mBioEntry = (EditText)findViewById(R.id.bio_entry);
         mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
         mSignOutButton = (Button)findViewById(R.id.sign_out_button);
+        mProfileButton = (Button)findViewById(R.id.self_profile_button);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Home");
     }

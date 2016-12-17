@@ -17,10 +17,14 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         />
+    <RelativeLayout
+        android:id="@+id/content_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/my_toolbar">
 
 
     <EditText
-        android:layout_below="@id/my_toolbar"
         android:id="@+id/enter_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -71,4 +75,13 @@
         android:layout_below="@id/retrieve_button"
         android:layout_centerHorizontal="true"
         android:text="sign out"/>
+
+    <Button
+        android:id="@+id/self_profile_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/sign_out_button"
+        android:text="SElf Profile"
+        android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
 </RelativeLayout>

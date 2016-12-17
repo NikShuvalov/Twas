@@ -8,18 +8,18 @@ import shuvalov.nikita.twas.PoJos.Profile;
  * Created by NikitaShuvalov on 12/15/16.
  */
 
-public class ProfilesHelper {
+public class ConnectionsHelper {
     ArrayList<Profile> mProfileConnections;
 
-    private static ProfilesHelper mProfilesHelper;
+    private static ConnectionsHelper sMConnectionsHelper;
 
-    public static ProfilesHelper getInstance() {
-        if (mProfilesHelper!= null){
-            mProfilesHelper = new ProfilesHelper();
+    public static ConnectionsHelper getInstance() {
+        if (sMConnectionsHelper != null){
+            sMConnectionsHelper = new ConnectionsHelper();
         }
-        return mProfilesHelper;
+        return sMConnectionsHelper;
     }
-    private ProfilesHelper(){
+    private ConnectionsHelper(){
         mProfileConnections = new ArrayList<>();
     }
 

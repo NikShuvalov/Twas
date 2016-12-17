@@ -79,6 +79,9 @@ public class FirebaseLogInActivity extends AppCompatActivity {
                     switch (view.getId()) {
                         case (R.id.sign_up_button):
                             createNewUserWithEmail(email,password);
+                            Intent intent = new Intent(FirebaseLogInActivity.this, SelfProfileActivity.class);
+                            intent.putExtra(AppConstants.ORIGIN_ACTIVITY,AppConstants.ORIGIN_LOG_IN);
+                            startActivity(intent);
                             break;
                         case (R.id.sign_in_button):
                             signInUserWithEmail(email, password);
@@ -123,6 +126,8 @@ public class FirebaseLogInActivity extends AppCompatActivity {
                         if (!task.isSuccessful()) {
                             Toast.makeText(FirebaseLogInActivity.this, "An Error Occurred",
                                     Toast.LENGTH_SHORT).show();
+                        }else{
+                            NearbyManager.getInstance().setId(mAuth.getCurrentUser().getUid());
                         }
 
                     }
