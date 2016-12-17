@@ -15,11 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
 
         <meta-data
@@ -32,8 +28,12 @@
         <activity android:name=".ProfileDetailActivity"
                   android:parentActivityName=".MainActivity">
         </activity>
-        <activity android:name=".FirebaseLogInActivity"
-            android:parentActivityName=".MainActivity">
+        <activity android:name=".FirebaseLogInActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
     </application>
 

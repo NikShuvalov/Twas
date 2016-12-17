@@ -27,16 +27,18 @@ import com.google.firebase.database.FirebaseDatabase;
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static final String FOUND_ID_INTENT = "Found id";
-    GoogleApiClient mGoogleApiClient;
-    Message mActiveMessage;
-    MessageListener mActiveListener;
+
     Toolbar mToolbar;
     Button mSendButt, mRetrieveButton;
     EditText mEditText, mBioEntry, mDobEntry;
     TextView mDisplayText;
+    String mFoundId;
 
     NearbyHelper mNearbyHelper;
-    String mFoundId;
+
+    GoogleApiClient mGoogleApiClient;
+    Message mActiveMessage;
+    MessageListener mActiveListener;
 
 
     Profile mProfile;
@@ -44,12 +46,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     FirebaseDatabase mFirebaseDatabase;
 
 
+    //ToDo: Remove these three
     private static final String MESSAGES_API_KEY = "AIzaSyB19mT541M39gddQhee5ehQy45G3FpV3MU";
     public static final String HTC_PHONE_ANDROID_ID = "41cc7ed0cfee3d4c";
     public static final String SAMSUNG_PHONE_ANDROID_ID = "669ec9813b4c140";
 
     String mId;
-    String[] navOptions= new String[]{"Profile","Home", "Settings","SoapBox Feed","Invite Friends", "Donate", "About"};
+//    String[] navOptions= new String[]{"Profile","Home", "Settings","SoapBox Feed","Invite Friends", "Donate", "About"};
 
 
     @Override
@@ -59,21 +62,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         mNearbyHelper = NearbyHelper.getInstance();
 
+        Log.d("MainActivity", "onCreate: "+mNearbyHelper.getId());
+
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        mId = getIntent().getStringExtra(AppConstants.SELF_USER_ID);
 
         mRef = mFirebaseDatabase.getReference(mId);
 
-
-        mSendButt = (Button)findViewById(R.id.send_butt);
-        mRetrieveButton = (Button)findViewById(R.id.retrieve_button);
-        mEditText = (EditText)findViewById(R.id.enter_text);
-        mDisplayText = (TextView)findViewById(R.id.display_text);
-        mDobEntry = (EditText)findViewById(R.id.dob_entry);
-        mBioEntry = (EditText)findViewById(R.id.bio_entry);
-        mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Home");
+        findViews();
 
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -138,6 +134,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
 
+    public void findViews(){
+        mSendButt = (Button)findViewById(R.id.send_butt);
+        mRetrieveButton = (Button)findViewById(R.id.retrieve_button);
+        mEditText = (EditText)findViewById(R.id.enter_text);
+        mDisplayText = (TextView)findViewById(R.id.display_text);
+        mDobEntry = (EditText)findViewById(R.id.dob_entry);
+        mBioEntry = (EditText)findViewById(R.id.bio_entry);
+        mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("Home");
+    }
+
 
     @Override
     public void onConnected(@Nullable Bundle connectionHint) {
@@ -183,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     protected void onDestroy() {
+        //ToDo: Find out if this is even necessary
 //        if(mNearbyHelper.isPublishing()){
 //            Nearby.Messages.unpublish(mGoogleApiClient,mActiveMessage);
 //        }

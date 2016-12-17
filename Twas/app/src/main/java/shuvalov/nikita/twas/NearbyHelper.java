@@ -5,7 +5,10 @@ package shuvalov.nikita.twas;
  */
 
 public class NearbyHelper {
+
+
     private boolean mGoogleApiConnected, mPublishing, mSubscribing;
+    private String mId;
 
     private static NearbyHelper myNearbyHelper;
 
@@ -43,5 +46,13 @@ public class NearbyHelper {
 
     public void setSubscribing(boolean subscribing) {
         mSubscribing = subscribing;
+    }
+
+    public String getId() {
+        return mId;
+    }
+
+    public void setId(String id) {
+        mId = id;
     }
 }

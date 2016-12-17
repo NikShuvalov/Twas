@@ -1,5 +1,6 @@
 package shuvalov.nikita.twas;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,17 +34,25 @@ public class FirebaseLogInActivity extends AppCompatActivity {
 
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Sign In");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
 
         mAuth = FirebaseAuth.getInstance();
+
+        //ToDo: Once I have a splash loading screen(& set as launch activity), do this check in that activity.
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user!= null){
+                    String userId = user.getUid();
+                    NearbyHelper.getInstance().setId(userId);
+                    Toast.makeText(FirebaseLogInActivity.this, "Signed as "+ userId, Toast.LENGTH_SHORT).show();
                     Log.d("AuthStateChanged", "Logged in as "+ user.getUid());
+                    Intent intent = new Intent(FirebaseLogInActivity.this, MainActivity.class);
+                    intent.putExtra(AppConstants.SELF_USER_ID,userId);
+                    startActivity(intent);
                 }else{
                     Log.d("AuthStateChanged", "Signed Out");
                 }
@@ -95,6 +104,7 @@ public class FirebaseLogInActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d("Log-In Activity", "createUserWithEmail:onComplete:" + task.isSuccessful());
+
 
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the

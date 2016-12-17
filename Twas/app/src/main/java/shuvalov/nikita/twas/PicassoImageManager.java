@@ -42,15 +42,12 @@ public class PicassoImageManager {
      * Takes in the url of image to be loaded.
      * @param imageUrl
      */
-    public void setImageFromUrl(final String imageUrl) {
-        final boolean imageUrlIsEmpty = imageUrl.isEmpty();
-
+    public boolean setImageFromUrl(final String imageUrl) {
         if (!imageUrl.isEmpty()) {
-            mRequestCreator = Picasso.with(mContext).load(imageUrl);
+            Picasso.with(mContext).load(imageUrl).into(mImageView);
+            return true;
         }
-        if (mRequestCreator != null) {
-            mRequestCreator.into(mImageView);
-        }
+        return false;
     }
 
 }
