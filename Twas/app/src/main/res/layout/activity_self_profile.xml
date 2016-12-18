@@ -36,7 +36,34 @@
             android:layout_below="@id/profile_image_view"
             android:layout_alignParentRight="true"
             android:text="Take a Selfie"/>
-
+        <EditText
+            android:id="@+id/name_entry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter Name"
+            android:layout_below="@id/selfie_button"
+            android:maxLines="1"/>
+        <EditText
+            android:id="@+id/about_me_entry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="About me"
+            android:gravity="start"
+            android:layout_below="@id/name_entry"
+            android:lines="3"/>
+        <EditText
+            android:id="@+id/hobbies_entry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Hobbies"
+            android:layout_below="@id/about_me_entry"/>
+        <Button
+            android:id="@+id/submit_changes_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="submit changes"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
 

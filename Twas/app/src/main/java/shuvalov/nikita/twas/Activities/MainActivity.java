@@ -65,9 +65,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mNearbyManager = shuvalov.nikita.twas.Helpers_Managers.NearbyManager.getInstance();
+        mNearbyManager = NearbyManager.getInstance();
 
-        Log.d("MainActivity", "onCreate: "+ mNearbyManager.getId());
+        Log.d("MainActivity", "onCreate: "+ mNearbyManager.getSelfID());
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mId = getIntent().getStringExtra(AppConstants.SELF_USER_ID);
@@ -88,8 +88,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onFound(Message message) {
                 super.onFound(message);
-                mFoundId = new String(message.getContent());//ToDo: The ID should be stored in some way so that the user can access that id's profile.
+                mFoundId = new String(message.getContent());
+                //ToDo: The ID should be stored in some way so that the user can access that id's profile.
                 mDisplayText.setText(mFoundId);
+                //ToDo: After storing the ID retrieve the profile data from FBDB and add to ConnectionsHelper
                 Toast.makeText(MainActivity.this, mFoundId, Toast.LENGTH_SHORT).show();
             }
 
@@ -135,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
 
 
-        //ToDo: After making prototype, instead of button, probably using a recyclerView to populate the profile blurbs and add onClickListeners to that.
+        //ToDo: After making prototype, instead of button, probably using a recyclerView, populate the profile blurbs and add onClickListeners to that.
         mRetrieveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -172,14 +174,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(@Nullable Bundle connectionHint) {
-        shuvalov.nikita.twas.Helpers_Managers.NearbyManager.getInstance().setGoogleApiConnected(true);
+        NearbyManager.getInstance().setGoogleApiConnected(true);
         publish();
         subscribe();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        shuvalov.nikita.twas.Helpers_Managers.NearbyManager.getInstance().setGoogleApiConnected(false);
+        NearbyManager.getInstance().setGoogleApiConnected(false);
 
     }
 

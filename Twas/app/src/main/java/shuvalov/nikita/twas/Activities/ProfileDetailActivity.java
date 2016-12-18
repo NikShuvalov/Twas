@@ -25,7 +25,7 @@ public class ProfileDetailActivity extends AppCompatActivity {
 
         findViews();
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        String foundProfile = getIntent().getStringExtra(MainActivity.FOUND_ID_INTENT); //Get the id that was based in the intent to find it in the firebase database.
+        String foundProfile = getIntent().getStringExtra(MainActivity.FOUND_ID_INTENT); //Get the id that was passed in the intent to find it in the firebase database.
         DatabaseReference myRef =  firebaseDatabase.getReference(foundProfile);
 
         myRef.addValueEventListener(new ValueEventListener() {

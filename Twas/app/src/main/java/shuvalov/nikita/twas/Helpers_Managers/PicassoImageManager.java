@@ -18,7 +18,6 @@ import com.squareup.picasso.RequestCreator;
 public class PicassoImageManager {
     private Context mContext;
     private ImageView mImageView;
-    private RequestCreator mRequestCreator;
 
     /**
      * The Manager takes in an imageview and its context to create a picassoImageManager object.

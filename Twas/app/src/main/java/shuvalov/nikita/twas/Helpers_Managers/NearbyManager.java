@@ -1,24 +1,12 @@
 package shuvalov.nikita.twas.Helpers_Managers;
 
-import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
-import shuvalov.nikita.twas.Activities.FirebaseLogInActivity;
-import shuvalov.nikita.twas.Activities.MainActivity;
-import shuvalov.nikita.twas.AppConstants;
-
 /**
  * Created by NikitaShuvalov on 12/16/16.
  */
 
 public class NearbyManager {
     private boolean mGoogleApiConnected, mPublishing, mSubscribing;
-    private String mId;
+    private String mSelfId;
 
     private static NearbyManager sMyNearbyManager;
 
@@ -58,12 +46,12 @@ public class NearbyManager {
         mSubscribing = subscribing;
     }
 
-    public String getId() {
-        return mId;
+    public String getSelfID() {
+        return mSelfId;
     }
 
     public void setId(String id){
-        mId = id;
+        mSelfId = id;
     }
 
 

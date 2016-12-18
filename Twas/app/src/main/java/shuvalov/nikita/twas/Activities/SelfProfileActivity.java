@@ -2,17 +2,14 @@ package shuvalov.nikita.twas.Activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -21,6 +18,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,30 +26,57 @@ import java.util.ArrayList;
 
 import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
+import shuvalov.nikita.twas.Helpers_Managers.PicassoImageManager;
 import shuvalov.nikita.twas.R;
-import shuvalov.nikita.twas.SelfProfileRecyclerAdapter;
 
 public class SelfProfileActivity extends AppCompatActivity {
-    ImageView mProfileImage;
-    Button mAccessGallery, mTakeSelfie;
+    private ImageView mProfileImage;
+    private Button mAccessGallery, mTakeSelfie, mSubmit;
+    private EditText mName, mBio, mHobbies;
 
-    public static final int PICK_IMAGE_REQUEST = 1;
-    public static final int TAKE_IMAGE_REQUEST = 2;
+    private ArrayList<EditText> mPromptFields;
+
+    public static final int PICK_IMAGE_REQUEST = 1; //ToDo: Move to appConstants and update where necessary.
+    public static final int TAKE_IMAGE_REQUEST = 2; //ToDo: Same
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_self_profile);
 
+        mPromptFields = new ArrayList<>();
+
         findViews();
+        loadSelfImage();
         initButtons();
-
-
     }
+
+    public void loadSelfImage(){
+        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+        StorageReference bucketRef = firebaseStorage.getReferenceFromUrl(AppConstants.FIREBASE_IMAGE_BUCKET);
+
+        String id = NearbyManager.getInstance().getSelfID();
+        StorageReference storageRef = bucketRef.child(String.format(AppConstants.FIREBASE_USER_PROFILE_IMAGE, id));
+
+        storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Picasso.with(SelfProfileActivity.this).load(uri).into(mProfileImage);//Loads, but takes a long time.
+            }
+
+        });
+    }
+
     public void findViews(){
-        mProfileImage = (ImageView)findViewById(R.id.profile_image_view);
+        mProfileImage = (ImageView)findViewById(R.id.profile_image_view);//Populate this if user already has a profile image.
+
         mAccessGallery = (Button)findViewById(R.id.upload_image_gallery);
         mTakeSelfie = (Button)findViewById(R.id.selfie_button);
+        mSubmit = (Button)findViewById(R.id.submit_changes_button);
+
+        mPromptFields.add(mName = (EditText)findViewById(R.id.name_entry));
+        mPromptFields.add(mBio = (EditText)findViewById(R.id.about_me_entry));
+        mPromptFields.add(mHobbies = (EditText)findViewById(R.id.hobbies_entry));
     }
 
     public void initButtons(){
@@ -69,14 +94,33 @@ public class SelfProfileActivity extends AppCompatActivity {
                         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         startActivityForResult(cameraIntent,TAKE_IMAGE_REQUEST);
                         break;
-                    default:
-                        Toast.makeText(SelfProfileActivity.this, "Gosh Darn't it", Toast.LENGTH_SHORT).show();
                 }
             }
         };
 
         mAccessGallery.setOnClickListener(imageClickerListener);
         mTakeSelfie.setOnClickListener(imageClickerListener);
+
+        mSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                for(EditText editText: mPromptFields){
+                    if(!editText.getText().toString().isEmpty()){//Only updates changes where there are values to update.
+                        switch (editText.getId()){
+                            case R.id.name_entry:
+                                //ToDo: Update Self Name
+                                break;
+                            case R.id.about_me_entry:
+                                //ToDo: Update bio
+                                break;
+                            case R.id.hobbies_entry:
+                                //ToDo: Update Hobbies
+                                break;
+                        }
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -91,7 +135,7 @@ public class SelfProfileActivity extends AppCompatActivity {
                 FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
                 StorageReference bucketRef = firebaseStorage.getReferenceFromUrl(AppConstants.FIREBASE_IMAGE_BUCKET);
 
-                String id = NearbyManager.getInstance().getId();
+                String id = NearbyManager.getInstance().getSelfID();
                 StorageReference storageRef = bucketRef.child(String.format(AppConstants.FIREBASE_USER_PROFILE_IMAGE, id));
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 chosenProfileImage.compress(Bitmap.CompressFormat.JPEG,100, byteArrayOutputStream);
