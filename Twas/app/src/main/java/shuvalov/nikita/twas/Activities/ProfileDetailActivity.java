@@ -34,7 +34,7 @@ public class ProfileDetailActivity extends AppCompatActivity {
                 String bio = dataSnapshot.child("bio").getValue().toString();
                 String name = dataSnapshot.child("name").getValue().toString();
                 String dob = dataSnapshot.child("dob").getValue().toString();
-                Profile stalkedProfile = new Profile(name, bio, dob);
+                Profile stalkedProfile = new Profile(name, bio, dob, null, null);
                 Log.d("ProfileDetailActivity", "onDataChange: "+bio);
                 bindDataToViews(stalkedProfile);
             }

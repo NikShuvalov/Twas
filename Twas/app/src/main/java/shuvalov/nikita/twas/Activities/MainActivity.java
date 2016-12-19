@@ -42,7 +42,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     NearbyManager mNearbyManager;
 
     GoogleApiClient mGoogleApiClient;
-    Message mActiveMessage;
+    Message mFindMeMessage;
+//    Message mActiveMessage;
     MessageListener mActiveListener;
 
 
@@ -119,10 +120,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mSendButt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mActiveMessage = new Message(mEditText.getText().toString().getBytes());
+//                mActiveMessage = new Message(mEditText.getText().toString().getBytes());
                 mProfile = new Profile(mEditText.getText().toString(),
                         mBioEntry.getText().toString(),
-                        mDobEntry.getText().toString());
+                        mDobEntry.getText().toString(),
+                        null,
+                        null);
                 mRef.setValue(mProfile);
             }
         });
@@ -132,7 +135,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
                 Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
-                finish();
+                //ToDo:Drop SQL table
+                Intent intent = new Intent(MainActivity.this, FirebaseLogInActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -199,9 +204,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void publish(){
-        Message message = new Message(mId.getBytes());
+        mFindMeMessage = new Message(mId.getBytes());
         if(mNearbyManager.isGoogleApiConnected()){
-            Nearby.Messages.publish(mGoogleApiClient, message);
+            Nearby.Messages.publish(mGoogleApiClient, mFindMeMessage);
             mNearbyManager.setPublishing(true);
         }else{
             Toast.makeText(this, "Not connected to Google Cloud", Toast.LENGTH_SHORT).show();
@@ -218,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onDestroy() {
         //ToDo: Find out if this is even necessary
 //        if(mNearbyManager.isPublishing()){
-//            Nearby.Messages.unpublish(mGoogleApiClient,mActiveMessage);
+//            Nearby.Messages.unpublish(mGoogleApiClient,mFindMeMessage);
 //        }
 //        if(mNearbyManager.isSubscribing()){
 //            Nearby.Messages.unsubscribe(mGoogleApiClient,mActiveListener);

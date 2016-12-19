@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -26,12 +27,12 @@ import java.util.ArrayList;
 
 import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
-import shuvalov.nikita.twas.Helpers_Managers.PicassoImageManager;
 import shuvalov.nikita.twas.R;
 
 public class SelfProfileActivity extends AppCompatActivity {
     private ImageView mProfileImage;
-    private Button mAccessGallery, mTakeSelfie, mSubmit;
+    private Button mAccessGallery, mTakeSelfie;
+    private FloatingActionButton mSubmit;
     private EditText mName, mBio, mHobbies;
 
     private ArrayList<EditText> mPromptFields;
@@ -72,7 +73,7 @@ public class SelfProfileActivity extends AppCompatActivity {
 
         mAccessGallery = (Button)findViewById(R.id.upload_image_gallery);
         mTakeSelfie = (Button)findViewById(R.id.selfie_button);
-        mSubmit = (Button)findViewById(R.id.submit_changes_button);
+        mSubmit = (FloatingActionButton) findViewById(R.id.submit_changes_button);
 
         mPromptFields.add(mName = (EditText)findViewById(R.id.name_entry));
         mPromptFields.add(mBio = (EditText)findViewById(R.id.about_me_entry));

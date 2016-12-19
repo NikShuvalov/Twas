@@ -74,7 +74,6 @@ public class FirebaseLogInActivity extends AppCompatActivity {
                     String email = mEmailEntry.getText().toString();
                     String password = mPasswordEntry.getText().toString();
 
-                    mEmailEntry.setText("");
                     mPasswordEntry.setText("");
                     switch (view.getId()) {
                         case (R.id.sign_up_button):
@@ -143,6 +142,9 @@ public class FirebaseLogInActivity extends AppCompatActivity {
                             Log.w("Sign in", "signInWithEmail:failed", task.getException());
                             Toast.makeText(FirebaseLogInActivity.this, "Password doesn't match username",
                                     Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(FirebaseLogInActivity.this, "Logged in as blah-blah", Toast.LENGTH_SHORT).show();
+                            //ToDo: On Successful log-in download all of user's made connections.
                         }
 
                     }

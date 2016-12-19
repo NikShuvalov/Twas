@@ -14,54 +14,86 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         />
+
     <RelativeLayout
         android:id="@+id/content_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/my_toolbar">
-        <ImageView
-            android:id="@+id/profile_image_view"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"/>
-        <Button
-            android:id="@+id/upload_image_gallery"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="get image from gallery"
-            android:layout_below="@id/profile_image_view"/>
-        <Button
-            android:id="@+id/selfie_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/profile_image_view"
-            android:layout_alignParentRight="true"
-            android:text="Take a Selfie"/>
+
         <EditText
             android:id="@+id/name_entry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/custom_name_edittext"
             android:hint="Enter Name"
-            android:layout_below="@id/selfie_button"
+            android:padding="4dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
             android:maxLines="1"/>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/profile_pic_card"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_below="@id/name_entry">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/profile_image_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"/>
+                <Button
+                    android:id="@+id/upload_image_gallery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="get image from gallery"
+                    android:layout_below="@id/profile_image_view"/>
+
+                <Button
+                    android:id="@+id/selfie_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/profile_image_view"
+                    android:layout_alignParentRight="true"
+                    android:text="Take a Selfie"/>
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+
         <EditText
             android:id="@+id/about_me_entry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="About me"
             android:gravity="start"
-            android:layout_below="@id/name_entry"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_below="@id/profile_pic_card"
             android:lines="3"/>
+
         <EditText
             android:id="@+id/hobbies_entry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Hobbies"
+
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
             android:layout_below="@id/about_me_entry"/>
-        <Button
+
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/submit_changes_button"
+            app:fabSize="normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="submit changes"
+            android:layout_margin="10dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"/>
 
