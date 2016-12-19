@@ -36,6 +36,8 @@ public class SelfProfileActivity extends AppCompatActivity {
     private Button mAccessGallery, mTakeSelfie;
     private FloatingActionButton mSubmit;
     private EditText mName, mBio, mHobbies;
+    private boolean mUpdatedProfileImage = false;
+    private Bitmap mChosenProfileImage;
 
     private ArrayList<EditText> mPromptFields;
 
@@ -67,6 +69,11 @@ public class SelfProfileActivity extends AppCompatActivity {
                 Picasso.with(SelfProfileActivity.this).load(uri).into(mProfileImage);//Loads, but takes a long time.
             }
 
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                mProfileImage.setImageResource(R.drawable.shakespeare_modern_bard_post);//Default image if no image is found.
+            }
         });
     }
 
@@ -122,6 +129,9 @@ public class SelfProfileActivity extends AppCompatActivity {
                         }
                     }
                 }
+                if(mUpdatedProfileImage){
+                    uploadProfileImage();
+                }
             }
         });
     }
@@ -132,50 +142,9 @@ public class SelfProfileActivity extends AppCompatActivity {
         if(requestCode==PICK_IMAGE_REQUEST||requestCode==TAKE_IMAGE_REQUEST && resultCode==RESULT_OK && data!=null && data.getData()!=null){
             Uri uri = data.getData();
             try {
-                Bitmap chosenProfileImage = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
-
-                mProfileImage.setImageBitmap(chosenProfileImage);
-
-                FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
-                StorageReference bucketRef = firebaseStorage.getReferenceFromUrl(AppConstants.FIREBASE_IMAGE_BUCKET);
-
-                String id = NearbyManager.getInstance().getSelfID();
-                StorageReference storageRef = bucketRef.child(String.format(AppConstants.FIREBASE_USER_PROFILE_IMAGE, id));
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                chosenProfileImage.compress(Bitmap.CompressFormat.JPEG,100, byteArrayOutputStream);
-
-                //Checks to see if the imageSize is larger than the firebase limit. If so, it scales the image down to an allowed amount.
-                long imageSize = byteArrayOutputStream.toByteArray().length;
-                byte[] imgStream = byteArrayOutputStream.toByteArray();
-                if(imageSize> AppConstants.FIREBASE_MAX_PHOTO_SIZE){
-                    Toast.makeText(this, "Image file too large", Toast.LENGTH_SHORT).show();
-
-//                    double scaledDownRatio = (double)AppConstants.FIREBASE_MAX_PHOTO_SIZE/(double)imageSize;
-//                    int scaledQuality = (int)(scaledDownRatio*100)-1;
-//                    chosenProfileImage = shrinkBitmap(imgStream, scaledDownRatio);
-
-//                    chosenProfileImage.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
-//                    imgStream = byteArrayOutputStream.toByteArray();
-                }else{
-                    imgStream = byteArrayOutputStream.toByteArray();
-                }
-
-                Log.d("boas compressed image", "Size of photo "+byteArrayOutputStream.toByteArray().length);
-
-                UploadTask uploadTask = storageRef.putBytes(imgStream);
-                uploadTask.addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(SelfProfileActivity.this, "Failed to upload picture", Toast.LENGTH_LONG).show();
-                    }
-                }).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Toast.makeText(SelfProfileActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
-                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                        //ToDo: Store DownloadURL, in FBDB as Profile parameter and in local SQL database.
-                    }
-                });
+                mChosenProfileImage = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
+                mProfileImage.setImageBitmap(mChosenProfileImage);
+                mUpdatedProfileImage=true;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -196,4 +165,46 @@ public class SelfProfileActivity extends AppCompatActivity {
 //        return BitmapFactory.decodeByteArray(imageData,0,imageData.length, bitmapFactOP);
 //    }
 
+    public void uploadProfileImage(){
+        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+        StorageReference bucketRef = firebaseStorage.getReferenceFromUrl(AppConstants.FIREBASE_IMAGE_BUCKET);
+
+        String id = NearbyManager.getInstance().getSelfID();
+        StorageReference storageRef = bucketRef.child(String.format(AppConstants.FIREBASE_USER_PROFILE_IMAGE, id));
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        mChosenProfileImage.compress(Bitmap.CompressFormat.JPEG,100, byteArrayOutputStream);
+
+        //Checks to see if the imageSize is larger than the firebase limit. If so, it scales the image down to an allowed amount.
+        long imageSize = byteArrayOutputStream.toByteArray().length;
+        byte[] imgStream = byteArrayOutputStream.toByteArray();
+        if(imageSize> AppConstants.FIREBASE_MAX_PHOTO_SIZE){
+            Toast.makeText(this, "Image file too large", Toast.LENGTH_SHORT).show();
+
+//                    double scaledDownRatio = (double)AppConstants.FIREBASE_MAX_PHOTO_SIZE/(double)imageSize;
+//                    int scaledQuality = (int)(scaledDownRatio*100)-1;
+//                    chosenProfileImage = shrinkBitmap(imgStream, scaledDownRatio);
+
+//                    chosenProfileImage.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
+//                    imgStream = byteArrayOutputStream.toByteArray();
+        }else{
+            imgStream = byteArrayOutputStream.toByteArray();
+        }
+
+        Log.d("boas compressed image", "Size of photo "+byteArrayOutputStream.toByteArray().length);
+
+        UploadTask uploadTask = storageRef.putBytes(imgStream);
+        uploadTask.addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(SelfProfileActivity.this, "Failed to upload picture", Toast.LENGTH_LONG).show();
+            }
+        }).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(SelfProfileActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
+                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                //ToDo: Store DownloadURL, in FBDB as Profile parameter and in local SQL database.
+            }
+        });
+    }
 }

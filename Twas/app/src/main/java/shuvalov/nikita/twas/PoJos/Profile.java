@@ -5,14 +5,22 @@ package shuvalov.nikita.twas.PoJos;
  */
 
 public class Profile {
-    private String mName, mBio, mDOB, mGender, mSoapBoxMessage;//ToDo: Consider changing DOB to long.
+    private String mUID, mName, mBio, mGender, mPicURL;//ToDo: Consider changing DOB to long.
+    private long mDOB;
 
-    public Profile(String name, String bio, String dob, String gender, String soapBoxMessage){
+    //ToDo: Add SoapBox message into profile? Or someplace else?
+
+    public Profile(String uid, String name, String bio, long dobInMillis, String gender, String picURL){
+        mUID = uid;
         mName = name;
         mBio = bio;
-        mDOB = dob;
+        mDOB = dobInMillis;
         mGender = gender;
-        mSoapBoxMessage = soapBoxMessage;
+        mPicURL = picURL;
+    }
+
+    public String getUID() {
+        return mUID;
     }
 
     public String getName() {
@@ -23,7 +31,7 @@ public class Profile {
         return mBio;
     }
 
-    public String getDOB() {
+    public long getDOB() {
         return mDOB;
     }
 
@@ -31,11 +39,7 @@ public class Profile {
         return mGender;
     }
 
-    public String getSoapBoxMessage() {
-        return mSoapBoxMessage;
-    }
-
-    public void setSoapBoxMessage(String soapBoxMessage) {
-        mSoapBoxMessage = soapBoxMessage;
+    public String getPicURL() {
+        return mPicURL;
     }
 }
