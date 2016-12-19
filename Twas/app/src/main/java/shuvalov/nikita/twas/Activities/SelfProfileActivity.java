@@ -2,12 +2,14 @@ package shuvalov.nikita.twas.Activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -131,6 +133,7 @@ public class SelfProfileActivity extends AppCompatActivity {
             Uri uri = data.getData();
             try {
                 Bitmap chosenProfileImage = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
+
                 mProfileImage.setImageBitmap(chosenProfileImage);
 
                 FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
@@ -140,7 +143,24 @@ public class SelfProfileActivity extends AppCompatActivity {
                 StorageReference storageRef = bucketRef.child(String.format(AppConstants.FIREBASE_USER_PROFILE_IMAGE, id));
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 chosenProfileImage.compress(Bitmap.CompressFormat.JPEG,100, byteArrayOutputStream);
+
+                //Checks to see if the imageSize is larger than the firebase limit. If so, it scales the image down to an allowed amount.
+                long imageSize = byteArrayOutputStream.toByteArray().length;
                 byte[] imgStream = byteArrayOutputStream.toByteArray();
+                if(imageSize> AppConstants.FIREBASE_MAX_PHOTO_SIZE){
+                    Toast.makeText(this, "Image file too large", Toast.LENGTH_SHORT).show();
+
+//                    double scaledDownRatio = (double)AppConstants.FIREBASE_MAX_PHOTO_SIZE/(double)imageSize;
+//                    int scaledQuality = (int)(scaledDownRatio*100)-1;
+//                    chosenProfileImage = shrinkBitmap(imgStream, scaledDownRatio);
+
+//                    chosenProfileImage.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
+//                    imgStream = byteArrayOutputStream.toByteArray();
+                }else{
+                    imgStream = byteArrayOutputStream.toByteArray();
+                }
+
+                Log.d("boas compressed image", "Size of photo "+byteArrayOutputStream.toByteArray().length);
 
                 UploadTask uploadTask = storageRef.putBytes(imgStream);
                 uploadTask.addOnFailureListener(this, new OnFailureListener() {
@@ -161,4 +181,19 @@ public class SelfProfileActivity extends AppCompatActivity {
             }
         }
     }
+
+    //Code retrieved from:
+    // http://android-coding.blogspot.com/2011/06/reduce-bitmap-size-using.html
+    // With minor changes
+//    public Bitmap shrinkBitmap(byte[] imageData, double scaleDownRatio){
+//        BitmapFactory.Options bitmapFactOP = new BitmapFactory.Options();
+//        bitmapFactOP.inJustDecodeBounds= true;
+//
+//        bitmapFactOP.inSampleSize = (int)(100/scaleDownRatio);
+//
+//        bitmapFactOP.inJustDecodeBounds= false;
+//
+//        return BitmapFactory.decodeByteArray(imageData,0,imageData.length, bitmapFactOP);
+//    }
+
 }
