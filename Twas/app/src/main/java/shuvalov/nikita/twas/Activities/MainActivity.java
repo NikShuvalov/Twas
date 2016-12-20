@@ -25,6 +25,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import shuvalov.nikita.twas.AppConstants;
+import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 mFoundId = new String(message.getContent());
                 //ToDo: The ID should be stored in some way so that the user can access that id's profile.
                 mDisplayText.setText(mFoundId);
-                //ToDo: After storing the ID retrieve the profile data from FBDB and add to ConnectionsHelper
+                //ToDo: After storing the ID retrieve the profile data from FBDB and add to ConnectionsHelper  && local db.
                 Toast.makeText(MainActivity.this, mFoundId, Toast.LENGTH_SHORT).show();
             }
 
@@ -121,11 +122,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onClick(View view) {
 //                mActiveMessage = new Message(mEditText.getText().toString().getBytes());
-                mProfile = new Profile(mEditText.getText().toString(),
-                        mBioEntry.getText().toString(),
-                        mDobEntry.getText().toString(),
-                        null,
-                        null);
+//                mProfile = new Profile(mEditText.getText().toString(),
+//                        mBioEntry.getText().toString(),
+//                        mDobEntry.getText().toString(),
+//                        null,
+//                        null,
+//                        null);
                 mRef.setValue(mProfile);
             }
         });
@@ -135,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
                 Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
-                //ToDo:Drop SQL table
+                ConnectionsSQLOpenHelper.getInstance(MainActivity.this).clearDatabase();
                 Intent intent = new Intent(MainActivity.this, FirebaseLogInActivity.class);
                 startActivity(intent);
             }

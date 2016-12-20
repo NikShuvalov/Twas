@@ -34,9 +34,9 @@ public class ProfileDetailActivity extends AppCompatActivity {
                 String bio = dataSnapshot.child("bio").getValue().toString();
                 String name = dataSnapshot.child("name").getValue().toString();
                 String dob = dataSnapshot.child("dob").getValue().toString();
-                Profile stalkedProfile = new Profile(name, bio, dob, null, null);
+//                Profile stalkedProfile = new Profile(name, bio, dob, null, null);
                 Log.d("ProfileDetailActivity", "onDataChange: "+bio);
-                bindDataToViews(stalkedProfile);
+//                bindDataToViews(stalkedProfile);
             }
 
             @Override
@@ -55,6 +55,6 @@ public class ProfileDetailActivity extends AppCompatActivity {
     public void bindDataToViews(Profile profile){
         mBioText.setText(profile.getBio());
         mNameText.setText(profile.getName());
-        mDOBTest.setText(profile.getDOB());
+//        mDOBTest.setText(profile.getDOB());
     }
 }

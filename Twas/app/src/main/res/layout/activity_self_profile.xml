@@ -82,10 +82,9 @@
             android:id="@+id/hobbies_entry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Hobbies"
-
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
+            android:hint="Gender"
             android:layout_below="@id/about_me_entry"/>
 
         <android.support.design.widget.FloatingActionButton
