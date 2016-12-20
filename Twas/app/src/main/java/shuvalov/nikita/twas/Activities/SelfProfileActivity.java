@@ -1,9 +1,7 @@
 package shuvalov.nikita.twas.Activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -42,8 +40,6 @@ public class SelfProfileActivity extends AppCompatActivity {
 
     private ArrayList<EditText> mPromptFields;
 
-    public static final int PICK_IMAGE_REQUEST = 1; //ToDo: Move to appConstants and update where necessary.
-    public static final int TAKE_IMAGE_REQUEST = 2; //ToDo: Same
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +57,7 @@ public class SelfProfileActivity extends AppCompatActivity {
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         StorageReference bucketRef = firebaseStorage.getReferenceFromUrl(AppConstants.FIREBASE_IMAGE_BUCKET);
 
-        String id = NearbyManager.getInstance().getSelfID();
+        String id = getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, MODE_PRIVATE).getString(AppConstants.PREF_ID, AppConstants.PREF_EMPTY);
         StorageReference storageRef = bucketRef.child(String.format(AppConstants.FIREBASE_USER_PROFILE_IMAGE, id));
 
         storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -99,11 +95,11 @@ public class SelfProfileActivity extends AppCompatActivity {
                         Intent galleryIntent = new Intent();
                         galleryIntent.setType("image/*");
                         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                        startActivityForResult(Intent.createChooser(galleryIntent,"Select Picture"),PICK_IMAGE_REQUEST);
+                        startActivityForResult(Intent.createChooser(galleryIntent,"Select Picture"),AppConstants.PICK_IMAGE_REQUEST);
                         break;
                     case R.id.selfie_button:
                         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        startActivityForResult(cameraIntent,TAKE_IMAGE_REQUEST);
+                        startActivityForResult(cameraIntent,AppConstants.TAKE_IMAGE_REQUEST);
                         break;
                 }
             }
@@ -140,7 +136,7 @@ public class SelfProfileActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==PICK_IMAGE_REQUEST||requestCode==TAKE_IMAGE_REQUEST && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+        if(requestCode==AppConstants.PICK_IMAGE_REQUEST||requestCode==AppConstants.TAKE_IMAGE_REQUEST && resultCode==RESULT_OK && data!=null && data.getData()!=null){
             Uri uri = data.getData();
             try {
                 mChosenProfileImage = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
@@ -170,7 +166,7 @@ public class SelfProfileActivity extends AppCompatActivity {
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         StorageReference bucketRef = firebaseStorage.getReferenceFromUrl(AppConstants.FIREBASE_IMAGE_BUCKET);
 
-        String id = NearbyManager.getInstance().getSelfID();
+        String id = getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, MODE_PRIVATE).getString(AppConstants.PREF_ID, AppConstants.PREF_EMPTY);
         StorageReference storageRef = bucketRef.child(String.format(AppConstants.FIREBASE_USER_PROFILE_IMAGE, id));
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         mChosenProfileImage.compress(Bitmap.CompressFormat.JPEG,100, byteArrayOutputStream);

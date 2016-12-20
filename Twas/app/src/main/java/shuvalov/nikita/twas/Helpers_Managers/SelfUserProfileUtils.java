@@ -30,7 +30,6 @@ public class SelfUserProfileUtils {
                 .commit();
     }
 
-
     /**
      * Adds user's picUrl in case it didn't exist when the profile was initially put into sharedPreferences.
      *
@@ -43,11 +42,26 @@ public class SelfUserProfileUtils {
     }
 
     /**
-     * Use this function to clear the user preferences. Happens on sign-out.
+     * Clears the user preferences. Called on sign-out.
      * @param context
      * @return True if cleared successfully.
      */
-    public static boolean clearUserPreferences(Context context){
+    public static boolean clearUserProfile(Context context){
         return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE,Context.MODE_PRIVATE).edit().clear().commit();
+    }
+
+    /**
+     * Adds Self-User ID to sharedPreferences.
+     *
+     * @param context
+     * @param uid
+     * @return
+     */
+    public static boolean setUserId(Context context, String uid){
+        return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE,Context.MODE_PRIVATE).edit().putString(AppConstants.PREF_ID,uid).commit();
+    }
+
+    public static boolean compareStoredIdWithCurrentId(Context context, String uid){
+        return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE,Context.MODE_PRIVATE).getString(AppConstants.PREF_ID, AppConstants.PREF_EMPTY).equals(uid);
     }
 }

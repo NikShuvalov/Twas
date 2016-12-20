@@ -19,7 +19,11 @@ import com.google.firebase.auth.FirebaseUser;
 
 import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
+import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.R;
+
+
+//ToDo: On Sign-up we should have another edittext activity for "confirm password"
 
 public class FirebaseLogInActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -49,11 +53,17 @@ public class FirebaseLogInActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user!= null){
                     String userId = user.getUid();
-                    NearbyManager.getInstance().setId(userId);
+
+                    //Check if the authenticated user's id matches the id we have stored in preferences. If not, clear preferences.
+                    if(!SelfUserProfileUtils.compareStoredIdWithCurrentId(FirebaseLogInActivity.this,userId)){
+                        SelfUserProfileUtils.clearUserProfile(FirebaseLogInActivity.this); //We clear the user Preferences if the IDs don't match. This is a back-up check, typically the preferences should be cleared on sign-out as well.
+                        //ToDo: Check to see if user has a profile in FBDB, if so add that info to preferences, otherwise add only UserId to preferences.
+                        SelfUserProfileUtils.setUserId(FirebaseLogInActivity.this, userId);
+
+                    }
                     Toast.makeText(FirebaseLogInActivity.this, "Signed as "+ userId, Toast.LENGTH_SHORT).show();
                     Log.d("AuthStateChanged", "Logged in as "+ user.getUid());
                     Intent intent = new Intent(FirebaseLogInActivity.this, MainActivity.class);
-                    intent.putExtra(AppConstants.SELF_USER_ID,userId);
                     startActivity(intent);
                 }else{
                     Log.d("AuthStateChanged", "Signed Out");
@@ -126,7 +136,13 @@ public class FirebaseLogInActivity extends AppCompatActivity {
                             Toast.makeText(FirebaseLogInActivity.this, "An Error Occurred",
                                     Toast.LENGTH_SHORT).show();
                         }else{
-                            NearbyManager.getInstance().setId(mAuth.getCurrentUser().getUid());
+                            String userId = mAuth.getCurrentUser().getUid();
+                            if(!SelfUserProfileUtils.compareStoredIdWithCurrentId(FirebaseLogInActivity.this,userId)){ //If logged in id doesn't match id stored in sharedPref.
+                                SelfUserProfileUtils.clearUserProfile(FirebaseLogInActivity.this); //We clear the user Preferences. This is a back-up check; typically the preferences should be cleared on sign-out.
+                                SelfUserProfileUtils.setUserId(FirebaseLogInActivity.this, userId);
+
+                            }
+                            //ToDo: If user signs up, but if there's already a User ID that isn't the same as the logged in user's in preferences, clear preferences and put correct data.
                         }
 
                     }

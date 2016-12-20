@@ -1,5 +1,6 @@
 package shuvalov.nikita.twas.Activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -67,14 +68,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mNearbyManager = NearbyManager.getInstance();
-
-        Log.d("MainActivity", "onCreate: "+ mNearbyManager.getSelfID());
+//        mNearbyManager = NearbyManager.getInstance();
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mId = getIntent().getStringExtra(AppConstants.SELF_USER_ID);
 
+        mId = getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, Context.MODE_PRIVATE).getString(AppConstants.PREF_ID,AppConstants.PREF_EMPTY);
+        if(mId.equals(AppConstants.PREF_EMPTY)){
+            Log.d("MainActivity", "Either Awesome ID or No ID found in sharedPref");
+        }
         mRef = mFirebaseDatabase.getReference(mId);
+
+//        mRef.addChildEventListener()
 
         findViews();
 

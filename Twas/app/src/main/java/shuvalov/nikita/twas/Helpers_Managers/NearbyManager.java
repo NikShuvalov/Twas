@@ -6,7 +6,6 @@ package shuvalov.nikita.twas.Helpers_Managers;
 
 public class NearbyManager {
     private boolean mGoogleApiConnected, mPublishing, mSubscribing;
-    private String mSelfId; //Should probably moved this into SelfUserProfileUtils
 
     private static NearbyManager sMyNearbyManager;
 
@@ -44,14 +43,6 @@ public class NearbyManager {
 
     public void setSubscribing(boolean subscribing) {
         mSubscribing = subscribing;
-    }
-
-    public String getSelfID() {
-        return mSelfId;
-    }
-
-    public void setId(String id){
-        mSelfId = id;
     }
 
 
