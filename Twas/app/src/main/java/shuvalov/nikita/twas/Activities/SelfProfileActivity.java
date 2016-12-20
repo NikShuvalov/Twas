@@ -1,6 +1,7 @@
 package shuvalov.nikita.twas.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -203,6 +204,7 @@ public class SelfProfileActivity extends AppCompatActivity {
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Toast.makeText(SelfProfileActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
                 Uri downloadUrl = taskSnapshot.getDownloadUrl();
+
                 //ToDo: Store DownloadURL, in FBDB as Profile parameter and in local SQL database.
             }
         });

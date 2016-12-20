@@ -14,4 +14,14 @@ public class AppConstants {
     public static final String ORIGIN_ACTIVITY = "where is intent coming from?";
     public static final String ORIGIN_MAIN = "main activity";
     public static final String ORIGIN_LOG_IN= "login activity";
+
+    public static final String PREF_SELF_USER_PROFILE = "Self_user_profile";
+    public static final String PREF_ID = "Self_id";
+    public static final String PREF_NAME ="Self_name";
+    public static final String PREF_DOB = "Self_dob";
+    public static final String PREF_BIO = "Self_bio";
+    public static final String PREF_GENDER = "Self_gender";
+    public static final String PREF_PICURL = "Self_picurl";
+
+
 }
