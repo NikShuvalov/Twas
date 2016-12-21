@@ -1,6 +1,7 @@
 package shuvalov.nikita.twas.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -10,13 +11,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -25,20 +32,28 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
+import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
+import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
 
 public class SelfProfileActivity extends AppCompatActivity {
     private ImageView mProfileImage;
     private Button mAccessGallery, mTakeSelfie;
     private FloatingActionButton mSubmit;
-    private EditText mName, mBio, mHobbies;
+    private EditText mName, mBio;
+    private EditText mDateEntry; //Placeholder, used for debugging.
     private boolean mUpdatedProfileImage = false;
     private Bitmap mChosenProfileImage;
+    private Spinner mGenders, mDate, mMonth, mYear;
+    private ArrayAdapter<CharSequence> mGenderAdapter, mDateAdapter, mMonthAdapter, mYearAdapter;
 
-    private ArrayList<EditText> mPromptFields;
+    private Profile mProfile;
+
+
 
 
     @Override
@@ -46,11 +61,12 @@ public class SelfProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_self_profile);
 
-        mPromptFields = new ArrayList<>();
-
         findViews();
         loadSelfImage();
         initButtons();
+        setSpinnerAdapters();
+
+
     }
 
     public void loadSelfImage(){
@@ -81,9 +97,15 @@ public class SelfProfileActivity extends AppCompatActivity {
         mTakeSelfie = (Button)findViewById(R.id.selfie_button);
         mSubmit = (FloatingActionButton) findViewById(R.id.submit_changes_button);
 
-        mPromptFields.add(mName = (EditText)findViewById(R.id.name_entry));
-        mPromptFields.add(mBio = (EditText)findViewById(R.id.about_me_entry));
-        mPromptFields.add(mHobbies = (EditText)findViewById(R.id.hobbies_entry));
+        mName = (EditText)findViewById(R.id.name_entry);
+        mBio = (EditText)findViewById(R.id.about_me_entry);
+        mGenders = (Spinner)findViewById(R.id.gender_select);
+        mDate = (Spinner)findViewById(R.id.date_spinner);
+        mMonth = (Spinner)findViewById(R.id.month_spinner);
+        mYear = (Spinner)findViewById(R.id.year_spinner);
+
+        mDateEntry = (EditText)findViewById(R.id.date_entry); //Used for debugging for now
+
     }
 
     public void initButtons(){
@@ -111,24 +133,30 @@ public class SelfProfileActivity extends AppCompatActivity {
         mSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                for(EditText editText: mPromptFields){
-                    if(!editText.getText().toString().isEmpty()){//Only updates changes where there are values to update.
-                        switch (editText.getId()){
-                            case R.id.name_entry:
-                                //ToDo: Update Self Name
-                                break;
-                            case R.id.about_me_entry:
-                                //ToDo: Update bio
-                                break;
-                            case R.id.hobbies_entry:
-                                //ToDo: Update Hobbies
-                                break;
-                        }
-                    }
-                }
+                String name = mName.getText().toString();
+                String bio = mBio.getText().toString();
+                String gender = "Male";
+                String dateOfBirth = mDateEntry.getText().toString();
+                int month = Integer.parseInt(dateOfBirth.substring(0,2));
+                int date = Integer.parseInt(dateOfBirth.substring(2,4));
+                int year = Integer.parseInt(dateOfBirth.substring(4));
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(year, month, date);
+
+                long birthInMillis = calendar.getTimeInMillis();
+
+                mProfile = new Profile(SelfUserProfileUtils.getUserId(SelfProfileActivity.this), name, bio, birthInMillis,gender);
+
+                SelfUserProfileUtils.assignProfileToSharedPreferences(SelfProfileActivity.this, mProfile);
                 if(mUpdatedProfileImage){
                     uploadProfileImage();
                 }
+
+                //ToDo: I might want to move my dataBase uploads and downloads to a helper class.
+                FirebaseDatabase db = FirebaseDatabase.getInstance();
+                DatabaseReference dbRef = db.getReference(mProfile.getUID()).child("Profile");
+                dbRef.setValue(mProfile);
             }
         });
     }
@@ -166,8 +194,8 @@ public class SelfProfileActivity extends AppCompatActivity {
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         StorageReference bucketRef = firebaseStorage.getReferenceFromUrl(AppConstants.FIREBASE_IMAGE_BUCKET);
 
-        String id = getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, MODE_PRIVATE).getString(AppConstants.PREF_ID, AppConstants.PREF_EMPTY);
-        StorageReference storageRef = bucketRef.child(String.format(AppConstants.FIREBASE_USER_PROFILE_IMAGE, id));
+        final String userId = SelfUserProfileUtils.getUserId(SelfProfileActivity.this);
+        StorageReference storageRef = bucketRef.child(String.format(AppConstants.FIREBASE_USER_PROFILE_IMAGE, userId));
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         mChosenProfileImage.compress(Bitmap.CompressFormat.JPEG,100, byteArrayOutputStream);
 
@@ -199,10 +227,29 @@ public class SelfProfileActivity extends AppCompatActivity {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Toast.makeText(SelfProfileActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
-                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
-                //ToDo: Store DownloadURL, in FBDB as Profile parameter and in local SQL database.
             }
         });
+    }
+    public void setSpinnerAdapters(){
+        mGenderAdapter = ArrayAdapter.createFromResource(this,R.array.genders, android.R.layout.simple_spinner_item);
+        mGenderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mGenders.setAdapter(mGenderAdapter);
+        mGenders.setSelection(0); //ToDo: Selection should be based off of sharedPreferences values.
+
+        mDateAdapter = ArrayAdapter.createFromResource(this,R.array.genders, android.R.layout.simple_spinner_item);
+        mDateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mDate.setAdapter(mDateAdapter);
+        mDate.setSelection(0);//ToDo: Current Selection should be based off of sharedPreferences value, ALSO a selector needed depending on which month it is?
+
+        mMonthAdapter = ArrayAdapter.createFromResource(this,R.array.months, android.R.layout.simple_spinner_item);
+        mMonthAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mMonth.setAdapter(mMonthAdapter);
+        mMonth.setSelection(0); //ToDo: Current Selection should be based of sharedpref
+
+        mYearAdapter = ArrayAdapter.createFromResource(this,R.array.genders, android.R.layout.simple_spinner_item);
+        mYearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mYear.setAdapter(mYearAdapter);
+        mYear.setSelection(0); //ToDo: Current selection should be based of sharedPref
+
     }
 }

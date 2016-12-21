@@ -27,7 +27,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
 
     public static final String COLUMN_UID = "UID";
     public static final String COLUMN_NAME = "NAME";
-    public static final String COLUMN_PIC_URL = "PROFILE_PIC_URL";
+//    public static final String COLUMN_PIC_URL = "PROFILE_PIC_URL";
     public static final String COLUMN_BIO = "BIO_SUMMARY";
     public static final String COLUMN_GENDER = "GENDER";
     public static final String COLUMN_BIRTHDATE = "BIRTH_DATE";
@@ -42,7 +42,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
     public static final String CREATE_PROFILE_TABLE_EXE = "CREATE TABLE "+ PROFILE_TABLE_NAME +
             " ("+ COLUMN_UID +" TEXT"+
             COLUMN_NAME + " TEXT"+
-            COLUMN_PIC_URL + " TEXT"+
+//            COLUMN_PIC_URL + " TEXT"+
             COLUMN_BIO + " TEXT"+
             COLUMN_GENDER + " TEXT" +
             COLUMN_BIRTHDATE + " INTEGER)";
@@ -73,7 +73,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
     }
 
     private ConnectionsSQLOpenHelper(Context context) {
-        super(context, DATABASE_NAME, null, 0);
+        super(context, DATABASE_NAME, null, 1);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
     //Clears database, idea is if user logs out, I wouldn't want other users on this phone to have access to that data.
     public void clearDatabase(){
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("TRUNCATE TABLE IF EXISTS" + PROFILE_TABLE_NAME);
+        db.execSQL("TRUNCATE TABLE IF EXISTS " + PROFILE_TABLE_NAME);
         db.execSQL("TRUNCATE TABLE IF EXISTS "+ CHATMESS_TABLE_NAME);
         db.execSQL("TRUNCATE TABLE IF EXISTS "+ CHATROOM_TABLE_NAME);
         db.close();
@@ -109,7 +109,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         content.put(COLUMN_BIO, profile.getBio());
         content.put(COLUMN_GENDER, profile.getGender());
         content.put(COLUMN_BIRTHDATE, profile.getDOB());
-        content.put(COLUMN_PIC_URL, profile.getPicURL());
+//        content.put(COLUMN_PIC_URL, profile.getPicURL());
 
         long row = db.insert(PROFILE_TABLE_NAME, null, content);
         db.close();
@@ -127,7 +127,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
             content.put(COLUMN_BIO, profile.getBio());
             content.put(COLUMN_GENDER, profile.getGender());
             content.put(COLUMN_BIRTHDATE, profile.getDOB());
-            content.put(COLUMN_PIC_URL, profile.getPicURL());
+//            content.put(COLUMN_PIC_URL, profile.getPicURL());
             addedAmount++;
         }
         db.close();

@@ -22,8 +22,12 @@ import com.google.android.gms.nearby.messages.Distance;
 import com.google.android.gms.nearby.messages.Message;
 import com.google.android.gms.nearby.messages.MessageListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
@@ -68,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        mNearbyManager = NearbyManager.getInstance();
+        mNearbyManager = NearbyManager.getInstance();
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
 
@@ -78,10 +82,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
         mRef = mFirebaseDatabase.getReference(mId);
 
-//        mRef.addChildEventListener()
+        //ToDo: Check if user has profile on FBDB that we can pull.
+//        long value = Long.valueOf("42132151512321512");
+//        Profile fakieProfile = new Profile(mId,"Nikita", "I love lamp", value,"Male","Whatta");
+//        mRef.setValue(fakieProfile);
 
         findViews();
 
+        mRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Profile myProfile = dataSnapshot.getValue(Profile.class);
+                Log.d("Profile test", "onDataChange: "+myProfile.getName());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("Checking FBDB", "onCancelled: "+ databaseError.getMessage());
+            }
+        });
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Nearby.MESSAGES_API)
@@ -141,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
                 Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
-                ConnectionsSQLOpenHelper.getInstance(MainActivity.this).clearDatabase();
+//                ConnectionsSQLOpenHelper.getInstance(MainActivity.this).clearDatabase();
                 Intent intent = new Intent(MainActivity.this, FirebaseLogInActivity.class);
                 startActivity(intent);
             }

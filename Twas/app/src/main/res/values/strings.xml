@@ -18,6 +18,15 @@
         <item>December</item>
     </string-array>
 
+    <string-array name="genders">
+        <item>Gender</item>
+        <item>Male</item>
+        <item>Fair Maiden</item>
+        <item>Neither</item>
+        <item>Unicorn</item>
+    </string-array>
+
+
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>

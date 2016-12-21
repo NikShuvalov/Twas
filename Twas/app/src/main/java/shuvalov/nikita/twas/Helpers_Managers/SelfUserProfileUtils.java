@@ -26,20 +26,19 @@ public class SelfUserProfileUtils {
                 .putString(AppConstants.PREF_BIO, profile.getBio())
                 .putLong(AppConstants.PREF_DOB, profile.getDOB())
                 .putString(AppConstants.PREF_GENDER, profile.getGender())
-                .putString(AppConstants.PREF_PICURL, profile.getPicURL())
                 .commit();
     }
 
-    /**
-     * Adds user's picUrl in case it didn't exist when the profile was initially put into sharedPreferences.
-     *
-     * @param context
-     * @param picUrl
-     * @return True if url add successfully.
-     */
-    public static boolean addUserProfilePicUrl(Context context, String picUrl){
-        return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE,Context.MODE_PRIVATE).edit().putString(AppConstants.PREF_PICURL,picUrl).commit();
-    }
+//    /**
+//     * Adds user's picUrl in case it didn't exist when the profile was initially put into sharedPreferences.
+//     *
+//     * @param context
+//     * @param picUrl
+//     * @return True if url add successfully.
+//     */
+//    public static boolean addUserProfilePicUrl(Context context, String picUrl){
+//        return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE,Context.MODE_PRIVATE).edit().putString(AppConstants.PREF_PICURL,picUrl).commit();
+//    }
 
     /**
      * Clears the user preferences. Called on sign-out.
@@ -59,6 +58,10 @@ public class SelfUserProfileUtils {
      */
     public static boolean setUserId(Context context, String uid){
         return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE,Context.MODE_PRIVATE).edit().putString(AppConstants.PREF_ID,uid).commit();
+    }
+
+    public static String getUserId(Context context){
+        return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, Context.MODE_PRIVATE).getString(AppConstants.PREF_ID,AppConstants.PREF_EMPTY);
     }
 
     public static boolean compareStoredIdWithCurrentId(Context context, String uid){

@@ -140,9 +140,7 @@ public class FirebaseLogInActivity extends AppCompatActivity {
                             if(!SelfUserProfileUtils.compareStoredIdWithCurrentId(FirebaseLogInActivity.this,userId)){ //If logged in id doesn't match id stored in sharedPref.
                                 SelfUserProfileUtils.clearUserProfile(FirebaseLogInActivity.this); //We clear the user Preferences. This is a back-up check; typically the preferences should be cleared on sign-out.
                                 SelfUserProfileUtils.setUserId(FirebaseLogInActivity.this, userId);
-
                             }
-                            //ToDo: If user signs up, but if there's already a User ID that isn't the same as the logged in user's in preferences, clear preferences and put correct data.
                         }
 
                     }
@@ -160,6 +158,11 @@ public class FirebaseLogInActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
                         }else{
                             Toast.makeText(FirebaseLogInActivity.this, "Logged in as blah-blah", Toast.LENGTH_SHORT).show();
+                            String userId = mAuth.getCurrentUser().getUid();
+                            if(!SelfUserProfileUtils.compareStoredIdWithCurrentId(FirebaseLogInActivity.this,userId)){ //If logged in id doesn't match id stored in sharedPref.
+                                SelfUserProfileUtils.clearUserProfile(FirebaseLogInActivity.this); //We clear the user Preferences. This is a back-up check; typically the preferences should be cleared on sign-out.
+                                SelfUserProfileUtils.setUserId(FirebaseLogInActivity.this, userId);
+                            }
                             //ToDo: On Successful log-in download all of user's made connections.
                         }
 
