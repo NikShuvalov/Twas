@@ -1,6 +1,7 @@
 package shuvalov.nikita.twas.RecyclersAndHolders;
 
 
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,6 +14,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import shuvalov.nikita.twas.Activities.ProfileDetailActivity;
+import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.Helpers_Managers.FireBaseStorageUtils;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
@@ -36,7 +39,7 @@ public class ProfileCollectionRecyclerAdapter extends RecyclerView.Adapter<Profi
 
     @Override
     public void onBindViewHolder(final ProfileCollectionViewHolder holder, int position) {
-        Profile profile = mProfileList.get(position);
+        final Profile profile = mProfileList.get(position);
         holder.bindProfileDataToViews(profile);
         StorageReference imageStoreRef = FireBaseStorageUtils.getProfilePicStorageRef(profile.getUID());
         imageStoreRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -45,6 +48,15 @@ public class ProfileCollectionRecyclerAdapter extends RecyclerView.Adapter<Profi
                 Picasso.with(holder.mPicView.getContext()).load(uri).into(holder.mPicView);
             }
         });
+        holder.mCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), ProfileDetailActivity.class);
+                intent.putExtra("Position in singleton", holder.getAdapterPosition());
+                view.getContext().startActivity(intent);
+            }
+        });
+
     }
 
     @Override

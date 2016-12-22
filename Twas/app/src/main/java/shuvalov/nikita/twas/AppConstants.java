@@ -27,6 +27,8 @@ public class AppConstants {
 
     public static final String PREF_EMPTY = "Duh-dah, duh-dah, duhhh! For whom the bell tolls!";
 
+    public static final String USER_ID = "Id";
+
     public static final int PICK_IMAGE_REQUEST = 1;
     public static final int TAKE_IMAGE_REQUEST = 2;
 

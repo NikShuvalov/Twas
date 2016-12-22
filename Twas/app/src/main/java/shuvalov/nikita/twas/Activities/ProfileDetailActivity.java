@@ -11,6 +11,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import shuvalov.nikita.twas.AppConstants;
+import shuvalov.nikita.twas.Helpers_Managers.ConnectionsHelper;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
 
@@ -24,26 +26,8 @@ public class ProfileDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile_detail);
 
         findViews();
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        String foundProfile = getIntent().getStringExtra(MainActivity.FOUND_ID_INTENT); //Get the id that was passed in the intent to find it in the firebase database.
-        DatabaseReference myRef =  firebaseDatabase.getReference(foundProfile);
-
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String bio = dataSnapshot.child("bio").getValue().toString();
-                String name = dataSnapshot.child("name").getValue().toString();
-                String dob = dataSnapshot.child("dob").getValue().toString();
-//                Profile stalkedProfile = new Profile(name, bio, dob, null, null);
-                Log.d("ProfileDetailActivity", "onDataChange: "+bio);
-//                bindDataToViews(stalkedProfile);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        Profile selectedProfile = ConnectionsHelper.getInstance().getProfileByPosition(getIntent().getIntExtra("Position in singleton",-1));
+        bindDataToViews(selectedProfile);
     }
 
     public void findViews(){

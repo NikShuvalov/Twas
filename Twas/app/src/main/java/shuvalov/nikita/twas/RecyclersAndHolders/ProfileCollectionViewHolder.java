@@ -1,11 +1,10 @@
 package shuvalov.nikita.twas.RecyclersAndHolders;
 
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.squareup.picasso.Picasso;
 
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
@@ -17,6 +16,7 @@ import shuvalov.nikita.twas.R;
 public class ProfileCollectionViewHolder extends RecyclerView.ViewHolder {
     ImageView mPicView;
     TextView mNameView;
+    CardView mCardView;
 
 
     public ProfileCollectionViewHolder(View itemView) {
@@ -24,6 +24,7 @@ public class ProfileCollectionViewHolder extends RecyclerView.ViewHolder {
 
         mPicView = (ImageView) itemView.findViewById(R.id.profile_image_view);
         mNameView = (TextView)itemView.findViewById(R.id.name_text);
+        mCardView = (CardView)itemView.findViewById(R.id.profile_card);
 
     }
 

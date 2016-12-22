@@ -15,12 +15,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -30,7 +28,6 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import shuvalov.nikita.twas.AppConstants;
@@ -78,8 +75,20 @@ public class SelfProfileActivity extends AppCompatActivity {
             String dateAsString;
 
             //ToDo: Remove this later probs. For now this snippet keeps the format consistent for birthdate.
-            if(month<10){
-                dateAsString = 0+String.valueOf(month)+date+year;
+            if(month<10||date<10){
+                String monthString;
+                String dateString;
+                if(month<10){
+                    monthString = 0+String.valueOf(month);
+                }else{
+                    monthString = String.valueOf(month);
+                }
+                if (date < 10) {
+                    dateString = 0+ String.valueOf(date);
+                }else{
+                    dateString = String.valueOf(date);
+                }
+                dateAsString = monthString+dateString+year;
             }else{
                 dateAsString = String.valueOf(month)+date+year;
             }
