@@ -37,7 +37,6 @@ import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
 import shuvalov.nikita.twas.RecyclersAndHolders.ProfileCollectionRecyclerAdapter;
-import shuvalov.nikita.twas.SelfProfileRecyclerAdapter;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -73,9 +72,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         setContentView(R.layout.activity_main);
 
         mNearbyManager = NearbyManager.getInstance();
-
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-
         mId = SelfUserProfileUtils.getUserId(this);
         if(mId.equals(AppConstants.PREF_EMPTY)){
             Log.d("MainActivity", "Either Awesome ID or No ID found in sharedPref");
@@ -86,13 +83,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 throwable1.printStackTrace();
             }
         }
-        mRef = mFirebaseDatabase.getReference(mId);
-
-        //ToDo: Check if user has profile on FBDB that we can pull.
+        mRef = mFirebaseDatabase.getReference(mId).child(AppConstants.FIREBASE_USER_CHILD_PROFILE);
 
         findViews();
         setUpRecyclerView();
 
+        //ToDo: Check if user has profile on FBDB that we can pull.
         mRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
