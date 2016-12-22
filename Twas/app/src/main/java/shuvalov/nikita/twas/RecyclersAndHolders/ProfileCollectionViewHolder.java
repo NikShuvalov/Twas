@@ -28,8 +28,7 @@ public class ProfileCollectionViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindProfileDataToViews(Profile profile){
-        //ToDo: I really should separate the logic for pulling images from Firebase storage so that I can bind data like here.
-        mPicView.setImageResource(R.drawable.shakespeare_modern_bard_post); //ToDo: Replace with actual image file.
+        mPicView.setImageResource(R.drawable.shakespeare_modern_bard_post); //Sets default image until actual image is loaded.
         mNameView.setText(profile.getName());
     }
 }
