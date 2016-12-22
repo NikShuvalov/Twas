@@ -40,23 +40,22 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
 
     //This holds all of the user profiles, including self(? maybe store as sharePreferences).
     public static final String CREATE_PROFILE_TABLE_EXE = "CREATE TABLE "+ PROFILE_TABLE_NAME +
-            " ("+ COLUMN_UID +" TEXT"+
-            COLUMN_NAME + " TEXT"+
-//            COLUMN_PIC_URL + " TEXT"+
-            COLUMN_BIO + " TEXT"+
-            COLUMN_GENDER + " TEXT" +
+            " ("+ COLUMN_UID +" TEXT,"+
+            COLUMN_NAME + " TEXT,"+
+            COLUMN_BIO + " TEXT,"+
+            COLUMN_GENDER + " TEXT," +
             COLUMN_BIRTHDATE + " INTEGER)";
 
     //This holds all of the messages relative to the current user.
     public static final String CREATE_CHATMESS_TABLE_EXE = "CREATE TABLE "+ CHATMESS_TABLE_NAME+
-            " (" + COLUMN_ROOM_ID+ " TEXT"+
-            COLUMN_TIMESTAMP+ " INTEGER"+
-            COLUMN_UID + " TEXT"+
+            " (" + COLUMN_ROOM_ID+ " TEXT,"+
+            COLUMN_TIMESTAMP+ " INTEGER,"+
+            COLUMN_UID + " TEXT,"+
             COLUMN_MESSAGE_CONTENT + " TEXT)";
 
     //This simply keeps the chatmessages segregated by rooms.
     public static final String CREATE_CHATROOM_TABLE_EXE = "CREATE TABLE "+ CHATROOM_TABLE_NAME+
-            " ("+ COLUMN_ROOM_ID+ " TEXT"+
+            " ("+ COLUMN_ROOM_ID+ " TEXT,"+
             COLUMN_ROOM_NAME+ " TEXT)";
 
 

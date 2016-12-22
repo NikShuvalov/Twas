@@ -24,25 +24,6 @@
         android:layout_below="@id/my_toolbar">
 
 
-    <EditText
-        android:id="@+id/enter_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Name"/>
-
-    <EditText
-        android:id="@+id/bio_entry"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/enter_text"
-        android:hint="Bio"/>
-
-    <EditText
-        android:id="@+id/dob_entry"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="DOB"
-        android:layout_below="@id/bio_entry"/>
 
     <Button
         android:id="@+id/send_butt"

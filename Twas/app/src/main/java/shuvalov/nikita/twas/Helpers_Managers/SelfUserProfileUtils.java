@@ -70,11 +70,11 @@ public class SelfUserProfileUtils {
 
     public static Profile getUsersInfoAsProfile(Context context){
         SharedPreferences sharedPreferences = context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, Context.MODE_PRIVATE);
-        String selfUID = sharedPreferences.getString(AppConstants.PREF_ID, AppConstants.PREF_EMPTY);
-        String selfName = sharedPreferences.getString(AppConstants.PREF_NAME, AppConstants.PREF_EMPTY);
-        String selfBio = sharedPreferences.getString(AppConstants.PREF_BIO, AppConstants.PREF_EMPTY);
-        long selfDOB = sharedPreferences.getLong(AppConstants.PREF_DOB, AppConstants.PREF_EMPTY_LONG);
-        String selfGender = sharedPreferences.getString(AppConstants.PREF_GENDER, AppConstants.PREF_EMPTY);
+        String selfUID = sharedPreferences.getString(AppConstants.PREF_ID, "");
+        String selfName = sharedPreferences.getString(AppConstants.PREF_NAME, "");
+        String selfBio = sharedPreferences.getString(AppConstants.PREF_BIO, "");
+        long selfDOB = sharedPreferences.getLong(AppConstants.PREF_DOB, 0);
+        String selfGender = sharedPreferences.getString(AppConstants.PREF_GENDER, "");
         return new Profile(selfUID, selfName, selfBio,selfDOB, selfGender);
     }
 }

@@ -68,22 +68,23 @@ public class SelfProfileActivity extends AppCompatActivity {
         mName.setText(mProfile.getName());
         mBio.setText(mProfile.getBio());
 
-        long birthdateMillis = mProfile.getDOB();
-        Calendar birthCal = Calendar.getInstance();
-        birthCal.setTimeInMillis(birthdateMillis);
-        int year = birthCal.get(Calendar.YEAR);
-        int month = birthCal.get(Calendar.MONTH);
-        int date = birthCal.get(Calendar.DATE);
-        String dateAsString;
+        if(mProfile.getDOB()!=0){
+            long birthdateMillis = mProfile.getDOB();
+            Calendar birthCal = Calendar.getInstance();
+            birthCal.setTimeInMillis(birthdateMillis);
+            int year = birthCal.get(Calendar.YEAR);
+            int month = birthCal.get(Calendar.MONTH);
+            int date = birthCal.get(Calendar.DATE);
+            String dateAsString;
 
-        //ToDo: Remove this later probs. For now this snippet keeps the format consistent for birthdate.
-        if(month<10){
-            dateAsString = 0+String.valueOf(month)+date+year;
-        }else{
-            dateAsString = String.valueOf(month)+date+year;
+            //ToDo: Remove this later probs. For now this snippet keeps the format consistent for birthdate.
+            if(month<10){
+                dateAsString = 0+String.valueOf(month)+date+year;
+            }else{
+                dateAsString = String.valueOf(month)+date+year;
+            }
+            mDateEntry.setText(dateAsString);
         }
-
-        mDateEntry.setText(dateAsString);
     }
 
     public void loadSelfImage(){
@@ -175,7 +176,7 @@ public class SelfProfileActivity extends AppCompatActivity {
 
                 //ToDo: I might want to move my dataBase uploads and downloads to a helper class.
                 FirebaseDatabase db = FirebaseDatabase.getInstance();
-                DatabaseReference dbRef = db.getReference(mProfile.getUID()).child("Profile");
+                DatabaseReference dbRef = db.getReference(mProfile.getUID()).child(AppConstants.FIREBASE_USER_CHILD_PROFILE);
                 dbRef.setValue(mProfile);
             }
         });
