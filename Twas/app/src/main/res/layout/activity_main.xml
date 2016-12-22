@@ -25,44 +25,51 @@
 
 
 
-    <Button
-        android:id="@+id/send_butt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Send"
-        android:layout_centerInParent="true"/>
+        <Button
+            android:id="@+id/send_butt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send"
+            android:layout_centerHorizontal="true"/>
 
-    <TextView
-        android:id="@+id/display_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:layout_below="@id/send_butt"
-        android:textSize="20sp"
-        android:textColor="#333"
-        android:layout_centerHorizontal="true"/>
+        <TextView
+            android:id="@+id/display_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello World!"
+            android:layout_below="@id/send_butt"
+            android:textSize="20sp"
+            android:textColor="#333"
+            android:layout_centerHorizontal="true"/>
 
-    <Button
-        android:id="@+id/retrieve_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Retrieve"
-        android:layout_below="@id/display_text"
-        android:layout_centerHorizontal="true"/>
-    <Button
-        android:id="@+id/sign_out_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/retrieve_button"
-        android:layout_centerHorizontal="true"
-        android:text="sign out"/>
+        <Button
+            android:id="@+id/retrieve_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Retrieve"
+            android:layout_below="@id/display_text"
+            android:layout_centerHorizontal="true"/>
+        <Button
+            android:id="@+id/sign_out_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/retrieve_button"
+            android:layout_centerHorizontal="true"
+            android:text="sign out"/>
 
-    <Button
-        android:id="@+id/self_profile_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/sign_out_button"
-        android:text="SElf Profile"
-        android:layout_centerHorizontal="true"/>
+        <Button
+            android:id="@+id/self_profile_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/sign_out_button"
+            android:text="Self Profile"
+            android:layout_centerHorizontal="true"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/profiles_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/self_profile_button"
+            android:layout_margin="10dp"/>
     </RelativeLayout>
+
 </RelativeLayout>

@@ -9,15 +9,15 @@ import shuvalov.nikita.twas.PoJos.Profile;
  */
 
 public class ConnectionsHelper {
-    ArrayList<Profile> mProfileConnections;
+    private ArrayList<Profile> mProfileConnections;
 
-    private static ConnectionsHelper sMConnectionsHelper;
+    private static ConnectionsHelper sConnectionsHelper;
 
     public static ConnectionsHelper getInstance() {
-        if (sMConnectionsHelper != null){
-            sMConnectionsHelper = new ConnectionsHelper();
+        if (sConnectionsHelper == null){
+            sConnectionsHelper = new ConnectionsHelper();
         }
-        return sMConnectionsHelper;
+        return sConnectionsHelper;
     }
     private ConnectionsHelper(){
         mProfileConnections = new ArrayList<>();

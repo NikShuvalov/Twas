@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -28,11 +30,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import shuvalov.nikita.twas.AppConstants;
+import shuvalov.nikita.twas.Helpers_Managers.ConnectionsHelper;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
 import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
+import shuvalov.nikita.twas.RecyclersAndHolders.ProfileCollectionRecyclerAdapter;
+import shuvalov.nikita.twas.SelfProfileRecyclerAdapter;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -43,7 +48,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     TextView mDisplayText;
     String mFoundId;
 
+    RecyclerView mRecyclerView;
+
     NearbyManager mNearbyManager;
+    ProfileCollectionRecyclerAdapter mProfileRecAdapter;
 
     GoogleApiClient mGoogleApiClient;
     Message mFindMeMessage;
@@ -81,11 +89,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mRef = mFirebaseDatabase.getReference(mId);
 
         //ToDo: Check if user has profile on FBDB that we can pull.
-//        long value = Long.valueOf("42132151512321512");
-//        Profile fakieProfile = new Profile(mId,"Nikita", "I love lamp", value,"Male","Whatta");
-//        mRef.setValue(fakieProfile);
 
         findViews();
+        setUpRecyclerView();
 
         mRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -122,6 +128,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Profile strangerProfile = dataSnapshot.getValue(Profile.class);
                         ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(strangerProfile);
+                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile);
+                        mProfileRecAdapter.notifyDataSetChanged();
                     }
 
                     @Override
@@ -220,6 +228,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mProfileButton = (Button)findViewById(R.id.self_profile_button);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Home");
+    }
+
+    public void setUpRecyclerView(){
+        mRecyclerView = (RecyclerView)findViewById(R.id.profiles_recyclerview);
+
+        mProfileRecAdapter = new ProfileCollectionRecyclerAdapter(ConnectionsHelper.getInstance().getConnections());
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this,2);
+
+        mRecyclerView.setLayoutManager(gridLayoutManager);
+        mRecyclerView.setAdapter(mProfileRecAdapter);
     }
 
 
