@@ -65,8 +65,26 @@ public class SelfProfileActivity extends AppCompatActivity {
         loadSelfImage();
         initButtons();
         setSpinnerAdapters();
+        loadCurrentValues();
 
 
+    }
+    public void loadCurrentValues(){
+        Profile userProfile = SelfUserProfileUtils.getUsersInfoAsProfile(this);
+        mName.setText(userProfile.getName());
+        mBio.setText(userProfile.getBio());
+
+        long birthdateMillis = userProfile.getDOB();
+        Calendar birthCal = Calendar.getInstance();
+        birthCal.setTimeInMillis(birthdateMillis);
+        int year = birthCal.get(Calendar.YEAR);
+        int month = birthCal.get(Calendar.MONTH);
+        int date = birthCal.get(Calendar.DATE);
+
+        String dateAsString = String.valueOf(month)+date+year;
+
+
+        mDateEntry.setText(dateAsString);
     }
 
     public void loadSelfImage(){

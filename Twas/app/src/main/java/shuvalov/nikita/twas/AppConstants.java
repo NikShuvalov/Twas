@@ -24,6 +24,7 @@ public class AppConstants {
 //    public static final String PREF_PICURL = "Self_picurl";
 
     public static final String PREF_EMPTY = "Duh-dah, duh-dah, duhhh! For whom the bell tolls!";
+    public static final long PREF_EMPTY_LONG = 0;
 
     public static final int PICK_IMAGE_REQUEST = 1;
     public static final int TAKE_IMAGE_REQUEST = 2;
