@@ -1,7 +1,6 @@
 package shuvalov.nikita.twas.Activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -35,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import shuvalov.nikita.twas.AppConstants;
-import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
 import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
@@ -53,9 +51,6 @@ public class SelfProfileActivity extends AppCompatActivity {
 
     private Profile mProfile;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,23 +61,27 @@ public class SelfProfileActivity extends AppCompatActivity {
         initButtons();
         setSpinnerAdapters();
         loadCurrentValues();
-
-
     }
-    public void loadCurrentValues(){
-        Profile userProfile = SelfUserProfileUtils.getUsersInfoAsProfile(this);
-        mName.setText(userProfile.getName());
-        mBio.setText(userProfile.getBio());
 
-        long birthdateMillis = userProfile.getDOB();
+    public void loadCurrentValues(){
+        mProfile = SelfUserProfileUtils.getUsersInfoAsProfile(this);
+        mName.setText(mProfile.getName());
+        mBio.setText(mProfile.getBio());
+
+        long birthdateMillis = mProfile.getDOB();
         Calendar birthCal = Calendar.getInstance();
         birthCal.setTimeInMillis(birthdateMillis);
         int year = birthCal.get(Calendar.YEAR);
         int month = birthCal.get(Calendar.MONTH);
         int date = birthCal.get(Calendar.DATE);
+        String dateAsString;
 
-        String dateAsString = String.valueOf(month)+date+year;
-
+        //ToDo: Remove this later probs. For now this snippet keeps the format consistent for birthdate.
+        if(month<10){
+            dateAsString = 0+String.valueOf(month)+date+year;
+        }else{
+            dateAsString = String.valueOf(month)+date+year;
+        }
 
         mDateEntry.setText(dateAsString);
     }
@@ -164,7 +163,10 @@ public class SelfProfileActivity extends AppCompatActivity {
 
                 long birthInMillis = calendar.getTimeInMillis();
 
-                mProfile = new Profile(SelfUserProfileUtils.getUserId(SelfProfileActivity.this), name, bio, birthInMillis,gender);
+                mProfile.setName(name);
+                mProfile.setBio(bio);
+                mProfile.setGender(gender);
+                mProfile.setDOB(birthInMillis);
 
                 SelfUserProfileUtils.assignProfileToSharedPreferences(SelfProfileActivity.this, mProfile);
                 if(mUpdatedProfileImage){
