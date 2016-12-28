@@ -133,7 +133,6 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         content.put(COLUMN_BIO, profile.getBio());
         content.put(COLUMN_GENDER, profile.getGender());
         content.put(COLUMN_BIRTHDATE, profile.getDOB());
-//        content.put(COLUMN_PIC_URL, profile.getPicURL());
 
         long row = db.insert(PROFILE_TABLE_NAME, null, content);
         db.close();
@@ -151,7 +150,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
             content.put(COLUMN_BIO, profile.getBio());
             content.put(COLUMN_GENDER, profile.getGender());
             content.put(COLUMN_BIRTHDATE, profile.getDOB());
-//            content.put(COLUMN_PIC_URL, profile.getPicURL()); //This is unnecessary since the UID is enough to find the picURL
+            db.insert(PROFILE_TABLE_NAME, null, content); //ToDo: Consider changing this to updateWithOnConflict
             addedAmount++;
         }
         db.close();

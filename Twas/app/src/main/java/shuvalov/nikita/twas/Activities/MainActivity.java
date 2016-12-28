@@ -236,7 +236,65 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         //ToDo: Check for logged-in user's chatroom associations.
 
         //ToDo: Check for logged-in user's connections list.
+        mSelfConnectionsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> connectionsSnapshot= dataSnapshot.getChildren();
+                ArrayList<String> connectionsList = new ArrayList<>();
+                for(DataSnapshot connection: connectionsSnapshot){
+                    connectionsList.add(connection.getKey());
+                }
+                //ToDo: Use the list of connections and compare with what we have in the database, then fill in what's missing.
+                ArrayList<String> missingIds = checkForMissingProfiles(connectionsList);
+                if(!missingIds.isEmpty()){
+                    retrieveMissingProfiles(missingIds);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
+    public void retrieveMissingProfiles(ArrayList<String> missingIdList){
+        for(String uid:missingIdList){
+            DatabaseReference profileRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase,uid);
+            profileRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Profile profile = dataSnapshot.getValue(Profile.class);
+                    ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(profile);
+                    ConnectionsHelper.getInstance().addProfileToCollection(profile);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+        mProfileRecAdapter.notifyDataSetChanged();
+    }
+
+    public ArrayList<String> checkForMissingProfiles(ArrayList<String> userIdList){
+        ArrayList<Profile> currentStoredProfiles = ConnectionsSQLOpenHelper.getInstance(MainActivity.this).getAllConnections();
+        ConnectionsHelper.getInstance().addProfileConnectionsToCollection(currentStoredProfiles); //FixMe: This should probably go elsewhere
+        ArrayList<String> currentStoredIds = new ArrayList<>();
+        ArrayList<String> idsMissingProfiles = new ArrayList<>();
+        for(Profile profile: currentStoredProfiles){
+            currentStoredIds.add(profile.getUID());
+        }
+
+        for(String uid: userIdList){
+            if(!currentStoredIds.contains(uid)){
+                idsMissingProfiles.add(uid);
+            }
+        }
+
+        return idsMissingProfiles;
+    }
+
 
     public void findViews(){
         mSendButt = (Button)findViewById(R.id.send_butt);
