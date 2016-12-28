@@ -199,6 +199,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         ConnectionsHelper.getInstance().addProfileConnectionsToCollection(allProfiles);
     }
 
+
+
+    //ToDo: Move method to another activity/class. So that we don't end up doing database check/syncs everytime we navigate back to here.
     public void getUsersFbdbInformation(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mId = SelfUserProfileUtils.getUserId(this);
@@ -257,6 +260,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
     }
+
+    //ToDo: Move method to another activity/class
     public void retrieveMissingProfiles(ArrayList<String> missingIdList){
         for(String uid:missingIdList){
             DatabaseReference profileRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase,uid);
@@ -277,6 +282,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mProfileRecAdapter.notifyDataSetChanged();
     }
 
+    //ToDo: Move method to another activity/class
     public ArrayList<String> checkForMissingProfiles(ArrayList<String> userIdList){
         ArrayList<Profile> currentStoredProfiles = ConnectionsSQLOpenHelper.getInstance(MainActivity.this).getAllConnections();
         ConnectionsHelper.getInstance().addProfileConnectionsToCollection(currentStoredProfiles); //FixMe: This should probably go elsewhere
