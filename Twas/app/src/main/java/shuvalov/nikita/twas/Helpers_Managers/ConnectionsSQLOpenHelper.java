@@ -2,6 +2,7 @@ package shuvalov.nikita.twas.Helpers_Managers;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -76,7 +77,8 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) { sqLiteDatabase.execSQL(CREATE_PROFILE_TABLE_EXE);
+    public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        sqLiteDatabase.execSQL(CREATE_PROFILE_TABLE_EXE);
         sqLiteDatabase.execSQL(CREATE_CHATMESS_TABLE_EXE);
         sqLiteDatabase.execSQL(CREATE_CHATROOM_TABLE_EXE);
     }
@@ -87,6 +89,29 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ CHATMESS_TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ CHATROOM_TABLE_NAME);
         onCreate(sqLiteDatabase);
+    }
+
+    //ToDo: Search to retrieve all profiles from database.
+    public ArrayList<Profile> getAllConnections(){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(PROFILE_TABLE_NAME, null, null, null ,null, null, null);
+        ArrayList<Profile> profiles = new ArrayList<>();
+        if(!cursor.moveToFirst()){
+            while(!cursor.isAfterLast()){
+                String uid = cursor.getString(cursor.getColumnIndex(COLUMN_UID));
+                String name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME));
+                String bio = cursor.getString(cursor.getColumnIndex(COLUMN_BIO));
+                String gender = cursor.getString(cursor.getColumnIndex(COLUMN_GENDER));
+                long dob = cursor.getLong(cursor.getColumnIndex(COLUMN_BIRTHDATE));
+                profiles.add(new Profile(uid, name, bio, dob, gender));
+                cursor.moveToNext();
+            }
+
+        }
+        cursor.close();
+        db.close();
+        return profiles;
+
     }
 
     //Clears database, idea is if user logs out, I wouldn't want other users on this phone to have access to that data.
@@ -126,7 +151,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
             content.put(COLUMN_BIO, profile.getBio());
             content.put(COLUMN_GENDER, profile.getGender());
             content.put(COLUMN_BIRTHDATE, profile.getDOB());
-//            content.put(COLUMN_PIC_URL, profile.getPicURL());
+//            content.put(COLUMN_PIC_URL, profile.getPicURL()); //This is unnecessary since the UID is enough to find the picURL
             addedAmount++;
         }
         db.close();
@@ -145,7 +170,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         content.put(COLUMN_BIRTHDATE, profile.getDOB());
 
         String selection = COLUMN_UID+ " = ?";
-        db.update(PROFILE_TABLE_NAME, null, selection, new String[]{profile.getUID()});
+        db.update(PROFILE_TABLE_NAME, content, selection, new String[]{profile.getUID()});
         db.close();
     }
 
@@ -200,7 +225,6 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    //ToDo: Search to retrieve all profiles from database.
     //ToDo: Join search for ChatMessages that are relevant to each room.
 
 

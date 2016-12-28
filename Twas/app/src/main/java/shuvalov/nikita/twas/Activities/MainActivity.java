@@ -28,9 +28,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
 import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsHelper;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
+import shuvalov.nikita.twas.Helpers_Managers.FirebaseDatabaseUtils;
 import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
 import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.Profile;
@@ -58,8 +61,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
     Profile mProfile;
-    DatabaseReference mRef;
+    DatabaseReference mSelfProfileRef;
+    DatabaseReference mSelfConnectionsRef;
+    DatabaseReference mSelfChatroomsRef;
     FirebaseDatabase mFirebaseDatabase;
+
 
     String mId;
 //    String[] navOptions= new String[]{"Profile","Home", "Settings","SoapBox Feed","Invite Friends", "Donate", "About"};
@@ -71,38 +77,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         setContentView(R.layout.activity_main);
 
         mNearbyManager = NearbyManager.getInstance();
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mId = SelfUserProfileUtils.getUserId(this);
-        if(mId.equals(AppConstants.PREF_EMPTY)){
-            Log.d("MainActivity", "Either Awesome ID or No ID found in sharedPref");
-            Throwable throwable = new Throwable("Accessed requires a User ID");//FixMe: Pretty sure this isn't the right way to do this.
-            try {
-                throw throwable;
-            } catch (Throwable throwable1) {
-                throwable1.printStackTrace();
-            }
-        }
-        mRef = mFirebaseDatabase.getReference(mId).child(AppConstants.FIREBASE_USER_CHILD_PROFILE);
-
-        findViews();
-        setUpRecyclerView();
-
-        //ToDo: Check if user has profile on FBDB that we can pull.
-        mRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Profile myProfile = dataSnapshot.getValue(Profile.class);
-                if(myProfile!=null){
-                    SelfUserProfileUtils.assignProfileToSharedPreferences(MainActivity.this, myProfile);
-                    Log.d("Profile test", "onDataChange: "+myProfile.getName());
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d("Checking FBDB", "onCancelled: "+ databaseError.getMessage());
-            }
-        });
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Nearby.MESSAGES_API)
@@ -111,19 +85,28 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 .addOnConnectionFailedListener(this)
                 .build();
 
+        findViews();
+        setUpRecyclerView();
+        getUsersFbdbInformation();
+
+
         mActiveListener = new MessageListener() {
             @Override
             public void onFound(Message message) {
                 super.onFound(message);
-                mFoundId = new String(message.getContent());
-                //ToDo: The ID should be stored in some way so that the user can access that id's profile. DO THIS SOMEWHERE ELSE!!!!!!
-                DatabaseReference strangerRef = mFirebaseDatabase.getReference(mFoundId).child(AppConstants.FIREBASE_USER_CHILD_PROFILE);
+                mFoundId = new String(message.getContent()); //Gets message from other phone, which holds just that phone's UID for now.
+                mSelfConnectionsRef.push().setValue(mFoundId); //Adds stranger's UID to user's connectionsList.
+
+                DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mFoundId);
+//                DatabaseReference strangerRef = FirebaseDatabaseUtils.getChildReference(mFirebaseDatabase, mFoundId, AppConstants.theoneforprofiles);
+
+                //Gets the stranger's profile information.
                 strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Profile strangerProfile = dataSnapshot.getValue(Profile.class);
-                        ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(strangerProfile);
-                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile);
+                        ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
+                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
                         mProfileRecAdapter.notifyDataSetChanged();
                     }
 
@@ -134,9 +117,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     }
                 });
                 mDisplayText.setText(mFoundId);
-                //ToDo: After storing the ID retrieve the profile data from FBDB and add to ConnectionsHelper  && local db.
                 Toast.makeText(MainActivity.this, mFoundId, Toast.LENGTH_SHORT).show();
-
 
                 //ToDo: Do a count that adds found users, to keep track of active publishing users.
             }
@@ -175,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 //                        null,
 //                        null,
 //                        null);
-                mRef.setValue(mProfile);
+                mSelfProfileRef.setValue(mProfile);
             }
         });
 
@@ -186,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                 //ToDo: Clear users information in SharedPref and Database, unless if I keep database info tied to specific Users.
                 Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
-//                ConnectionsSQLOpenHelper.getInstance(MainActivity.this).clearDatabase();
+                ConnectionsSQLOpenHelper.getInstance(MainActivity.this).clearDatabase();
                 Intent intent = new Intent(MainActivity.this, FirebaseLogInActivity.class);
                 startActivity(intent);
             }
@@ -194,14 +175,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
         //ToDo: After making prototype, instead of button, probably using a recyclerView, populate the profile blurbs and add onClickListeners to that.
-        mRetrieveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent  = new Intent(MainActivity.this, ProfileDetailActivity.class);
-                intent.putExtra(FOUND_ID_INTENT,mFoundId);//ToDo: Once I have some way of displaying each Id's blurb, this will take in the id for that profile to be passed to the detail activity.
-                startActivity(intent);
-            }
-        });
+//        mRetrieveButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent  = new Intent(MainActivity.this, ProfileDetailActivity.class);
+//                intent.putExtra(FOUND_ID_INTENT,mFoundId);//ToDo: Once I have some way of displaying each Id's blurb, this will take in the id for that profile to be passed to the detail activity.
+//                startActivity(intent);
+//            }
+//        });
 
         mProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -211,8 +192,48 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
+        ArrayList<Profile> allProfiles = ConnectionsSQLOpenHelper.getInstance(this).getAllConnections();
+        ConnectionsHelper.getInstance().addProfileConnectionsToCollection(allProfiles);
     }
 
+    public void getUsersFbdbInformation(){
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mId = SelfUserProfileUtils.getUserId(this);
+        if(mId.equals(AppConstants.PREF_EMPTY)){
+            Log.d("MainActivity", "Either Awesome ID or No ID found in sharedPref");
+            Throwable throwable = new Throwable("Accessed requires a User ID");//FixMe: Pretty sure this isn't the right way to do this.
+            try {
+                throw throwable;
+            } catch (Throwable throwable1) {
+                throwable1.printStackTrace();
+            }
+        }
+
+        mSelfProfileRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase,mId);
+        mSelfConnectionsRef = FirebaseDatabaseUtils.getUserConnectionsRef(mFirebaseDatabase, mId);
+        mSelfChatroomsRef = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,mId);
+
+        //Check for logged-in user's profile information, in case it was updated on another device.
+        mSelfProfileRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Profile myProfile = dataSnapshot.getValue(Profile.class);
+                if(myProfile!=null){
+                    SelfUserProfileUtils.assignProfileToSharedPreferences(MainActivity.this, myProfile);
+                    Log.d("Profile test", "onDataChange: "+myProfile.getName());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("Checking FBDB", "onCancelled: "+ databaseError.getMessage());
+            }
+        });
+
+        //ToDo: Check for logged-in user's chatroom associations.
+
+        //ToDo: Check for logged-in user's connections list.
+    }
 
     public void findViews(){
         mSendButt = (Button)findViewById(R.id.send_butt);

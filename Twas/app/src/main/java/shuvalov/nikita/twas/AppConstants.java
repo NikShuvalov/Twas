@@ -12,6 +12,7 @@ public class AppConstants {
     public static final long FIREBASE_MAX_PHOTO_SIZE = 10*1024*1024; //n number of megabytes where n(1024^2)
     public static final String FIREBASE_USER_CHILD_PROFILE= "Profile";
     public static final String FIREBASE_USER_CHILD_CHATROOMS = "Chatrooms";
+    public static final String FIREBASE_USER_CHILD_CONNECTIONS = "Connections";
 
     public static final String ORIGIN_ACTIVITY = "where is intent coming from?";
     public static final String ORIGIN_MAIN = "main activity";
