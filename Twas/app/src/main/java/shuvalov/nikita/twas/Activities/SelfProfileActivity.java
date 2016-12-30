@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -45,7 +46,7 @@ public class SelfProfileActivity extends AppCompatActivity {
     private Bitmap mChosenProfileImage;
     private Spinner mGenders, mDate, mMonth, mYear;
     private ArrayAdapter<CharSequence> mGenderAdapter, mDateAdapter, mMonthAdapter, mYearAdapter;
-
+    private Toolbar mToolbar;
     private Profile mProfile;
 
     @Override
@@ -123,6 +124,11 @@ public class SelfProfileActivity extends AppCompatActivity {
         mAccessGallery = (Button)findViewById(R.id.upload_image_gallery);
         mTakeSelfie = (Button)findViewById(R.id.selfie_button);
         mSubmit = (FloatingActionButton) findViewById(R.id.submit_changes_button);
+        mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("My Profile");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         mName = (EditText)findViewById(R.id.name_entry);
         mBio = (EditText)findViewById(R.id.about_me_entry);

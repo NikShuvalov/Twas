@@ -45,7 +45,7 @@ public class ProfileDetailActivity extends AppCompatActivity {
         mDOBText = (TextView)findViewById(R.id.dob_text);
         mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
         setSupportActionBar(mToolbar);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mImageView = (ImageView)findViewById(R.id.profile_image_view);
     }
 
