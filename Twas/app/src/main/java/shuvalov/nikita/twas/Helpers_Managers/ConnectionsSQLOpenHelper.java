@@ -96,7 +96,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(PROFILE_TABLE_NAME, null, null, null ,null, null, null);
         ArrayList<Profile> profiles = new ArrayList<>();
-        if(!cursor.moveToFirst()){
+        if(cursor.moveToFirst()){
             while(!cursor.isAfterLast()){
                 String uid = cursor.getString(cursor.getColumnIndex(COLUMN_UID));
                 String name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME));

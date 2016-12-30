@@ -87,8 +87,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         findViews();
         setUpRecyclerView();
+        retrieveStoredProfiles();
         getUsersFbdbInformation();
-
 
         mActiveListener = new MessageListener() {
             @Override
@@ -199,7 +199,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         ConnectionsHelper.getInstance().addProfileConnectionsToCollection(allProfiles);
     }
 
-
+    public void retrieveStoredProfiles(){
+        ArrayList<Profile> storedProfiles = ConnectionsSQLOpenHelper.getInstance(this).getAllConnections();
+        for (Profile profile: storedProfiles){
+            Log.d("MainActivity", "Profile name: "+profile.getName());
+        }
+        ConnectionsHelper.getInstance().addProfileConnectionsToCollection(storedProfiles);
+        mProfileRecAdapter.notifyDataSetChanged();
+    }
 
     //ToDo: Move method to another activity/class. So that we don't end up doing database check/syncs everytime we navigate back to here.
     public void getUsersFbdbInformation(){
