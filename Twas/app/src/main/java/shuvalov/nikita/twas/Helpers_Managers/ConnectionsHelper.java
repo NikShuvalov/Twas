@@ -28,7 +28,7 @@ public class ConnectionsHelper {
     }
 
     //ToDo: Optimize
-    public void addProfileToCollection(Profile profile){
+    public int addProfileToCollection(Profile profile){
         boolean alreadyIn =false;
         for(Profile storedProfile: mProfileConnections){
             if(storedProfile.getUID().equals(profile.getUID())){
@@ -38,6 +38,7 @@ public class ConnectionsHelper {
         if(!alreadyIn){
             mProfileConnections.add(profile);
         }
+        return mProfileConnections.size();
     }
 
     //Should call this after pulling data from database... But no other time, otherwise it'll end up giving duplicates.

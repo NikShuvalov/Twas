@@ -21,6 +21,7 @@ import shuvalov.nikita.twas.PoJos.Profile;
 
 public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "CONNECTION_COLLECTION_DB";
+    public static final int DATABASE_VERSION = 2;
 
     public static final String PROFILE_TABLE_NAME = "PROFILE_LIST";
     public static final String CHATMESS_TABLE_NAME = "CHAT_MESSAGES_LIST";
@@ -33,7 +34,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
     public static final String COLUMN_GENDER = "GENDER";
     public static final String COLUMN_BIRTHDATE = "BIRTH_DATE";
 
-//    public static final String COLUMN_ID = "ID";
+//    public static final String COLUMN_MESSAGE_ID = "_ID";
     public static final String COLUMN_ROOM_ID = "ROOM_ID";
     public static final String COLUMN_ROOM_NAME = "ROOM_NAME";
     public static final String COLUMN_TIMESTAMP = "TIMESTAMP";
@@ -41,7 +42,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
 
     //This holds all of the user profiles, including self(? maybe store as sharePreferences).
     public static final String CREATE_PROFILE_TABLE_EXE = "CREATE TABLE "+ PROFILE_TABLE_NAME +
-            " ("+ COLUMN_UID +" TEXT,"+
+            " ("+ COLUMN_UID +" TEXT PRIMARY KEY,"+
             COLUMN_NAME + " TEXT,"+
             COLUMN_BIO + " TEXT,"+
             COLUMN_GENDER + " TEXT," +
@@ -50,13 +51,13 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
     //This holds all of the messages relative to the current user.
     public static final String CREATE_CHATMESS_TABLE_EXE = "CREATE TABLE "+ CHATMESS_TABLE_NAME+
             " (" + COLUMN_ROOM_ID+ " TEXT,"+
-            COLUMN_TIMESTAMP+ " INTEGER,"+
+            COLUMN_TIMESTAMP+ " INTEGER PRIMARY KEY,"+
             COLUMN_UID + " TEXT,"+
             COLUMN_MESSAGE_CONTENT + " TEXT)";
 
     //This simply keeps the chatmessages segregated by rooms.
     public static final String CREATE_CHATROOM_TABLE_EXE = "CREATE TABLE "+ CHATROOM_TABLE_NAME+
-            " ("+ COLUMN_ROOM_ID+ " TEXT,"+
+            " ("+ COLUMN_ROOM_ID+ " TEXT PRIMARY KEY,"+
             COLUMN_ROOM_NAME+ " TEXT)";
 
 
@@ -73,7 +74,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
     }
 
     private ConnectionsSQLOpenHelper(Context context) {
-        super(context, DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
@@ -117,9 +118,9 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
     //Clears database, idea is if user logs out, I wouldn't want other users on this phone to have access to that data.
     public void clearDatabase(){
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("TRUNCATE TABLE IF EXISTS " + PROFILE_TABLE_NAME);
-        db.execSQL("TRUNCATE TABLE IF EXISTS "+ CHATMESS_TABLE_NAME);
-        db.execSQL("TRUNCATE TABLE IF EXISTS "+ CHATROOM_TABLE_NAME);
+        db.delete(PROFILE_TABLE_NAME, null, null);
+        db.delete(CHATMESS_TABLE_NAME, null, null);
+        db.delete(CHATROOM_TABLE_NAME, null, null);
         db.close();
 
     }
@@ -134,7 +135,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         content.put(COLUMN_GENDER, profile.getGender());
         content.put(COLUMN_BIRTHDATE, profile.getDOB());
 
-        long row = db.insert(PROFILE_TABLE_NAME, null, content);
+        long row=db.insertWithOnConflict(PROFILE_TABLE_NAME, null, content, SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
         return row;//ToDo: Not sure why I'm returning a value, but might serve useful. (Remove if proves unnecessary)
     }
@@ -150,7 +151,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
             content.put(COLUMN_BIO, profile.getBio());
             content.put(COLUMN_GENDER, profile.getGender());
             content.put(COLUMN_BIRTHDATE, profile.getDOB());
-            db.insert(PROFILE_TABLE_NAME, null, content); //ToDo: Consider changing this to updateWithOnConflict
+            db.insertWithOnConflict(PROFILE_TABLE_NAME, null, content, SQLiteDatabase.CONFLICT_REPLACE); //ToDo: Consider changing this to updateWithOnConflict
             addedAmount++;
         }
         db.close();

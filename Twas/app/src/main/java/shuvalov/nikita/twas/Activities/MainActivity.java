@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         retrieveStoredProfiles();
         getUsersFbdbInformation();
 
+
         mActiveListener = new MessageListener() {
             @Override
             public void onFound(Message message) {
@@ -194,16 +195,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 startActivity(intent);
             }
         });
-
-        ArrayList<Profile> allProfiles = ConnectionsSQLOpenHelper.getInstance(this).getAllConnections();
-        ConnectionsHelper.getInstance().addProfileConnectionsToCollection(allProfiles);
     }
 
+    //ToDo: Move into splash screen activity. Should only be called a single time upon load.
     public void retrieveStoredProfiles(){
         ArrayList<Profile> storedProfiles = ConnectionsSQLOpenHelper.getInstance(this).getAllConnections();
-        for (Profile profile: storedProfiles){
-            Log.d("MainActivity", "Profile name: "+profile.getName());
-        }
         ConnectionsHelper.getInstance().addProfileConnectionsToCollection(storedProfiles);
         mProfileRecAdapter.notifyDataSetChanged();
     }
@@ -249,14 +245,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mSelfConnectionsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("Retrieve Connections", "Checking for connections");
                 Iterable<DataSnapshot> connectionsSnapshot= dataSnapshot.getChildren();
                 ArrayList<String> connectionsList = new ArrayList<>();
-                for(DataSnapshot connection: connectionsSnapshot){
-                    connectionsList.add(connection.getKey());
+                while(connectionsSnapshot.iterator().hasNext()){
+                    String profileUid = connectionsSnapshot.iterator().next().getKey();
+                    Log.d("Connection Retrieval", "Connection UID: "+ profileUid);
+                    connectionsList.add(profileUid);
+
                 }
                 //ToDo: Use the list of connections and compare with what we have in the database, then fill in what's missing.
                 ArrayList<String> missingIds = checkForMissingProfiles(connectionsList);
                 if(!missingIds.isEmpty()){
+                    Log.d("Retrieve Connections", "Some Missing Ids");
                     retrieveMissingProfiles(missingIds);
                 }
             }
@@ -277,7 +278,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Profile profile = dataSnapshot.getValue(Profile.class);
                     ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(profile);
-                    ConnectionsHelper.getInstance().addProfileToCollection(profile);
+                    int profilesListSize = ConnectionsHelper.getInstance().addProfileToCollection(profile);
+                    mProfileRecAdapter.notifyItemInserted(profilesListSize-1);
                 }
 
                 @Override
@@ -286,13 +288,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 }
             });
         }
-        mProfileRecAdapter.notifyDataSetChanged();
     }
 
     //ToDo: Move method to another activity/class
     public ArrayList<String> checkForMissingProfiles(ArrayList<String> userIdList){
         ArrayList<Profile> currentStoredProfiles = ConnectionsSQLOpenHelper.getInstance(MainActivity.this).getAllConnections();
-        ConnectionsHelper.getInstance().addProfileConnectionsToCollection(currentStoredProfiles); //FixMe: This should probably go elsewhere
         ArrayList<String> currentStoredIds = new ArrayList<>();
         ArrayList<String> idsMissingProfiles = new ArrayList<>();
         for(Profile profile: currentStoredProfiles){
@@ -359,6 +359,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void publish(){
         mFindMeMessage = new Message(mId.getBytes());
+        Log.d("NearBy", "publishing ID: "+ mId);
         if(mNearbyManager.isGoogleApiConnected()){
             Nearby.Messages.publish(mGoogleApiClient, mFindMeMessage);
             mNearbyManager.setPublishing(true);
