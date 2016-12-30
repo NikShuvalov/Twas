@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     TextView mDisplayText;
     String mFoundId;
 
+    boolean mBackRecentlyPressed;
     RecyclerView mRecyclerView;
 
     NearbyManager mNearbyManager;
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mBackRecentlyPressed=false;
 
         mNearbyManager = NearbyManager.getInstance();
 
@@ -173,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
                 ConnectionsSQLOpenHelper.getInstance(MainActivity.this).clearDatabase();
                 Intent intent = new Intent(MainActivity.this, FirebaseLogInActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
         });
@@ -387,5 +391,27 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             mGoogleApiClient.disconnect();
         }
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mBackRecentlyPressed=false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(!mBackRecentlyPressed){
+            mBackRecentlyPressed=true;
+            Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            mBackRecentlyPressed=false;
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+
     }
 }
