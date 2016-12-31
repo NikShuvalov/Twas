@@ -20,7 +20,6 @@ public class FireBaseStorageUtils {
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         StorageReference bucketRef = firebaseStorage.getReferenceFromUrl(AppConstants.FIREBASE_IMAGE_BUCKET);
         return bucketRef.child(String.format(AppConstants.FIREBASE_USER_PROFILE_IMAGE, uid));
-
     }
 }
 

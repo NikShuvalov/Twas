@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import shuvalov.nikita.twas.AppConstants;
+import shuvalov.nikita.twas.Helpers_Managers.FirebaseDatabaseUtils;
 import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
@@ -107,7 +108,7 @@ public class SelfProfileActivity extends AppCompatActivity {
         storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                Picasso.with(SelfProfileActivity.this).load(uri).into(mProfileImage);//Loads, but takes a long time.
+                Picasso.with(SelfProfileActivity.this).load(uri).into(mProfileImage);
             }
 
         }).addOnFailureListener(new OnFailureListener() {
@@ -191,7 +192,8 @@ public class SelfProfileActivity extends AppCompatActivity {
 
                 //ToDo: I might want to move my dataBase uploads and downloads to a helper class.
                 FirebaseDatabase db = FirebaseDatabase.getInstance();
-                DatabaseReference dbRef = db.getReference(mProfile.getUID()).child(AppConstants.FIREBASE_USER_CHILD_PROFILE);
+                DatabaseReference dbRef = FirebaseDatabaseUtils.getUserProfileRef(db, mProfile.getUID());
+//                DatabaseReference dbRef = db.getReference(mProfile.getUID()).child(AppConstants.FIREBASE_USER_CHILD_PROFILE);
                 dbRef.setValue(mProfile);
             }
         });

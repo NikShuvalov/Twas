@@ -17,6 +17,8 @@ public class ChatMessage {
         mTimeStamp = timeStamp;
     }
 
+    public ChatMessage(){}
+
     public String getUserID() {
         return mUserID;
     }

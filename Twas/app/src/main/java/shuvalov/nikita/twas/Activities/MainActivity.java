@@ -181,17 +181,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
-
-        //ToDo: After making prototype, instead of button, probably using a recyclerView, populate the profile blurbs and add onClickListeners to that.
-//        mRetrieveButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent  = new Intent(MainActivity.this, ProfileDetailActivity.class);
-//                intent.putExtra(FOUND_ID_INTENT,mFoundId);//ToDo: Once I have some way of displaying each Id's blurb, this will take in the id for that profile to be passed to the detail activity.
-//                startActivity(intent);
-//            }
-//        });
-
         mProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -244,6 +233,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
 
         //ToDo: Check for logged-in user's chatroom associations.
+        /*  This is going to have to be a constant listener in case a new chatroom/message appears over the course of the session.
+         */
 
         //ToDo: Check for logged-in user's connections list.
         mSelfConnectionsRef.addListenerForSingleValueEvent(new ValueEventListener() {

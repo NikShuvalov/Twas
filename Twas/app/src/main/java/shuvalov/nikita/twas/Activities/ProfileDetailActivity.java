@@ -6,20 +6,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
+import java.util.HashMap;
 
 import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsHelper;
+import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.FireBaseStorageUtils;
+import shuvalov.nikita.twas.Helpers_Managers.FirebaseDatabaseUtils;
+import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
+import shuvalov.nikita.twas.PoJos.ChatMessage;
+import shuvalov.nikita.twas.PoJos.ChatRoom;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
 
@@ -28,15 +38,54 @@ public class ProfileDetailActivity extends AppCompatActivity {
     TextView mNameText, mBioText, mDOBText;
     ImageView mImageView;
     Toolbar mToolbar;
+    Button mChatInviteButton;
+    FirebaseDatabase mFirebaseDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_detail);
 
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
         findViews();
-        Profile selectedProfile = ConnectionsHelper.getInstance().getProfileByPosition(getIntent().getIntExtra("Position in singleton",-1));
+        final Profile selectedProfile = ConnectionsHelper.getInstance().getProfileByPosition(getIntent().getIntExtra("Position in singleton",-1));
         bindDataToViews(selectedProfile);
+
+
+        mChatInviteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //ToDo: Check if currentUser and selectedUser already have a chatroom together, to prevent making duplicates
+
+                DatabaseReference chatroomsRef = FirebaseDatabaseUtils.getChatroomRef(mFirebaseDatabase, null);
+
+                DatabaseReference createdChatroom = chatroomsRef.push();
+
+                Profile selfUser = SelfUserProfileUtils.getUsersInfoAsProfile(ProfileDetailActivity.this);
+                HashMap<String, String> users = new HashMap<String, String>();
+
+                users.put(selectedProfile.getUID(),selectedProfile.getName());
+                users.put(selfUser.getUID(), selfUser.getName());
+
+                ChatRoom chatroom = new ChatRoom();
+                chatroom.setId(createdChatroom.getKey());
+                chatroom.addUserToChatroom(selfUser.getUID());
+                chatroom.addUserToChatroom(selectedProfile.getUID());
+                createdChatroom.child(AppConstants.FIREBASE_USERS).setValue(chatroom); //FixMe: Adds each MemberVariable twice to database.
+                DatabaseReference messageReference = FirebaseDatabaseUtils.getChatroomMessagesRef(mFirebaseDatabase,chatroom.getId());
+                long currentTime = Calendar.getInstance().getTimeInMillis();
+                ChatMessage initialChatMessage = new ChatMessage(selfUser.getUID(),chatroom.getId(), String.format("%s has started this conversation",selfUser.getName()),currentTime);
+                messageReference.setValue(initialChatMessage); //FixMe: Adds each mVariable twice to database.
+
+                //Adds a reference to the Chatroom to both members' profiles.
+                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, selfUser.getUID()).child(chatroom.getId()).setValue(users);
+                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, selectedProfile.getUID()).child(chatroom.getId()).setValue(users);
+
+                //Adds the newly made chatroom and initial message to the local db.
+                ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addChatRoom(chatroom);
+                ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addMessage(initialChatMessage);
+            }
+        });
     }
 
     public void findViews(){
@@ -47,6 +96,7 @@ public class ProfileDetailActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mImageView = (ImageView)findViewById(R.id.profile_image_view);
+        mChatInviteButton = (Button)findViewById(R.id.chat_invite_button);
     }
 
     public void bindDataToViews(Profile profile){
@@ -97,5 +147,6 @@ public class ProfileDetailActivity extends AppCompatActivity {
                 mImageView.setImageResource(R.drawable.shakespeare_modern_bard_post);
             }
         });
+        mChatInviteButton.setText(String.format("Invite %s to chat", profile.getName()));
     }
 }
