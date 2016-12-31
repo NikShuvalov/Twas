@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public static final String FOUND_ID_INTENT = "Found id";
 
     Toolbar mToolbar;
-    Button mSendButt, mRetrieveButton, mSignOutButton, mProfileButton;
+    Button mSendButt, mSignOutButton, mProfileButton;
     TextView mDisplayText;
     String mFoundId;
 
@@ -153,17 +153,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         };
 
+        //ToDo:Remove this, simply using for debugging to navigate to chatroomListActivity
         mSendButt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                mActiveMessage = new Message(mEditText.getText().toString().getBytes());
-//                mProfile = new Profile(mEditText.getText().toString(),
-//                        mBioEntry.getText().toString(),
-//                        mDobEntry.getText().toString(),
-//                        null,
-//                        null,
-//                        null);
-                mSelfProfileRef.setValue(mProfile);
+                Intent chatroomIntent = new Intent(MainActivity.this, ChatRoomListActivity.class);
+                startActivity(chatroomIntent);
             }
         });
 
@@ -306,7 +301,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void findViews(){
         mSendButt = (Button)findViewById(R.id.send_butt);
-        mRetrieveButton = (Button)findViewById(R.id.retrieve_button);
         mDisplayText = (TextView)findViewById(R.id.display_text);
         mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
         mSignOutButton = (Button)findViewById(R.id.sign_out_button);
