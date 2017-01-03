@@ -185,6 +185,23 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+//    public ArrayList<ChatRoom> getChatRooms(){
+//        ArrayList<ChatRoom> chatRooms = new ArrayList<>();
+//        SQLiteDatabase db = getReadableDatabase();
+//        Cursor cursor = db.query(CHATROOM_TABLE_NAME,
+//                null,
+//                null,
+//                null,
+//                null,
+//                null,
+//                null);
+//        if(cursor.moveToFirst()){
+//            while(!cursor.isAfterLast()){
+//                cursor.get
+//                cursor.moveToNext();
+//            }
+//        }
+//    }
     //Adds collection of chatrooms. Called upon logging in and retrieving from FBDB.
     public void addAllChatRooms(List<ChatRoom> chatRooms){
         SQLiteDatabase db = getWritableDatabase();
@@ -205,8 +222,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         content.put(COLUMN_TIMESTAMP, chatMessage.getTimeStamp());
         content.put(COLUMN_UID, chatMessage.getUserId());
         content.put(COLUMN_MESSAGE_CONTENT, chatMessage.getContent());
-
-        db.insert(CHATMESS_TABLE_NAME, null, content);
+        db.insertWithOnConflict(CHATMESS_TABLE_NAME, null, content,SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
     }
 

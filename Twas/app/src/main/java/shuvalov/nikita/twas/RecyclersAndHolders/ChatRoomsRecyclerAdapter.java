@@ -33,15 +33,15 @@ public class ChatRoomsRecyclerAdapter extends RecyclerView.Adapter<ChatRoomsView
     @Override
     public void onBindViewHolder(final ChatRoomsViewHolder holder, int position) {
         holder.bindDataToView(mChatRooms.get(position));
-        holder.mChatRoomIdText.setOnClickListener(new View.OnClickListener() {
+        holder.mCardContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), ChatRoomActivity.class);
+                intent.putExtra(AppConstants.ORIGIN_ACTIVITY, AppConstants.ORIGIN_CHATROOMS);
                 intent.putExtra(AppConstants.PREF_CHATROOM,holder.getAdapterPosition());
                 view.getContext().startActivity(intent);
             }
         });
-
     }
 
     @Override

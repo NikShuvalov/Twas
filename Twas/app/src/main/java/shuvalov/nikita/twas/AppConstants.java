@@ -20,6 +20,8 @@ public class AppConstants {
     public static final String ORIGIN_ACTIVITY = "where is intent coming from?";
     public static final String ORIGIN_MAIN = "main activity";
     public static final String ORIGIN_LOG_IN= "login activity";
+    public static final String ORIGIN_CHATROOMS = "chatrooms activity";
+    public static final String ORIGIN_PROFILE_DETAIL = "profile detail activity";
 
     public static final String PREF_SELF_USER_PROFILE = "Self_user_profile";
     public static final String PREF_ID = "Self_id";

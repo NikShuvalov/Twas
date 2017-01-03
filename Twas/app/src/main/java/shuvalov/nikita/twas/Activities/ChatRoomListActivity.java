@@ -52,6 +52,7 @@ public class ChatRoomListActivity extends AppCompatActivity {
 
             }
         });
+        //ToDo: Allow users to rename the chatRoom.
         /*
         This will display all of the chatrooms that the user belongs to.
         User can select a chatroom to view all messages in the chatroom.

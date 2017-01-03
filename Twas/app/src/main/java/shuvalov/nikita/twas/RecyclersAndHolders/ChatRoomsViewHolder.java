@@ -1,9 +1,18 @@
 package shuvalov.nikita.twas.RecyclersAndHolders;
 
+import android.net.Uri;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
+
+import shuvalov.nikita.twas.Helpers_Managers.FireBaseStorageUtils;
+import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.ChatRoom;
 import shuvalov.nikita.twas.R;
 
@@ -13,13 +22,29 @@ import shuvalov.nikita.twas.R;
 
 public class ChatRoomsViewHolder extends RecyclerView.ViewHolder {
     TextView mChatRoomIdText;
+    ImageView mImageView;
+    CardView mCardContainer;
 
     public ChatRoomsViewHolder(View itemView) {
         super(itemView);
-        mChatRoomIdText = (TextView)itemView.findViewById(R.id.chatroom_id_text);
+        mChatRoomIdText = (TextView)itemView.findViewById(R.id.chatroom_name_text);
+        mImageView = (ImageView)itemView.findViewById(R.id.image_view);
+        mCardContainer = (CardView)itemView.findViewById(R.id.chatroom_card);
     }
     public void bindDataToView(ChatRoom chatRoom){
-        //ToDo: Chang to taking in a chatRoomObject maybe to keep track of name and shit.
         mChatRoomIdText.setText(chatRoom.getRoomName());
+        String id=  chatRoom.getUserIds().get(0); //Get the first user's id.
+
+
+        if(SelfUserProfileUtils.getUserId(mChatRoomIdText.getContext()).equals(id)){ //If This is the same as the user's id, then let's set it to the other user's id.
+            id = chatRoom.getUserIds().get(1);
+        }
+        StorageReference imageRef = FireBaseStorageUtils.getProfilePicStorageRef(id);
+        imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Picasso.with(mImageView.getContext()).load(uri).into(mImageView);
+            }
+        });
     }
 }

@@ -11,7 +11,6 @@ import shuvalov.nikita.twas.PoJos.ChatRoom;
 public class ChatRoomsHelper {
 
     private ArrayList<ChatRoom> mChatRooms;
-    private ArrayList<String> mChatRoomIds;
 
     private static ChatRoomsHelper sChatRoomsHelper;
 
@@ -24,7 +23,6 @@ public class ChatRoomsHelper {
 
     private ChatRoomsHelper(){
         mChatRooms = new ArrayList<>();
-        mChatRoomIds = new ArrayList<>();
     }
 
     public void addChatRoom(ChatRoom chatRoom){
@@ -37,15 +35,9 @@ public class ChatRoomsHelper {
         return mChatRooms.get(position);
     }
 
-    public void addChatRoomId(String chatRoomId){
-        mChatRoomIds.add(chatRoomId);
-    }
-    public String getChatRoomIdAtPosition(int position){
-        return mChatRoomIds.get(position);
-    }
 
-    public ArrayList<String> getChatRoomIds(){
-        return mChatRoomIds;
+    public int getNumberOfChatrooms(){
+        return mChatRooms.size();
     }
 
 }

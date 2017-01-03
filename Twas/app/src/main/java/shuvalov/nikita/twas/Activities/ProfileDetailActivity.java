@@ -1,5 +1,6 @@
 package shuvalov.nikita.twas.Activities;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -14,13 +15,16 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 
 import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsHelper;
@@ -40,11 +44,14 @@ public class ProfileDetailActivity extends AppCompatActivity {
     Toolbar mToolbar;
     Button mChatInviteButton;
     FirebaseDatabase mFirebaseDatabase;
+    String mSelfUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_detail);
+
+        mSelfUserId = SelfUserProfileUtils.getUserId(ProfileDetailActivity.this);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         findViews();
@@ -56,16 +63,42 @@ public class ProfileDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //ToDo: Check if currentUser and selectedUser already have a chatroom together, to prevent making duplicates
+                DatabaseReference selfReference = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,mSelfUserId);
+                selfReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Iterable<DataSnapshot> chatRoomsData = dataSnapshot.getChildren();
+                        while(chatRoomsData.iterator().hasNext()){
+                            ChatRoom chatRoom = chatRoomsData.iterator().next().getValue(ChatRoom.class);
+                            ArrayList<String> userIds = chatRoom.getUserIds();
+
+                            //If both user IDs are found in one of the chatrooms that means users already have an existing chatroom together.
+                            if((userIds.get(0).equals(mSelfUserId) && userIds.get(1).equals(selectedProfile.getUID()))||
+                                    (userIds.get(1).equals(mSelfUserId) && userIds.get(0).equals(selectedProfile.getUID()))) {
+                                Intent intent = new Intent(ProfileDetailActivity.this, ChatRoomActivity.class);
+                                intent.putExtra(AppConstants.ORIGIN_ACTIVITY, AppConstants.ORIGIN_PROFILE_DETAIL);
+                                intent.putExtra(AppConstants.PREF_CHATROOM, chatRoom.getId());
+                                startActivity(intent);
+                            }
+                        }
+
+
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
 
                 DatabaseReference chatroomsRef = FirebaseDatabaseUtils.getChatroomRef(mFirebaseDatabase, null);
 
                 DatabaseReference createdChatroom = chatroomsRef.push();
 
                 Profile selfUser = SelfUserProfileUtils.getUsersInfoAsProfile(ProfileDetailActivity.this);
-//                HashMap<String, String> users = new HashMap<String, String>();
-//
-//                users.put(selectedProfile.getUID(),selectedProfile.getName());
-//                users.put(selfUser.getUID(), selfUser.getName());
+
 
                 ChatRoom chatroom = new ChatRoom();
                 chatroom.setId(createdChatroom.getKey());
@@ -84,6 +117,11 @@ public class ProfileDetailActivity extends AppCompatActivity {
                 //Adds the newly made chatroom and initial message to the local db.
                 ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addChatRoom(chatroom);
                 ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addMessage(initialChatMessage);
+
+                Intent intent = new Intent(ProfileDetailActivity.this, ChatRoomActivity.class);
+                intent.putExtra(AppConstants.ORIGIN_ACTIVITY, AppConstants.ORIGIN_PROFILE_DETAIL);
+                intent.putExtra(AppConstants.PREF_CHATROOM, chatroom.getId());
+                startActivity(intent);
             }
         });
     }

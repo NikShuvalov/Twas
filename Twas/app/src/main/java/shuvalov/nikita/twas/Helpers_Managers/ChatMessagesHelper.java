@@ -10,7 +10,6 @@ import shuvalov.nikita.twas.PoJos.ChatMessage;
 
 public class ChatMessagesHelper {
     private ArrayList<ChatMessage> mChatMessages;
-    private ArrayList<String> mChatMakeShiftString;
 
     private static ChatMessagesHelper sChatMessagesHelper;
 
@@ -23,7 +22,6 @@ public class ChatMessagesHelper {
 
     private ChatMessagesHelper(){
         mChatMessages = new ArrayList<>();
-        mChatMakeShiftString = new ArrayList<>();
     }
 
     public void addChatMessage(ChatMessage chatMessage){
@@ -34,11 +32,14 @@ public class ChatMessagesHelper {
         return mChatMessages;
     }
 
-    public void addMakeShiftMessage(String message){
-        mChatMakeShiftString.add(message);
-    }
-    public ArrayList<String> getMakeShiftChatLog(){
-        return mChatMakeShiftString;
-    }
+    public void cleanChatLog(String chatroomId) {
+        //If the id of the chatroom we are entering is not the same as the id of the messages that are already inside then let's clear the list. Otherwise keep it.
+        if (!mChatMessages.isEmpty()) {
+            String id = mChatMessages.get(0).getRoomID();
+            if (!chatroomId.equals(id)) {
+                mChatMessages = new ArrayList<>();
+            }
+        }
 
+    }
 }

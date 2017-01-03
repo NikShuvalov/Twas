@@ -23,6 +23,7 @@ import java.util.Calendar;
 import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.Helpers_Managers.ChatMessagesHelper;
 import shuvalov.nikita.twas.Helpers_Managers.ChatRoomsHelper;
+import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.FirebaseDatabaseUtils;
 import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.ChatMessage;
@@ -44,13 +45,13 @@ public class ChatRoomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
+
         findViews();
         getChatLog();
         recyclerLogic();
         onClickLogic();
 
         /* This is going to display all of the chatmessages that belong to this chatRoom in a recyclerView.
-        User can also send new messages from this activity.
         User can arrive to this activity either by clicking on a chatroom in their chatroom list or
         User can Arrive to this activity upon creation of a new chatroom.
         (Optional) User can invite additional users to the chatroom.
@@ -67,22 +68,29 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     public void getChatLog(){
-        int chatRoomPos = getIntent().getIntExtra(AppConstants.PREF_CHATROOM,-1);
-        if(chatRoomPos == -1){
-            Toast.makeText(this, "ChatRoom couldn't be found", Toast.LENGTH_SHORT).show();
-            finish();
+        ChatRoom chatRoom;
+        if(getIntent().getStringExtra(AppConstants.ORIGIN_ACTIVITY).equals(AppConstants.ORIGIN_CHATROOMS)){
+            int chatRoomPos = getIntent().getIntExtra(AppConstants.PREF_CHATROOM,-1);
+            if(chatRoomPos == -1){
+                Toast.makeText(this, "ChatRoom couldn't be found", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            chatRoom = ChatRoomsHelper.getInstance().getChatRoomAtPosition(chatRoomPos);
+            mChatRoomId = chatRoom.getId();
+        }else if (getIntent().getStringExtra(AppConstants.ORIGIN_ACTIVITY).equals(AppConstants.ORIGIN_PROFILE_DETAIL)){
+            mChatRoomId = getIntent().getStringExtra(AppConstants.PREF_CHATROOM);
         }
 
-        ChatRoom chatRoom = ChatRoomsHelper.getInstance().getChatRoomAtPosition(chatRoomPos);
-        mChatRoomId = chatRoom.getId();
+        ChatMessagesHelper.getInstance().cleanChatLog(mChatRoomId);
         mChatRoomRef = FirebaseDatabaseUtils.getChatroomMessagesRef(FirebaseDatabase.getInstance(), mChatRoomId);
-
 
         mChatRoomRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 ChatMessage newMessage = dataSnapshot.getValue(ChatMessage.class);
                 ChatMessagesHelper.getInstance().addChatMessage(newMessage);
+                ConnectionsSQLOpenHelper.getInstance(ChatRoomActivity.this).addMessage(newMessage);
                 mAdapter.notifyItemInserted(ChatMessagesHelper.getInstance().getChatLog().size()-1);
             }
 
