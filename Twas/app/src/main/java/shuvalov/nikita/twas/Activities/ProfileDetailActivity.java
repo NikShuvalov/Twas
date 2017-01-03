@@ -61,7 +61,7 @@ public class ProfileDetailActivity extends AppCompatActivity {
         mChatInviteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //ToDo: Check if currentUser and selectedUser already have a chatroom together, to prevent making duplicates
+                //Check if currentUser and selectedUser already have a chatroom together, to prevent making duplicates
                 DatabaseReference selfReference = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,mSelfUserId);
                 selfReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

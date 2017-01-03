@@ -362,10 +362,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mNearbyManager.setSubscribing(true);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 
     @Override
     protected void onDestroy() {

@@ -53,9 +53,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         onClickLogic();
 
         /* This is going to display all of the chatMessages that belong to this chatRoom in a recyclerView.
-        User can arrive to this activity either by clicking on a chatroom in their chatroom list or
-        User can Arrive to this activity upon creation of a new chatroom.
-        (Optional) User can invite additional users to the chatroom.
+        ToDo: (Optional) User can invite additional users to the chatroom.
          */
     }
 
@@ -125,7 +123,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     public void recyclerLogic(){
-        mAdapter = new ChatMessagesRecyclerAdapter(ChatMessagesHelper.getInstance().getChatLog());//True Code
+        mAdapter = new ChatMessagesRecyclerAdapter(ChatMessagesHelper.getInstance().getChatLog(),SelfUserProfileUtils.getUserId(this));//True Code
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
+import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.ChatMessage;
 import shuvalov.nikita.twas.R;
 
@@ -16,42 +17,44 @@ import shuvalov.nikita.twas.R;
 
 public class ChatMessagesRecyclerAdapter extends RecyclerView.Adapter<ChatMessageViewHolder> {
     ArrayList<ChatMessage> mChatMessages;
-//    ArrayList<String> mMakeShiftChat;
+    String mSelfId;
 
-    //ToDo: The true code
-    public ChatMessagesRecyclerAdapter(ArrayList<ChatMessage> chatMessages) {
+    public ChatMessagesRecyclerAdapter(ArrayList<ChatMessage> chatMessages, String selfId) {
         mChatMessages = chatMessages;
+        mSelfId = selfId;
     }
 
-    //ToDO: THe fake code
-//    public ChatMessagesRecyclerAdapter(ArrayList<String> makeShiftChat) {
-//        mMakeShiftChat = makeShiftChat;
-//    }
 
     @Override
     public ChatMessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.viewholder_chat_message,null);
+        int resource;
+        if(viewType==0){
+            resource=R.layout.viewholder_chat_self;
+        }else{
+            resource = R.layout.viewholder_chat_message;
+        }
+        View view = LayoutInflater.from(parent.getContext()).inflate(resource,null);
         return new ChatMessageViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ChatMessageViewHolder holder, int position) {
-//        holder.mChatText.setText(mMakeShiftChat.get(position));//MakeShift code
-
         holder.bindDataToViews(mChatMessages.get(position));//True code
     }
 
-//    ToDo: The real Code
     @Override
     public int getItemCount() {
         return mChatMessages.size();
     }
 
-    //TODO: THe fake code
-//
-//    @Override
-//    public int getItemCount() {
-//        return mMakeShiftChat.size();
-//    }
+    @Override
+    public int getItemViewType(int position) {
+        ChatMessage chatMessage = mChatMessages.get(position);
 
+        //If self was the one who posted the message use return viewtype 0, else 1;
+        if(chatMessage.getUserId().equals(mSelfId)){
+            return 0;
+        }
+        return 1;
+    }
 }

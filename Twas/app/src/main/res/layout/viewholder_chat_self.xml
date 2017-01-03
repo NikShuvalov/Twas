@@ -4,36 +4,33 @@
                 android:layout_height="match_parent"
                 xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!--ToDo: Make prettier, duh-->
-
     <Space
         android:id="@+id/empty_space"
         android:layout_width="150dp"
-        android:layout_height="match_parent"
-        android:layout_alignParentRight="true"/>
+        android:layout_height="match_parent"/>
+
 
     <android.support.v7.widget.CardView
         android:id="@+id/message_card"
+        android:layout_toRightOf="@id/empty_space"
         app:cardCornerRadius="5dp"
-        android:layout_toLeftOf="@id/empty_space"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp">
 
-            <RelativeLayout
-                android:background="#8383ff"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#87ff74">
+        <TextView
+            android:id="@+id/chat_message_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:padding="5dp"
+            android:textColor="#222"/>
 
-                <TextView
-                    android:id="@+id/chat_message_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:padding="5dp"
-                    android:textColor="#222"/>
-
-            </RelativeLayout>
+        </RelativeLayout>
     </android.support.v7.widget.CardView>
 
     <TextView
@@ -42,7 +39,7 @@
         android:layout_height="wrap_content"
         android:textColor="#aaa"
         android:textSize="10sp"
-        android:layout_toRightOf="@id/message_card"
+        android:layout_toLeftOf="@id/message_card"
         android:layout_alignBottom="@id/message_card"/>
     <Space
         android:layout_below="@id/message_card"
