@@ -75,6 +75,7 @@ public class FirebaseDatabaseUtils {
      * @return
      */
     public static DatabaseReference getChatroomMessagesRef (FirebaseDatabase fbdb, String chatroomId){
+        //ToDo: Each message is going to need it's own directory within the Messages directory. This currently takes you to the parent "Messages" directory.
         return fbdb.getReference(AppConstants.FIREBASE_CHATROOMS).child(chatroomId).child(AppConstants.FIREBASE_CHATROOM_MESSSAGES);
     }
 

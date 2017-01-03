@@ -44,6 +44,10 @@ public class ChatRoom {
         return mRoomName;
     }
 
+    public void setUserIds(ArrayList<String> userIds) {
+        mUserIds = userIds;
+    }
+
     public void addUserToChatroom(String uid){
         mUserIds.add(uid);
     }

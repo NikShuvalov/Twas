@@ -75,7 +75,7 @@ public class ProfileDetailActivity extends AppCompatActivity {
                 DatabaseReference messageReference = FirebaseDatabaseUtils.getChatroomMessagesRef(mFirebaseDatabase,chatroom.getId());
                 long currentTime = Calendar.getInstance().getTimeInMillis();
                 ChatMessage initialChatMessage = new ChatMessage(selfUser.getUID(),chatroom.getId(), String.format("%s has started this conversation",selfUser.getName()),currentTime);
-                messageReference.setValue(initialChatMessage); //FixMe: Adds each mVariable twice to database.
+                messageReference.push().setValue(initialChatMessage); //FixMe: Adds each mVariable twice to database.
 
                 //Adds a reference to the Chatroom to both members' profiles.
                 FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, selfUser.getUID()).child(chatroom.getId()).setValue(users);

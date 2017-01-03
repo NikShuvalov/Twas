@@ -28,6 +28,7 @@ public class AppConstants {
     public static final String PREF_BIO = "Self_bio";
     public static final String PREF_GENDER = "Self_gender";
 //    public static final String PREF_PICURL = "Self_picurl";
+    public static final String PREF_CHATROOM = "Chatroom";
 
     public static final String PREF_EMPTY = "Duh-dah, duh-dah, duhhh! For whom the bell tolls!";
 
