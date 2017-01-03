@@ -41,9 +41,8 @@ public class ChatRoomListActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> chatRooms = dataSnapshot.getChildren();
                 while(chatRooms.iterator().hasNext()){
-                    String roomId = chatRooms.iterator().next().getKey();
-                    Log.d("Test", "onDataChange: "+ roomId);
-                    ChatRoomsHelper.getInstance().addChatRoomId(roomId);
+                    ChatRoom chatRoom = chatRooms.iterator().next().getValue(ChatRoom.class);
+                    ChatRoomsHelper.getInstance().addChatRoom(chatRoom);
                 }
                 mAdapter.notifyDataSetChanged();
             }
@@ -61,7 +60,7 @@ public class ChatRoomListActivity extends AppCompatActivity {
     }
 
     public void recyclerLogic(){
-        mAdapter = new ChatRoomsRecyclerAdapter(ChatRoomsHelper.getInstance().getChatRoomIds());
+        mAdapter = new ChatRoomsRecyclerAdapter(ChatRoomsHelper.getInstance().getChatRooms());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false);
 
         mRecyclerView.setAdapter(mAdapter);

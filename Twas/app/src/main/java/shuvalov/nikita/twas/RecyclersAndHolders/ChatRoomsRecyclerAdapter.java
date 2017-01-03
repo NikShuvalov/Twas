@@ -18,12 +18,10 @@ import shuvalov.nikita.twas.R;
  */
 
 public class ChatRoomsRecyclerAdapter extends RecyclerView.Adapter<ChatRoomsViewHolder> {
-//    ArrayList<ChatRoom> mChatRooms; //ToDo:Ultimately use this.
-    ArrayList<String> mChatRoomIds;//FixMe: Currently using this just to debug.
+    ArrayList<ChatRoom> mChatRooms;
 
-    //ToDo: Chang back to ChatRoom objects in ArrayList.
-    public ChatRoomsRecyclerAdapter(ArrayList<String> chatRooms) {
-        mChatRoomIds = chatRooms;
+    public ChatRoomsRecyclerAdapter(ArrayList<ChatRoom> chatRooms) {
+        mChatRooms = chatRooms;
     }
 
     @Override
@@ -34,8 +32,7 @@ public class ChatRoomsRecyclerAdapter extends RecyclerView.Adapter<ChatRoomsView
 
     @Override
     public void onBindViewHolder(final ChatRoomsViewHolder holder, int position) {
-//        holder.bindDataToView(mChatRooms.get(position));
-        holder.mChatRoomIdText.setText(mChatRoomIds.get(position));
+        holder.bindDataToView(mChatRooms.get(position));
         holder.mChatRoomIdText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -49,7 +46,6 @@ public class ChatRoomsRecyclerAdapter extends RecyclerView.Adapter<ChatRoomsView
 
     @Override
     public int getItemCount() {
-        return mChatRoomIds.size();
-//        return mChatRooms.size();
+        return mChatRooms.size();
     }
 }

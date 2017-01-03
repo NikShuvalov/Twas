@@ -73,24 +73,10 @@ public class ChatRoomActivity extends AppCompatActivity {
         }
 
         //ToDo: Replace this true code with the fake debug code.
-//        ChatRoom chatRoom = ChatRoomsHelper.getInstance().getChatRoomAtPosition(chatRoomPos);
-//      mChatRoomId = chatRoom.getId();
-//        DatabaseReference chatRoomRef = FirebaseDatabaseUtils.getChatroomMessagesRef(FirebaseDatabase.getInstance(), mChatRoomId);
-
-
-        //ToDo: This is the fake debugcode.
-        mChatRoomId = ChatRoomsHelper.getInstance().getChatRoomIdAtPosition(chatRoomPos);
+        ChatRoom chatRoom = ChatRoomsHelper.getInstance().getChatRoomAtPosition(chatRoomPos);
+        mChatRoomId = chatRoom.getId();
         mChatRoomRef = FirebaseDatabaseUtils.getChatroomMessagesRef(FirebaseDatabase.getInstance(), mChatRoomId);
-
-
-
-
-
-
-
-
-
-
+        
 
         mChatRoomRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -114,8 +100,6 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     public void recyclerLogic(){
         mAdapter = new ChatMessagesRecyclerAdapter(ChatMessagesHelper.getInstance().getChatLog());//True Code
-
-//        mAdapter = new ChatMessagesRecyclerAdapter(ChatMessagesHelper.getInstance().getMakeShiftChatLog());//Fake Code
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 

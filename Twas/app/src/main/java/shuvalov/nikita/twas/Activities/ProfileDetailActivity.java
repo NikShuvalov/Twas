@@ -62,24 +62,24 @@ public class ProfileDetailActivity extends AppCompatActivity {
                 DatabaseReference createdChatroom = chatroomsRef.push();
 
                 Profile selfUser = SelfUserProfileUtils.getUsersInfoAsProfile(ProfileDetailActivity.this);
-                HashMap<String, String> users = new HashMap<String, String>();
-
-                users.put(selectedProfile.getUID(),selectedProfile.getName());
-                users.put(selfUser.getUID(), selfUser.getName());
+//                HashMap<String, String> users = new HashMap<String, String>();
+//
+//                users.put(selectedProfile.getUID(),selectedProfile.getName());
+//                users.put(selfUser.getUID(), selfUser.getName());
 
                 ChatRoom chatroom = new ChatRoom();
                 chatroom.setId(createdChatroom.getKey());
                 chatroom.addUserToChatroom(selfUser.getUID());
                 chatroom.addUserToChatroom(selectedProfile.getUID());
-                createdChatroom.child(AppConstants.FIREBASE_USERS).setValue(chatroom); //FixMe: Adds each MemberVariable twice to database.
+                createdChatroom.child(AppConstants.FIREBASE_USERS).setValue(chatroom);
                 DatabaseReference messageReference = FirebaseDatabaseUtils.getChatroomMessagesRef(mFirebaseDatabase,chatroom.getId());
                 long currentTime = Calendar.getInstance().getTimeInMillis();
                 ChatMessage initialChatMessage = new ChatMessage(selfUser.getUID(),chatroom.getId(), String.format("%s has started this conversation",selfUser.getName()),currentTime);
-                messageReference.push().setValue(initialChatMessage); //FixMe: Adds each mVariable twice to database.
+                messageReference.push().setValue(initialChatMessage);
 
                 //Adds a reference to the Chatroom to both members' profiles.
-                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, selfUser.getUID()).child(chatroom.getId()).setValue(users);
-                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, selectedProfile.getUID()).child(chatroom.getId()).setValue(users);
+                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, selfUser.getUID()).child(chatroom.getId()).setValue(chatroom);
+                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, selectedProfile.getUID()).child(chatroom.getId()).setValue(chatroom);
 
                 //Adds the newly made chatroom and initial message to the local db.
                 ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addChatRoom(chatroom);

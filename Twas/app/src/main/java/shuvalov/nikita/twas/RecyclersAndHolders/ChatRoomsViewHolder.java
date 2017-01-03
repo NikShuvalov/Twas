@@ -18,8 +18,8 @@ public class ChatRoomsViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
         mChatRoomIdText = (TextView)itemView.findViewById(R.id.chatroom_id_text);
     }
-    public void bindDataToView(String chatRoomId){
+    public void bindDataToView(ChatRoom chatRoom){
         //ToDo: Chang to taking in a chatRoomObject maybe to keep track of name and shit.
-        mChatRoomIdText.setText(chatRoomId);
+        mChatRoomIdText.setText(chatRoom.getRoomName());
     }
 }
