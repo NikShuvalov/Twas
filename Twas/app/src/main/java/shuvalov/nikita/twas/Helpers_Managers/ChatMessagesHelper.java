@@ -34,12 +34,17 @@ public class ChatMessagesHelper {
 
     public void cleanChatLog(String chatroomId) {
         //If the id of the chatroom we are entering is not the same as the id of the messages that are already inside then let's clear the list. Otherwise keep it.
-        if (!mChatMessages.isEmpty()) {
-            String id = mChatMessages.get(0).getRoomID();
-            if (!chatroomId.equals(id)) {
-                mChatMessages = new ArrayList<>();
-            }
-        }
+
+        mChatMessages = new ArrayList<>();
+
+        //FixMe: If I want to keep from loading the same info multiple times, I'm going to need to not just not clear it if messages are already there, but also not run the eventListener.
+        //FixMe: For now the above fix is just WAY more simpler, but less efficient.
+//        if (!mChatMessages.isEmpty()) {
+//            String id = mChatMessages.get(0).getRoomID();
+//            if (!chatroomId.equals(id)) {
+//                mChatMessages = new ArrayList<>();
+//            }
+//        }
 
     }
 }

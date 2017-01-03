@@ -39,6 +39,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private ChatMessagesRecyclerAdapter mAdapter;
     private String mChatRoomId;
     private DatabaseReference mChatRoomRef;
+    private ChildEventListener mChatRoomListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +52,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         recyclerLogic();
         onClickLogic();
 
-        /* This is going to display all of the chatmessages that belong to this chatRoom in a recyclerView.
+        /* This is going to display all of the chatMessages that belong to this chatRoom in a recyclerView.
         User can arrive to this activity either by clicking on a chatroom in their chatroom list or
         User can Arrive to this activity upon creation of a new chatroom.
         (Optional) User can invite additional users to the chatroom.
@@ -67,31 +68,30 @@ public class ChatRoomActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("ChatRoom Name or Other UserName");
     }
 
-    public void getChatLog(){
+    public void getChatLog() {
         ChatRoom chatRoom;
-        if(getIntent().getStringExtra(AppConstants.ORIGIN_ACTIVITY).equals(AppConstants.ORIGIN_CHATROOMS)){
-            int chatRoomPos = getIntent().getIntExtra(AppConstants.PREF_CHATROOM,-1);
-            if(chatRoomPos == -1){
+        if (getIntent().getStringExtra(AppConstants.ORIGIN_ACTIVITY).equals(AppConstants.ORIGIN_CHATROOMS)) {
+            int chatRoomPos = getIntent().getIntExtra(AppConstants.PREF_CHATROOM, -1);
+            if (chatRoomPos == -1) {
                 Toast.makeText(this, "ChatRoom couldn't be found", Toast.LENGTH_SHORT).show();
                 finish();
             }
 
             chatRoom = ChatRoomsHelper.getInstance().getChatRoomAtPosition(chatRoomPos);
             mChatRoomId = chatRoom.getId();
-        }else if (getIntent().getStringExtra(AppConstants.ORIGIN_ACTIVITY).equals(AppConstants.ORIGIN_PROFILE_DETAIL)){
+        } else if (getIntent().getStringExtra(AppConstants.ORIGIN_ACTIVITY).equals(AppConstants.ORIGIN_PROFILE_DETAIL)) {
             mChatRoomId = getIntent().getStringExtra(AppConstants.PREF_CHATROOM);
         }
 
         ChatMessagesHelper.getInstance().cleanChatLog(mChatRoomId);
         mChatRoomRef = FirebaseDatabaseUtils.getChatroomMessagesRef(FirebaseDatabase.getInstance(), mChatRoomId);
-
-        mChatRoomRef.addChildEventListener(new ChildEventListener() {
+        mChatRoomListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 ChatMessage newMessage = dataSnapshot.getValue(ChatMessage.class);
                 ChatMessagesHelper.getInstance().addChatMessage(newMessage);
                 ConnectionsSQLOpenHelper.getInstance(ChatRoomActivity.this).addMessage(newMessage);
-                mAdapter.notifyItemInserted(ChatMessagesHelper.getInstance().getChatLog().size()-1);
+                mAdapter.notifyItemInserted(ChatMessagesHelper.getInstance().getChatLog().size() - 1);
             }
 
             @Override
@@ -113,8 +113,15 @@ public class ChatRoomActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
 
+        mChatRoomRef.addChildEventListener(mChatRoomListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mChatRoomRef.removeEventListener(mChatRoomListener);
     }
 
     public void recyclerLogic(){

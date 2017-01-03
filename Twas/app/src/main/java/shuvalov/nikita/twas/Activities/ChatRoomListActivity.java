@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,6 +27,8 @@ public class ChatRoomListActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private Toolbar mToolbar;
     private ChatRoomsRecyclerAdapter mAdapter;
+    private ChildEventListener mChatRoomsListener;
+    private DatabaseReference mUserChatRoomRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,23 +38,58 @@ public class ChatRoomListActivity extends AppCompatActivity {
         findViews();
         recyclerLogic();
 
-        DatabaseReference usersChatroomRef = FirebaseDatabaseUtils.getUserChatroomsRef(FirebaseDatabase.getInstance(), SelfUserProfileUtils.getUserId(this));
-        usersChatroomRef.addValueEventListener(new ValueEventListener() {
+        mUserChatRoomRef = FirebaseDatabaseUtils.getUserChatroomsRef(FirebaseDatabase.getInstance(), SelfUserProfileUtils.getUserId(this));
+
+        mChatRoomsListener = new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Iterable<DataSnapshot> chatRooms = dataSnapshot.getChildren();
-                while(chatRooms.iterator().hasNext()){
-                    ChatRoom chatRoom = chatRooms.iterator().next().getValue(ChatRoom.class);
-                    ChatRoomsHelper.getInstance().addChatRoom(chatRoom);
-                }
-                mAdapter.notifyDataSetChanged();
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                ChatRoom chatRoom = dataSnapshot.getValue(ChatRoom.class);
+                ChatRoomsHelper.getInstance().addChatRoom(chatRoom);
+                mAdapter.notifyItemInserted(ChatRoomsHelper.getInstance().getNumberOfChatrooms()-1);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
+
+        mUserChatRoomRef.addChildEventListener(mChatRoomsListener);
+//
+//        usersChatroomRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                Iterable<DataSnapshot> chatRooms = dataSnapshot.getChildren();
+//                while(chatRooms.iterator().hasNext()){
+//                    ChatRoom chatRoom = chatRooms.iterator().next().getValue(ChatRoom.class);
+//                    ChatRoomsHelper.getInstance().addChatRoom(chatRoom);
+//                }
+//                mAdapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+
+
+
         //ToDo: Allow users to rename the chatRoom.
         /*
         This will display all of the chatrooms that the user belongs to.
@@ -73,5 +111,11 @@ public class ChatRoomListActivity extends AppCompatActivity {
         mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("My Chatrooms");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mUserChatRoomRef.removeEventListener(mChatRoomsListener);
     }
 }
