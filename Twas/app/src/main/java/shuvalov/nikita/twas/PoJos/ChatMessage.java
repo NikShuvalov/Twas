@@ -5,33 +5,33 @@ package shuvalov.nikita.twas.PoJos;
  */
 
 public class ChatMessage {
-    String mUserID; //THe user that submitted this message
-    String mRoomID;  //The room to which this message was submitted
-    String mContent; //The content of the message.
-    long mTimeStamp; //The time the message was posted.
+    String userId; //THe user that submitted this message
+    String roomID;  //The room to which this message was submitted
+    String content; //The content of the message.
+    long timeStamp; //The time the message was posted.
 
-    public ChatMessage(String userID, String roomID, String content, long timeStamp) {
-        mUserID = userID;
-        mRoomID = roomID;
-        mContent = content;
-        mTimeStamp = timeStamp;
+    public ChatMessage(String userId, String roomId, String content, long timeStamp) {
+        this.userId = userId;
+        this.roomID = roomId;
+        this.content = content;
+        this.timeStamp = timeStamp;
     }
 
     public ChatMessage(){}
 
-    public String getUserID() {
-        return mUserID;
+    public String getUserId() {
+        return this.userId;
     }
 
     public String getRoomID() {
-        return mRoomID;
+        return this.roomID;
     }
 
     public String getContent() {
-        return mContent;
+        return this.content;
     }
 
     public long getTimeStamp() {
-        return mTimeStamp;
+        return this.timeStamp;
     }
 }

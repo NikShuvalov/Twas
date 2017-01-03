@@ -95,7 +95,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         mChatRoomRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //FixMe: Currently I'm getting a copy of every other previously poseted message if I post any new message.
+                //FixMe: Currently I'm getting a copy of every other previously posted message if I post any new message.
                 Iterable<DataSnapshot> chatMessagesData =  dataSnapshot.getChildren();
                 while(chatMessagesData.iterator().hasNext()){
                     ChatMessage chatMessage= chatMessagesData.iterator().next().getValue(ChatMessage.class);

@@ -203,7 +203,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
 
         content.put(COLUMN_ROOM_ID, chatMessage.getRoomID());
         content.put(COLUMN_TIMESTAMP, chatMessage.getTimeStamp());
-        content.put(COLUMN_UID, chatMessage.getUserID());
+        content.put(COLUMN_UID, chatMessage.getUserId());
         content.put(COLUMN_MESSAGE_CONTENT, chatMessage.getContent());
 
         db.insert(CHATMESS_TABLE_NAME, null, content);
@@ -216,7 +216,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         for (ChatMessage chatMessage: chatMessages){
             content.put(COLUMN_ROOM_ID, chatMessage.getRoomID());
             content.put(COLUMN_TIMESTAMP, chatMessage.getTimeStamp());
-            content.put(COLUMN_UID, chatMessage.getUserID());
+            content.put(COLUMN_UID, chatMessage.getUserId());
             content.put(COLUMN_MESSAGE_CONTENT, chatMessage.getContent());
 
             db.insert(CHATMESS_TABLE_NAME, null, content);

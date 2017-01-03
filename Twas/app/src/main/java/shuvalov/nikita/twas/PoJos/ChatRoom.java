@@ -9,50 +9,48 @@ import java.util.ArrayList;
  */
 
 public class ChatRoom {
-    String mId, mRoomName; //Room ID is a unique identifier for the room, room name is the nickname for the room.
-    ArrayList<String> mUserIds;
+    String id, roomName; //Room ID is a unique identifier for the room, room name is the nickname for the room.
+    ArrayList<String> userIds;
 
     public static final String DEFAULT_NAME = "Generic Room"; //I want to use a random name generator. Just have to figure out the words to use.
 
     public ChatRoom(String id, @Nullable String roomName) {
-        mId = id;
-        mUserIds = new ArrayList<>();
+        this.id = id;
+        this.userIds = new ArrayList<>();
         if(roomName!=null){
-            mRoomName = roomName;
+            this.roomName = roomName;
         }else{
-            mRoomName=DEFAULT_NAME;
+            this.roomName=DEFAULT_NAME;
         }
     }
     public ChatRoom(){
-        mUserIds = new ArrayList<>();
-        mRoomName = DEFAULT_NAME;
+        this.userIds = new ArrayList<>();
+        this.roomName = DEFAULT_NAME;
     }
 
     public void setId(String id) {
-        mId = id;
+        this.id = id;
     }
 
     public void setRoomName(String roomName) {
-        mRoomName = roomName;
+        this.roomName = roomName;
     }
 
     public String getId() {
-        return mId;
+        return id;
     }
 
     public String getRoomName() {
-        return mRoomName;
+        return roomName;
     }
 
-    public void setUserIds(ArrayList<String> userIds) {
-        mUserIds = userIds;
-    }
+
 
     public void addUserToChatroom(String uid){
-        mUserIds.add(uid);
+        userIds.add(uid);
     }
 
     public ArrayList<String> getUserIds() {
-        return mUserIds;
+        return userIds;
     }
 }
