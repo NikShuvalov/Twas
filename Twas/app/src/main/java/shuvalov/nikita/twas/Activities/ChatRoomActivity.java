@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -72,30 +73,40 @@ public class ChatRoomActivity extends AppCompatActivity {
             finish();
         }
 
-        //ToDo: Replace this true code with the fake debug code.
         ChatRoom chatRoom = ChatRoomsHelper.getInstance().getChatRoomAtPosition(chatRoomPos);
         mChatRoomId = chatRoom.getId();
         mChatRoomRef = FirebaseDatabaseUtils.getChatroomMessagesRef(FirebaseDatabase.getInstance(), mChatRoomId);
-        
 
-        mChatRoomRef.addValueEventListener(new ValueEventListener() {
+
+        mChatRoomRef.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                //FixMe: Currently I'm getting a copy of every other previously posted message if I post any new message.
-                Iterable<DataSnapshot> chatMessagesData =  dataSnapshot.getChildren();
-                while(chatMessagesData.iterator().hasNext()){
-                    ChatMessage chatMessage= chatMessagesData.iterator().next().getValue(ChatMessage.class);
-                    ChatMessagesHelper.getInstance().addChatMessage(chatMessage);
-                }
-                mAdapter.notifyDataSetChanged();
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                ChatMessage newMessage = dataSnapshot.getValue(ChatMessage.class);
+                ChatMessagesHelper.getInstance().addChatMessage(newMessage);
+                mAdapter.notifyItemInserted(ChatMessagesHelper.getInstance().getChatLog().size()-1);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.d("Chat Log", "Error while trying to get chatlogs");
 
             }
         });
+
     }
 
     public void recyclerLogic(){
@@ -123,17 +134,6 @@ public class ChatRoomActivity extends AppCompatActivity {
                     ChatMessage chatMessage = new ChatMessage(userId,mChatRoomId,chatContent,timeStamp);
                     mChatRoomRef.push().setValue(chatMessage);
                 }
-
-
-
-                /* 1. Check if message empty/get message in edittext.
-                 2. clear edittext
-                 3. Create new chatMessage.
-                 3. Send chatMessage to chatroom fbdb.
-                 4. Update locally.
-                 5. Display new chatMessage to recycler.
-                 6. Inform user somehow that message was sent, perhaps with one of the previous steps.
-                 */
             }
         });
     }
