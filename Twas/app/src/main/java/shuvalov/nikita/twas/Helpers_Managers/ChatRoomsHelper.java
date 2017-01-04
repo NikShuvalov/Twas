@@ -25,9 +25,20 @@ public class ChatRoomsHelper {
         mChatRooms = new ArrayList<>();
     }
 
-    public void addChatRoom(ChatRoom chatRoom){
-        mChatRooms.add(chatRoom);
+    public boolean addChatRoom(ChatRoom chatRoom){
+        boolean alreadyIn = false;
+        for(ChatRoom storedChatRooms: mChatRooms){
+            if(storedChatRooms.getId().equals(chatRoom.getId())){
+                alreadyIn=true;
+                break;
+            }
+        }
+        if(!alreadyIn){
+            mChatRooms.add(chatRoom);
+        }
+        return alreadyIn;
     }
+
     public ArrayList<ChatRoom> getChatRooms(){
         return mChatRooms;
     }

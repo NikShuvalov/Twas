@@ -25,7 +25,6 @@ import shuvalov.nikita.twas.RecyclersAndHolders.ChatRoomsRecyclerAdapter;
 
 public class ChatRoomListActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
-    private Toolbar mToolbar;
     private ChatRoomsRecyclerAdapter mAdapter;
     private ChildEventListener mChatRoomsListener;
     private DatabaseReference mUserChatRoomRef;
@@ -40,12 +39,14 @@ public class ChatRoomListActivity extends AppCompatActivity {
 
         mUserChatRoomRef = FirebaseDatabaseUtils.getUserChatroomsRef(FirebaseDatabase.getInstance(), SelfUserProfileUtils.getUserId(this));
 
+        //ToDo: Dropping the singleton values might be faster than not adding duplicates when numbers start getting higher. Ask About it.
         mChatRoomsListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 ChatRoom chatRoom = dataSnapshot.getValue(ChatRoom.class);
-                ChatRoomsHelper.getInstance().addChatRoom(chatRoom);
-                mAdapter.notifyItemInserted(ChatRoomsHelper.getInstance().getNumberOfChatrooms()-1);
+                if(!ChatRoomsHelper.getInstance().addChatRoom(chatRoom)){
+                    mAdapter.notifyItemInserted(ChatRoomsHelper.getInstance().getNumberOfChatrooms()-1);
+                }
             }
 
             @Override
@@ -108,9 +109,10 @@ public class ChatRoomListActivity extends AppCompatActivity {
 
     public void findViews(){
         mRecyclerView = (RecyclerView)findViewById(R.id.chatroom_list_recycler);
-        mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
-        setSupportActionBar(mToolbar);
+        Toolbar toolbar= (Toolbar)findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("My Chatrooms");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

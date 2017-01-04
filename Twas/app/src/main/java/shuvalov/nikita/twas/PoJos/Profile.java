@@ -11,7 +11,6 @@ import java.util.List;
 
 public class Profile {
     private String mUID, mName, mBio, mGender;
-//    private String mPicURL;
     private long mDOB;
 //    private ArrayList<ChatRoom> mActiveChatRooms;
 
@@ -26,7 +25,6 @@ public class Profile {
         mBio = bio;
         mDOB = dobInMillis;
         mGender = gender;
-//        mPicURL = picURL;
 //        mActiveChatRooms = new ArrayList<>();
     }
 
@@ -67,8 +65,6 @@ public class Profile {
         return mGender;
     }
 
-
-
     public void setUID(String UID) {
         mUID = UID;
     }
@@ -85,14 +81,6 @@ public class Profile {
         mGender = gender;
     }
 
-    //Since the image reference is standardized storing image URL strings is abso-fucking-lutely unnecessary. Just use the UID and formatting.
-//    public void setPicURL(String picURL) {
-//        mPicURL = picURL;
-//    }
-
-//    public String getPicURL() {
-//        return mPicURL;
-//    }
 
     public void setDOB(long DOB) {
         mDOB = DOB;

@@ -35,7 +35,6 @@ public class ChatRoomActivity extends AppCompatActivity {
     private Button mSendButton;
     private EditText mMessageEntry;
     private RecyclerView mMessageRecycler;
-    private Toolbar mToolbar;
     private ChatMessagesRecyclerAdapter mAdapter;
     private String mChatRoomId;
     private DatabaseReference mChatRoomRef;
@@ -61,9 +60,10 @@ public class ChatRoomActivity extends AppCompatActivity {
         mSendButton = (Button)findViewById(R.id.send_butt);
         mMessageEntry = (EditText)findViewById(R.id.message_entry);
         mMessageRecycler = (RecyclerView)findViewById(R.id.message_recycler);
-        mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
-        setSupportActionBar(mToolbar);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("ChatRoom Name or Other UserName");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     public void getChatLog() {
@@ -76,6 +76,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
 
             chatRoom = ChatRoomsHelper.getInstance().getChatRoomAtPosition(chatRoomPos);
+            getSupportActionBar().setTitle(chatRoom.getRoomName());
             mChatRoomId = chatRoom.getId();
         } else if (getIntent().getStringExtra(AppConstants.ORIGIN_ACTIVITY).equals(AppConstants.ORIGIN_PROFILE_DETAIL)) {
             mChatRoomId = getIntent().getStringExtra(AppConstants.PREF_CHATROOM);

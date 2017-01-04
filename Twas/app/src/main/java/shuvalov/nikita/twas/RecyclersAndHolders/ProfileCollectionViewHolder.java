@@ -15,7 +15,7 @@ import shuvalov.nikita.twas.R;
 
 public class ProfileCollectionViewHolder extends RecyclerView.ViewHolder {
     ImageView mPicView;
-    TextView mNameView;
+    private TextView mNameView;
     CardView mCardView;
 
 

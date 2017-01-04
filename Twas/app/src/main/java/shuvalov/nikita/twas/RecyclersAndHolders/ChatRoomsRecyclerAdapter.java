@@ -18,7 +18,7 @@ import shuvalov.nikita.twas.R;
  */
 
 public class ChatRoomsRecyclerAdapter extends RecyclerView.Adapter<ChatRoomsViewHolder> {
-    ArrayList<ChatRoom> mChatRooms;
+    private ArrayList<ChatRoom> mChatRooms;
 
     public ChatRoomsRecyclerAdapter(ArrayList<ChatRoom> chatRooms) {
         mChatRooms = chatRooms;

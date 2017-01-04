@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.ChatMessage;
 import shuvalov.nikita.twas.R;
 
