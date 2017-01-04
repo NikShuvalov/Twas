@@ -3,6 +3,7 @@ package shuvalov.nikita.twas.Helpers_Managers;
 import java.util.ArrayList;
 
 import shuvalov.nikita.twas.PoJos.Profile;
+import shuvalov.nikita.twas.RecyclersAndHolders.ProfileCollectionRecyclerAdapter;
 
 /**
  * Created by NikitaShuvalov on 12/15/16.
@@ -10,6 +11,8 @@ import shuvalov.nikita.twas.PoJos.Profile;
 
 public class ConnectionsHelper {
     private ArrayList<Profile> mProfileConnections;
+    private ProfileCollectionRecyclerAdapter mProfileCollectionRecyclerAdapter;
+
 
     private static ConnectionsHelper sConnectionsHelper;
 
@@ -48,5 +51,12 @@ public class ConnectionsHelper {
 
     public Profile getProfileByPosition(int i){
         return mProfileConnections.get(i);
+    }
+
+    public void setProfileCollectionRecyclerAdapter(ProfileCollectionRecyclerAdapter adapter){
+        mProfileCollectionRecyclerAdapter = adapter;
+    }
+    public ProfileCollectionRecyclerAdapter getProfileCollectionRecyclerAdapter(){
+        return mProfileCollectionRecyclerAdapter;
     }
 }

@@ -80,19 +80,9 @@ public class ChatMessage {
 
     public static ChatMessage getSoapBoxMessageFromBytes(byte[] bytes){
         String soapBoxAsString = new String(bytes);
-        Log.d("Log all the things", soapBoxAsString);
+        String[] soapBoxParams = soapBoxAsString.split(AppConstants.SOAPBOX_MESSAGE_DELIMITER);
+        long timeStamp = Long.parseLong(soapBoxParams[2]);
 
-
-        if(soapBoxAsString!=null){
-            String[] soapBoxParams = soapBoxAsString.split(AppConstants.SOAPBOX_MESSAGE_DELIMITER);
-            Log.d("Log all the things", soapBoxParams[0]);
-            Log.d("Log all the things", soapBoxParams[1]);
-            Log.d("Log all the things", soapBoxParams[2]);
-
-            long timeStamp = Long.parseLong(soapBoxParams[2]);
-            return new ChatMessage(soapBoxParams[0],null, soapBoxParams[1],timeStamp);
-        }
-        Log.d("SoapBoxMessage", "SoapBoxMessage didn't parse correctly");
-        return new ChatMessage();
+        return new ChatMessage(soapBoxParams[0],null, soapBoxParams[1],timeStamp);
     }
 }

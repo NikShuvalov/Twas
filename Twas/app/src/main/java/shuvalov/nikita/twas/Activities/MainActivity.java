@@ -36,6 +36,7 @@ import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.FirebaseDatabaseUtils;
 import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
 import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
+import shuvalov.nikita.twas.NearbyMessagesService;
 import shuvalov.nikita.twas.PoJos.ChatMessage;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
@@ -81,85 +82,92 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         mBackRecentlyPressed=false;
 
         mNearbyManager = NearbyManager.getInstance();
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Nearby.MESSAGES_API)
-                .addConnectionCallbacks(this)
-                .enableAutoManage(this, this)
-                .addOnConnectionFailedListener(this)
-                .build();
 
         findViews();
         setUpRecyclerView();
         retrieveStoredProfiles();
         getUsersFbdbInformation();
 
-        soapBoxDebug();
+        Intent intent  = new Intent(this, NearbyMessagesService.class);
+        intent.putExtra(AppConstants.SERVICE_INTENT,AppConstants.START_PUBSUB);
+        startService(intent);
+
+//        mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                .addApi(Nearby.MESSAGES_API)
+//                .addConnectionCallbacks(this)
+//                .enableAutoManage(this, this)
+//                .addOnConnectionFailedListener(this)
+//                .build();
+        soapBoxDebug(); //FixMe: Remove me
 
 
-        mActiveListener = new MessageListener() {
-            @Override
-            public void onFound(Message message) {
-                super.onFound(message);
-                ChatMessage soapBoxMessage = ChatMessage.getSoapBoxMessageFromBytes(message.getContent());
-                ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addSoapBoxMessage(soapBoxMessage);
-                mFoundId = soapBoxMessage.getUserId();
-//                mFoundId = new String(message.getContent()); //Gets message from other phone, which holds just that phone's UID for now.
-
-
-                //ToDo: Figure out what I can store as a value for the stranger Connections, maybe a counter?
-                //Idea: If using a counter 0-10 encounters = Stranger, 11-25 Familiar, 26-50 Regular, 51-99 Acquaintance,100-499 Friendly, 500+ whatever
-                mSelfConnectionsRef.child(mFoundId).setValue(mFoundId); //Adds stranger's UID to user's connectionsList.
-
-                DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mFoundId);
-//                DatabaseReference strangerRef = FirebaseDatabaseUtils.getChildReference(mFirebaseDatabase, mFoundId, AppConstants.theoneforprofiles);
-
-                //Gets the stranger's profile information.
-                strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Profile strangerProfile = dataSnapshot.getValue(Profile.class);
-                        ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
-                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
-                        mProfileRecAdapter.notifyDataSetChanged();
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Toast.makeText(MainActivity.this, "Did not load correctly", Toast.LENGTH_SHORT).show();
-                        Log.d("MainActivity", "on heard signal, failed attempt to D/L profile ");
-                    }
-                });
-                mDisplayText.setText(mFoundId);
-                Toast.makeText(MainActivity.this, mFoundId, Toast.LENGTH_SHORT).show();
-
-                //ToDo: Do a count that adds found users, to keep track of active publishing users.
-            }
-
-            @Override
-            public void onLost(Message message) {
-                super.onLost(message);
-                Toast.makeText(MainActivity.this, "Lost the signal", Toast.LENGTH_SHORT).show();
-
-                //ToDo: Do a count that removes found users, to keep track of active publishing users.
-
-            }
-
-            @Override
-            public void onDistanceChanged(Message message, Distance distance) {
-                super.onDistanceChanged(message, distance);
-            }
-
-            @Override
-            public void onBleSignalChanged(Message message, BleSignal bleSignal) {
-                super.onBleSignalChanged(message, bleSignal);
-                Log.d("Testing Shots fired", "Please clap");
-                mDisplayText.setText(ChatMessage.getSoapBoxMessageFromBytes(message.getContent()).getContent());
-            }
-        };
+//        mActiveListener = new MessageListener() {
+//            @Override
+//            public void onFound(Message message) {
+//                super.onFound(message);
+//                ChatMessage soapBoxMessage = ChatMessage.getSoapBoxMessageFromBytes(message.getContent());
+//                if(!soapBoxMessage.getContent().equals("")){
+//                    ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addSoapBoxMessage(soapBoxMessage);
+//                }
+//                mFoundId = soapBoxMessage.getUserId();
+////                mFoundId = new String(message.getContent()); //Gets message from other phone, which holds just that phone's UID for now.
+//
+//
+//                //ToDo: Figure out what I can store as a value for the stranger Connections, maybe a counter?
+//                //Idea: If using a counter 0-10 encounters = Stranger, 11-25 Familiar, 26-50 Regular, 51-99 Acquaintance,100-499 Friendly, 500+ whatever
+//                mSelfConnectionsRef.child(mFoundId).setValue(mFoundId); //Adds stranger's UID to user's connectionsList.
+//
+//                DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mFoundId);
+////                DatabaseReference strangerRef = FirebaseDatabaseUtils.getChildReference(mFirebaseDatabase, mFoundId, AppConstants.theoneforprofiles);
+//
+//                //Gets the stranger's profile information.
+//                strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        Profile strangerProfile = dataSnapshot.getValue(Profile.class);
+//                        ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
+//                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+//                        mProfileRecAdapter.notifyDataSetChanged();
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//                        Toast.makeText(MainActivity.this, "Did not load correctly", Toast.LENGTH_SHORT).show();
+//                        Log.d("MainActivity", "on heard signal, failed attempt to D/L profile ");
+//                    }
+//                });
+//                mDisplayText.setText(mFoundId);
+//                Toast.makeText(MainActivity.this, mFoundId, Toast.LENGTH_SHORT).show();
+//
+//                //ToDo: Do a count that adds found users, to keep track of active publishing users.
+//            }
+//
+//            @Override
+//            public void onLost(Message message) {
+//                super.onLost(message);
+//                Toast.makeText(MainActivity.this, "Lost the signal", Toast.LENGTH_SHORT).show();
+//
+//                //ToDo: Do a count that removes found users, to keep track of active publishing users.
+//
+//            }
+//
+//            @Override
+//            public void onDistanceChanged(Message message, Distance distance) {
+//                super.onDistanceChanged(message, distance);
+//            }
+//
+//            @Override
+//            public void onBleSignalChanged(Message message, BleSignal bleSignal) {
+//                super.onBleSignalChanged(message, bleSignal);
+//                Log.d("Testing Shots fired", "Please clap");
+//                mDisplayText.setText(ChatMessage.getSoapBoxMessageFromBytes(message.getContent()).getContent());
+//            }
+//        };
 
         //ToDo:Remove this, simply using for debugging to navigate to chatroomListActivity
         mSendButt.setOnClickListener(new View.OnClickListener() {
@@ -332,6 +340,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mRecyclerView = (RecyclerView)findViewById(R.id.profiles_recyclerview);
 
         mProfileRecAdapter = new ProfileCollectionRecyclerAdapter(ConnectionsHelper.getInstance().getConnections());
+        ConnectionsHelper.getInstance().setProfileCollectionRecyclerAdapter(mProfileRecAdapter);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this,2);
 
         mRecyclerView.setLayoutManager(gridLayoutManager);
@@ -341,14 +350,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(@Nullable Bundle connectionHint) {
-        NearbyManager.getInstance().setGoogleApiConnected(true);
-        publish();
-        subscribe();
+        Intent intent  = new Intent(this, NearbyMessagesService.class);
+        intent.putExtra(AppConstants.SERVICE_INTENT,AppConstants.START_PUBSUB);
+        startService(intent);
+        //publish();
+        //subscribe();
+
     }
 
     @Override
     public void onConnectionSuspended(int i) {
+        Intent intent  = new Intent(this, NearbyMessagesService.class);
+        intent.putExtra(AppConstants.SERVICE_INTENT,AppConstants.STOP_PUBSUB);
+        stopService(intent);
         NearbyManager.getInstance().setGoogleApiConnected(false);
+
 
     }
 
@@ -366,7 +382,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void publish(){
-        mFindMeMessage = new Message(mId.getBytes());
+        mFindMeMessage = new Message(ChatMessage.getBytesForSoapBox(new ChatMessage(mId,"")));
         Log.d("NearBy", "publishing ID: "+ mId);
         if(mNearbyManager.isGoogleApiConnected()){
             Nearby.Messages.publish(mGoogleApiClient, mFindMeMessage);
@@ -376,6 +392,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             Log.d("MainActivity", "publish: failed");
         }
     }
+
     public void subscribe(){
         Nearby.Messages.subscribe(mGoogleApiClient, mActiveListener);
         mNearbyManager.setSubscribing(true);

@@ -42,4 +42,14 @@ public class AppConstants {
 
     public static final String SOAPBOX_MESSAGE_DELIMITER = "&&&&&&&&&&&&&&&";
 
+    public static final String SERVICE_INTENT= "Is there work to be doing?";
+
+    public static final String SHOUTOUT_PUBLISH= "Soapbox message publishing";
+    public static final String SHOUTOUT_MESSAGE = "Message to be used if soapbox";
+
+    public static final String STOP_PUBLISHING = "stop publishing";
+
+    public static final String START_PUBSUB = "Start both";
+
+    public static final String STOP_PUBSUB = "Stop both";
 }

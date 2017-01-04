@@ -1,11 +1,14 @@
 package shuvalov.nikita.twas.Helpers_Managers;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+
 /**
  * Created by NikitaShuvalov on 12/16/16.
  */
 
 public class NearbyManager {
     private boolean mGoogleApiConnected, mPublishing, mSubscribing;
+    public GoogleApiClient mGoogleApiClient;
 
     private static NearbyManager sMyNearbyManager;
 
