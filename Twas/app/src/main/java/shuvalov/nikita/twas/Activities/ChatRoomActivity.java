@@ -126,7 +126,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     public void recyclerLogic(){
         mAdapter = new ChatMessagesRecyclerAdapter(ChatMessagesHelper.getInstance().getChatLog(),SelfUserProfileUtils.getUserId(this));//True Code
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true);
 
         mMessageRecycler.setAdapter(mAdapter);
         mMessageRecycler.setLayoutManager(linearLayoutManager);

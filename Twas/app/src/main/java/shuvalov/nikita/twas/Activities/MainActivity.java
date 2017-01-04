@@ -36,6 +36,7 @@ import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.FirebaseDatabaseUtils;
 import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
 import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
+import shuvalov.nikita.twas.PoJos.ChatMessage;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
 import shuvalov.nikita.twas.RecyclersAndHolders.ProfileCollectionRecyclerAdapter;
@@ -103,7 +104,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onFound(Message message) {
                 super.onFound(message);
-                mFoundId = new String(message.getContent()); //Gets message from other phone, which holds just that phone's UID for now.
+                ChatMessage soapBoxMessage = ChatMessage.getSoapBoxMessageFromBytes(message.getContent());
+                ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addSoapBoxMessage(soapBoxMessage);
+                mFoundId = soapBoxMessage.getUserId();
+//                mFoundId = new String(message.getContent()); //Gets message from other phone, which holds just that phone's UID for now.
+
 
                 //ToDo: Figure out what I can store as a value for the stranger Connections, maybe a counter?
                 //Idea: If using a counter 0-10 encounters = Stranger, 11-25 Familiar, 26-50 Regular, 51-99 Acquaintance,100-499 Friendly, 500+ whatever
@@ -151,10 +156,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onBleSignalChanged(Message message, BleSignal bleSignal) {
                 super.onBleSignalChanged(message, bleSignal);
-                String received = message.getNamespace();
-                mDisplayText.setText(received);
-                Toast.makeText(MainActivity.this, received, Toast.LENGTH_SHORT).show();
-
+                Log.d("Testing Shots fired", "Please clap");
+                mDisplayText.setText(ChatMessage.getSoapBoxMessageFromBytes(message.getContent()).getContent());
             }
         };
 

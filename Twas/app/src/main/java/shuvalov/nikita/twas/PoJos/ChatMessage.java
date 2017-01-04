@@ -71,7 +71,7 @@ public class ChatMessage {
         String timeStampAsString = String.valueOf(chatMessage.getTimeStamp());
         String split = AppConstants.SOAPBOX_MESSAGE_DELIMITER;
         //[0] = uid, [1] = message, [2] = Timestamp
-        String chatMessageAsString = String.format("%s"+split+"%s"+split+" %s",
+        String chatMessageAsString = String.format("%s"+split+"%s"+split+"%s",
                 chatMessage.getUserId(),
                 chatMessage.getContent(),
                 timeStampAsString);
@@ -79,14 +79,16 @@ public class ChatMessage {
     }
 
     public static ChatMessage getSoapBoxMessageFromBytes(byte[] bytes){
-        String soapBoxAsString = null;
-        try {
-            soapBoxAsString = new String (bytes, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        String soapBoxAsString = new String(bytes);
+        Log.d("Log all the things", soapBoxAsString);
+
+
         if(soapBoxAsString!=null){
             String[] soapBoxParams = soapBoxAsString.split(AppConstants.SOAPBOX_MESSAGE_DELIMITER);
+            Log.d("Log all the things", soapBoxParams[0]);
+            Log.d("Log all the things", soapBoxParams[1]);
+            Log.d("Log all the things", soapBoxParams[2]);
+
             long timeStamp = Long.parseLong(soapBoxParams[2]);
             return new ChatMessage(soapBoxParams[0],null, soapBoxParams[1],timeStamp);
         }

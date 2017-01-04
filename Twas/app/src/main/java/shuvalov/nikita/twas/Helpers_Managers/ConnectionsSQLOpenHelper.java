@@ -21,7 +21,7 @@ import shuvalov.nikita.twas.PoJos.Profile;
 
 public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "CONNECTION_COLLECTION_DB";
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 4;
 
     public static final String PROFILE_TABLE_NAME = "PROFILE_LIST";
     public static final String CHATMESS_TABLE_NAME = "CHAT_MESSAGES_LIST";
@@ -50,6 +50,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
             COLUMN_BIRTHDATE + " INTEGER)";
 
     //This holds all of the messages relative to the current user.
+    //ToDo; Make Timestamp+Uid primary key. See SoapBoxMessages for the HOW.
     public static final String CREATE_CHATMESS_TABLE_EXE = "CREATE TABLE "+ CHATMESS_TABLE_NAME+
             " (" + COLUMN_ROOM_ID+ " TEXT,"+
             COLUMN_TIMESTAMP+ " INTEGER PRIMARY KEY,"+
@@ -62,9 +63,10 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
             COLUMN_ROOM_NAME+ " TEXT)";
 
     public static final String CREATE_SOAPBOX_MESSAGES_TABLE_EXE = "CREATE TABLE "+ SOAPBOX_TABLE_NAME+
-            " (" + COLUMN_TIMESTAMP+ " INTEGER PRIMARY KEY,"+
+            " (" + COLUMN_TIMESTAMP+ " INTEGER,"+
             COLUMN_MESSAGE_CONTENT+ " TEXT,"+
-            COLUMN_UID+ " TEXT PRIMARY KEY)";
+            COLUMN_UID+ " TEXT, "+
+            "PRIMARY KEY ("+COLUMN_UID+", "+COLUMN_TIMESTAMP+"))";
 
 
 
@@ -95,7 +97,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ PROFILE_TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ CHATMESS_TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ CHATROOM_TABLE_NAME);
-        //No reason to drop the soapbox messages, they aren't private.
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ SOAPBOX_TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 

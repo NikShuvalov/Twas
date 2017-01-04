@@ -40,6 +40,6 @@ public class AppConstants {
     public static final int TAKE_IMAGE_REQUEST = 2;
 
 
-    public static final String SOAPBOX_MESSAGE_DELIMITER = "&'^|>,`~|";
+    public static final String SOAPBOX_MESSAGE_DELIMITER = "&&&&&&&&&&&&&&&";
 
 }
