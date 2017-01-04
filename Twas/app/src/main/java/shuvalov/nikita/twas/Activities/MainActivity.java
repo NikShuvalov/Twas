@@ -105,7 +105,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onFound(Message message) {
                 super.onFound(message);
                 ChatMessage soapBoxMessage = ChatMessage.getSoapBoxMessageFromBytes(message.getContent());
-                ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addSoapBoxMessage(soapBoxMessage);
+                if(!soapBoxMessage.getContent().equals("")) {
+                    ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addSoapBoxMessage(soapBoxMessage);
+                }
                 mFoundId = soapBoxMessage.getUserId();
 //                mFoundId = new String(message.getContent()); //Gets message from other phone, which holds just that phone's UID for now.
 
@@ -366,7 +368,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void publish(){
-        mFindMeMessage = new Message(mId.getBytes());
+
+        mFindMeMessage = new Message(ChatMessage.getBytesForSoapBox(new ChatMessage(mId,"")));
         Log.d("NearBy", "publishing ID: "+ mId);
         if(mNearbyManager.isGoogleApiConnected()){
             Nearby.Messages.publish(mGoogleApiClient, mFindMeMessage);
