@@ -1,6 +1,7 @@
 package shuvalov.nikita.twas.RecyclersAndHolders;
 
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +43,16 @@ public class ChatRoomsRecyclerAdapter extends RecyclerView.Adapter<ChatRoomsView
                 view.getContext().startActivity(intent);
             }
         });
+
+        //ToDo; Figure out best way for user to change the name of the chatroom if they want to. Either in this activity or the chatRoom Activity via toolbar.
+//        holder.mCardContainer.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
+//                ChatRoom chatroom = mChatRooms.get(holder.getAdapterPosition());
+//                AlertDialog alertDialog = new AlertDialog.Builder(view.getContext());
+//                return false;
+//            }
+//        });
     }
 
     @Override

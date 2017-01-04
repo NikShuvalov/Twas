@@ -35,7 +35,6 @@ public class ChatRoomsViewHolder extends RecyclerView.ViewHolder {
         mChatRoomIdText.setText(chatRoom.getRoomName());
         String id=  chatRoom.getUserIds().get(0); //Get the first user's id.
 
-
         if(SelfUserProfileUtils.getUserId(mChatRoomIdText.getContext()).equals(id)){ //If This is the same as the user's id, then let's set it to the other user's id.
             id = chatRoom.getUserIds().get(1);
         }
