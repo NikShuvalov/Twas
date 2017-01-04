@@ -26,6 +26,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
     public static final String PROFILE_TABLE_NAME = "PROFILE_LIST";
     public static final String CHATMESS_TABLE_NAME = "CHAT_MESSAGES_LIST";
     public static final String CHATROOM_TABLE_NAME = "CHAT_ROOM_LIST";
+    public static final String SOAPBOX_TABLE_NAME = "SOAPBOX_MESSAGES_LIST";
 
     public static final String COLUMN_UID = "UID";
     public static final String COLUMN_NAME = "NAME";
@@ -60,9 +61,13 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
             " ("+ COLUMN_ROOM_ID+ " TEXT PRIMARY KEY,"+
             COLUMN_ROOM_NAME+ " TEXT)";
 
+    public static final String CREATE_SOAPBOX_MESSAGES_TABLE_EXE = "CREATE TABLE "+ SOAPBOX_TABLE_NAME+
+            " (" + COLUMN_TIMESTAMP+ " INTEGER PRIMARY KEY,"+
+            COLUMN_MESSAGE_CONTENT+ " TEXT,"+
+            COLUMN_UID+ " TEXT PRIMARY KEY)";
 
 
-            ;
+
 
     private static ConnectionsSQLOpenHelper sConnectionsSQLOpenHelper;
 
@@ -82,6 +87,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(CREATE_PROFILE_TABLE_EXE);
         sqLiteDatabase.execSQL(CREATE_CHATMESS_TABLE_EXE);
         sqLiteDatabase.execSQL(CREATE_CHATROOM_TABLE_EXE);
+        sqLiteDatabase.execSQL(CREATE_SOAPBOX_MESSAGES_TABLE_EXE);
     }
 
     @Override
@@ -89,6 +95,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ PROFILE_TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ CHATMESS_TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ CHATROOM_TABLE_NAME);
+        //No reason to drop the soapbox messages, they aren't private.
         onCreate(sqLiteDatabase);
     }
 
@@ -213,6 +220,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
             db.insert(CHATROOM_TABLE_NAME, null, content);
         }
         db.close();
+
     }
     public void addMessage(ChatMessage chatMessage){
         SQLiteDatabase db = getWritableDatabase();
@@ -239,6 +247,67 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         }
 
         db.close();
+    }
+
+    public void addSoapBoxMessage(ChatMessage soapBoxMessage){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues content = new ContentValues();
+        content.put(COLUMN_UID, soapBoxMessage.getUserId());
+        content.put(COLUMN_TIMESTAMP, soapBoxMessage.getTimeStamp());
+        content.put(COLUMN_MESSAGE_CONTENT, soapBoxMessage.getContent());
+
+        db.insert(SOAPBOX_TABLE_NAME, null, content);
+        db.close();
+    }
+
+    public void addSoapBoxMessageList(ArrayList<ChatMessage> soapBoxMessages){
+        SQLiteDatabase db = getWritableDatabase();
+        for(ChatMessage soapBoxMessage: soapBoxMessages){
+            ContentValues content = new ContentValues();
+            content.put(COLUMN_UID, soapBoxMessage.getUserId());
+            content.put(COLUMN_TIMESTAMP, soapBoxMessage.getTimeStamp());
+            content.put(COLUMN_MESSAGE_CONTENT, soapBoxMessage.getContent());
+
+            db.insert(SOAPBOX_TABLE_NAME, null, content);
+        }
+
+        db.close();
+    }
+
+    public ArrayList<ChatMessage> getSoapBoxMessages(){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(SOAPBOX_TABLE_NAME, null, null, null, null, null, null);
+        ArrayList<ChatMessage> soapBoxMessages = new ArrayList<>();
+        int count = 0;
+        if(cursor.moveToFirst()){
+            while(!cursor.isAfterLast() && count<=100){
+                count++;
+                String userId = cursor.getString(cursor.getColumnIndex(COLUMN_UID));
+                Integer timeStamp = cursor.getInt(cursor.getColumnIndex(COLUMN_TIMESTAMP));
+                String messageContent = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_CONTENT));
+                long longTime = (long)timeStamp;
+
+                soapBoxMessages.add(new ChatMessage(userId,null,messageContent,longTime));
+                cursor.moveToNext();
+            }
+        }
+        db.close();
+        if(cursor.getCount()>250){
+            messageHouseKeeping(SOAPBOX_TABLE_NAME, soapBoxMessages);
+        }
+        cursor.close();
+        return soapBoxMessages;
+    }
+
+
+    private void messageHouseKeeping(String tableName, ArrayList<ChatMessage> keptList){
+        SQLiteDatabase db = getWritableDatabase();
+        if(tableName.equals(SOAPBOX_TABLE_NAME)){ //Might add this to private conversations as well, so keeping it general for now.
+            db.execSQL("DROP TABLE IF EXISTS "+ tableName);
+            addSoapBoxMessageList(keptList);
+        }
+        db.close();
+
     }
 
     //ToDo: Join search for ChatMessages that are relevant to each room.

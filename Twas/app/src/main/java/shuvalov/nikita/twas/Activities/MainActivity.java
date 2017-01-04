@@ -49,6 +49,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     TextView mDisplayText;
     String mFoundId;
 
+
+    Button mDebugButton; //FixMe: Remove
+
     boolean mBackRecentlyPressed;
     RecyclerView mRecyclerView;
 
@@ -92,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         setUpRecyclerView();
         retrieveStoredProfiles();
         getUsersFbdbInformation();
+
+        soapBoxDebug();
 
 
         mActiveListener = new MessageListener() {
@@ -146,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onBleSignalChanged(Message message, BleSignal bleSignal) {
                 super.onBleSignalChanged(message, bleSignal);
-                String received = new String(message.getContent());
+                String received = message.getNamespace();
                 mDisplayText.setText(received);
                 Toast.makeText(MainActivity.this, received, Toast.LENGTH_SHORT).show();
 
@@ -180,6 +185,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onClick(View view) {
                 Intent intent =new Intent(MainActivity.this, SelfProfileActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    public void soapBoxDebug(){
+        mDebugButton = (Button)findViewById(R.id.soapbox_debug);
+        mDebugButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent  = new Intent(MainActivity.this, SoapBoxFeedActivity.class);
                 startActivity(intent);
             }
         });
