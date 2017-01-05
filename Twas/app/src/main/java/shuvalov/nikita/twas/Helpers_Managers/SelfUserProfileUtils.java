@@ -77,4 +77,6 @@ public class SelfUserProfileUtils {
         String selfGender = sharedPreferences.getString(AppConstants.PREF_GENDER, "");
         return new Profile(selfUID, selfName, selfBio,selfDOB, selfGender);
     }
+
+
 }

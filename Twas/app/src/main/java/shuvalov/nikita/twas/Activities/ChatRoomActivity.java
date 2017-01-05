@@ -51,6 +51,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         recyclerLogic();
         onClickLogic();
 
+
         /* This is going to display all of the chatMessages that belong to this chatRoom in a recyclerView.
         ToDo: (Optional) User can invite additional users to the chatroom.
          */
@@ -91,6 +92,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 ChatMessagesHelper.getInstance().addChatMessage(newMessage);
                 ConnectionsSQLOpenHelper.getInstance(ChatRoomActivity.this).addMessage(newMessage);
                 mAdapter.notifyItemInserted(ChatMessagesHelper.getInstance().getChatLog().size() - 1);
+                mMessageRecycler.smoothScrollToPosition(ChatMessagesHelper.getInstance().getChatLog().size()-1);
             }
 
             @Override
@@ -126,7 +128,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     public void recyclerLogic(){
         mAdapter = new ChatMessagesRecyclerAdapter(ChatMessagesHelper.getInstance().getChatLog(),SelfUserProfileUtils.getUserId(this));//True Code
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
         mMessageRecycler.setAdapter(mAdapter);
         mMessageRecycler.setLayoutManager(linearLayoutManager);

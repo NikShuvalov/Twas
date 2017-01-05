@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     NearbyManager mNearbyManager;
     ProfileCollectionRecyclerAdapter mProfileRecAdapter;
 
-    GoogleApiClient mGoogleApiClient;
+    public GoogleApiClient mGoogleApiClient;
     Message mFindMeMessage;
 //    Message mActiveMessage;
     MessageListener mActiveListener;
@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onFound(Message message) {
                 super.onFound(message);
+                Log.d("MainActivity LIstener", "Are both of... ");
                 ChatMessage soapBoxMessage = ChatMessage.getSoapBoxMessageFromBytes(message.getContent());
                 if(!soapBoxMessage.getContent().equals("")) {
                     ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addSoapBoxMessage(soapBoxMessage);
@@ -146,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onLost(Message message) {
                 super.onLost(message);
-                Toast.makeText(MainActivity.this, "Lost the signal", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "Lost the signal", Toast.LENGTH_SHORT).show();
 
                 //ToDo: Do a count that removes found users, to keep track of active publishing users.
 
@@ -346,13 +347,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onConnected(@Nullable Bundle connectionHint) {
         NearbyManager.getInstance().setGoogleApiConnected(true);
+        NearbyManager.getInstance().setGoogleApiClient(mGoogleApiClient);
         publish();
         subscribe();
+//        mNearbyManager.setupForListening(mId,this).beginListening();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
         NearbyManager.getInstance().setGoogleApiConnected(false);
+
 
     }
 
@@ -370,10 +374,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void publish(){
-
         mFindMeMessage = new Message(ChatMessage.getBytesForSoapBox(new ChatMessage(mId,"")));
         Log.d("NearBy", "publishing ID: "+ mId);
-        if(mNearbyManager.isGoogleApiConnected()){
+        if(mGoogleApiClient.isConnected()){
 
             //ToDo: Use this for background publishing.
 //            PublishOptions publishOptions = new PublishOptions.Builder().setStrategy(Strategy.BLE_ONLY).build();
@@ -401,8 +404,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 //        if(mNearbyManager.isSubscribing()){
 //            Nearby.Messages.unsubscribe(mGoogleApiClient,mActiveListener);
 //        }
-        if(mGoogleApiClient!=null){
-            mGoogleApiClient.disconnect();
+        if(mNearbyManager.getGoogleApiClient()!=null){
+            mNearbyManager.getGoogleApiClient().disconnect();
         }
         super.onDestroy();
     }
