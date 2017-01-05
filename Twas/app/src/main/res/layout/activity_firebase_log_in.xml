@@ -39,12 +39,26 @@
         android:layout_height="wrap_content"
         android:text="SIGN IN "
         android:layout_centerInParent="true"/>
-    <Button
-        android:id="@+id/sign_up_button"
+
+    <TextView
+        android:id="@+id/sign_up_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create a new account"
+        android:text="Sign up for a new account"
+        android:textColor="#00F"
         android:layout_below="@id/sign_in_button"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:paddingTop="20dp"
+        android:textSize="16sp"/>
+
+    <!--<com.google.android.gms.common.SignInButton-->
+        <!--android:id="@+id/google_sign_in_button"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_below="@id/sign_up_text"-->
+        <!--android:paddingTop="60dp"-->
+        <!--android:layout_centerHorizontal="true"/>-->
+
+
 
 </RelativeLayout>

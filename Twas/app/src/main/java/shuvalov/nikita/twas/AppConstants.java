@@ -38,7 +38,10 @@ public class AppConstants {
 
     public static final int PICK_IMAGE_REQUEST = 1;
     public static final int TAKE_IMAGE_REQUEST = 2;
-
+//
+//    public static final int SIGN_UP_REQUESTCODE= 666;
+//    public static final String SIGN_UP_USERNAME="user's user'sname";
+//    public static final String SIGN_UP_PASSWORD = "";
 
     public static final String SOAPBOX_MESSAGE_DELIMITER = "&&&&&&&&&&&&&&&";
 

@@ -1,10 +1,13 @@
 package shuvalov.nikita.twas.Activities;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -24,6 +27,7 @@ import com.google.android.gms.nearby.messages.MessageListener;
 import com.google.android.gms.nearby.messages.PublishOptions;
 import com.google.android.gms.nearby.messages.Strategy;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -106,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onFound(Message message) {
                 super.onFound(message);
-                Log.d("MainActivity LIstener", "Are both of... ");
                 ChatMessage soapBoxMessage = ChatMessage.getSoapBoxMessageFromBytes(message.getContent());
                 if(!soapBoxMessage.getContent().equals("")) {
                     ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addSoapBoxMessage(soapBoxMessage);
@@ -122,6 +125,39 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mFoundId);
 //                DatabaseReference strangerRef = FirebaseDatabaseUtils.getChildReference(mFirebaseDatabase, mFoundId, AppConstants.theoneforprofiles);
 
+//                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MainActivity.this);
+//
+////                ConnectionsSQLOpenHelper.getInstance().addSoapBoxMessage(soapBoxMessage);
+//                notificationBuilder.setContentText(soapBoxMessage.getContent()).setContentTitle("New SoapBoxMessage").setSmallIcon(android.R.drawable.ic_dialog_alert);
+//                notificationManager.notify(0,notificationBuilder.build());
+
+                mSelfChatroomsRef.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        Toast.makeText(MainActivity.this, "New ChatRoom", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
                 //Gets the stranger's profile information.
                 strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -200,13 +236,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void soapBoxDebug(){
         mDebugButton = (Button)findViewById(R.id.soapbox_debug);
-        mDebugButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent  = new Intent(MainActivity.this, SoapBoxFeedActivity.class);
-                startActivity(intent);
-            }
-        });
+        mDebugButton.setVisibility(View.INVISIBLE);
+//        mDebugButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent  = new Intent(MainActivity.this, SoapBoxFeedActivity.class);
+//                startActivity(intent);
+//            }
+//        });
     }
 
     //ToDo: Move into splash screen activity. Should only be called a single time upon load.
@@ -396,18 +433,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
     @Override
-    protected void onDestroy() {
-        //ToDo: Find out if this is even necessary
-//        if(mNearbyManager.isPublishing()){
-//            Nearby.Messages.unpublish(mGoogleApiClient,mFindMeMessage);
-//        }
-//        if(mNearbyManager.isSubscribing()){
-//            Nearby.Messages.unsubscribe(mGoogleApiClient,mActiveListener);
-//        }
-        if(mNearbyManager.getGoogleApiClient()!=null){
-            mNearbyManager.getGoogleApiClient().disconnect();
+    protected void onStop() {
+        if(mNearbyManager.isPublishing()){
+            Nearby.Messages.unpublish(mGoogleApiClient,mFindMeMessage);
+            mNearbyManager.setPublishing(false);
         }
-        super.onDestroy();
+        if(mNearbyManager.isSubscribing()){
+            Nearby.Messages.unsubscribe(mGoogleApiClient,mActiveListener);
+            mNearbyManager.setSubscribing(false);
+        }
+        super.onStop();
     }
 
     @Override

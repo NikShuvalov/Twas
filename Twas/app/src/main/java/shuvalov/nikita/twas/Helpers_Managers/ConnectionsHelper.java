@@ -43,6 +43,7 @@ public class ConnectionsHelper {
 
     //Should call this after pulling data from database... But no other time, otherwise it'll end up giving duplicates.
     public void addProfileConnectionsToCollection(ArrayList<Profile> profileList){
+        mProfileConnections.clear();
         mProfileConnections.addAll(profileList);
     }
 

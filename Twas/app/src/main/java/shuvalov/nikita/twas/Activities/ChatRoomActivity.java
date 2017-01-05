@@ -91,8 +91,8 @@ public class ChatRoomActivity extends AppCompatActivity {
                 ChatMessage newMessage = dataSnapshot.getValue(ChatMessage.class);
                 ChatMessagesHelper.getInstance().addChatMessage(newMessage);
                 ConnectionsSQLOpenHelper.getInstance(ChatRoomActivity.this).addMessage(newMessage);
-                mAdapter.notifyItemInserted(ChatMessagesHelper.getInstance().getChatLog().size() - 1);
-                mMessageRecycler.smoothScrollToPosition(ChatMessagesHelper.getInstance().getChatLog().size()-1);
+                mAdapter.notifyItemInserted(mAdapter.getItemCount()-1);
+                mMessageRecycler.smoothScrollToPosition(mAdapter.getItemCount()-1);
             }
 
             @Override
