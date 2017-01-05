@@ -21,6 +21,8 @@ import com.google.android.gms.nearby.messages.BleSignal;
 import com.google.android.gms.nearby.messages.Distance;
 import com.google.android.gms.nearby.messages.Message;
 import com.google.android.gms.nearby.messages.MessageListener;
+import com.google.android.gms.nearby.messages.PublishOptions;
+import com.google.android.gms.nearby.messages.Strategy;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -372,7 +374,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mFindMeMessage = new Message(ChatMessage.getBytesForSoapBox(new ChatMessage(mId,"")));
         Log.d("NearBy", "publishing ID: "+ mId);
         if(mNearbyManager.isGoogleApiConnected()){
-            Nearby.Messages.publish(mGoogleApiClient, mFindMeMessage);
+
+            //ToDo: Use this for background publishing.
+//            PublishOptions publishOptions = new PublishOptions.Builder().setStrategy(Strategy.BLE_ONLY).build();
+//            Nearby.Messages.publish(mGoogleApiClient, mFindMeMessage, publishOptions);
+
+            Nearby.Messages.publish(mGoogleApiClient,mFindMeMessage);
             mNearbyManager.setPublishing(true);
         }else{
             Toast.makeText(this, "Not connected to Google Cloud", Toast.LENGTH_SHORT).show();
