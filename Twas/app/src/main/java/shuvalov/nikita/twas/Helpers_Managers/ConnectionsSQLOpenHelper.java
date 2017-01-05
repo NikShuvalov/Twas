@@ -21,12 +21,13 @@ import shuvalov.nikita.twas.PoJos.Profile;
 
 public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "CONNECTION_COLLECTION_DB";
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 5;
 
     public static final String PROFILE_TABLE_NAME = "PROFILE_LIST";
     public static final String CHATMESS_TABLE_NAME = "CHAT_MESSAGES_LIST";
     public static final String CHATROOM_TABLE_NAME = "CHAT_ROOM_LIST";
     public static final String SOAPBOX_TABLE_NAME = "SOAPBOX_MESSAGES_LIST";
+    public static final String MISSED_CONNECTIONS_TABLE_NAME = "MISSED_CONNECTIONS_LIST";
 
     public static final String COLUMN_UID = "UID";
     public static final String COLUMN_NAME = "NAME";
@@ -40,6 +41,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ROOM_NAME = "ROOM_NAME";
     public static final String COLUMN_TIMESTAMP = "TIMESTAMP";
     public static final String COLUMN_MESSAGE_CONTENT = "CONTENT";
+
 
     //This holds all of the user profiles, including self(? maybe store as sharePreferences).
     public static final String CREATE_PROFILE_TABLE_EXE = "CREATE TABLE "+ PROFILE_TABLE_NAME +
@@ -68,7 +70,11 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
             COLUMN_UID+ " TEXT, "+
             "PRIMARY KEY ("+COLUMN_UID+", "+COLUMN_TIMESTAMP+"))";
 
-
+    public static final String CREATE_MISSED_CONNECTIONS_TABLE_EXE = "CREATE TABLE " + MISSED_CONNECTIONS_TABLE_NAME +
+            " (" + COLUMN_TIMESTAMP+ " INTEGER,"+
+            COLUMN_MESSAGE_CONTENT+ " TEXT,"+
+            COLUMN_UID+ " TEXT, "+
+            "PRIMARY KEY ("+COLUMN_UID+", "+COLUMN_TIMESTAMP+"))";
 
 
     private static ConnectionsSQLOpenHelper sConnectionsSQLOpenHelper;
@@ -90,6 +96,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(CREATE_CHATMESS_TABLE_EXE);
         sqLiteDatabase.execSQL(CREATE_CHATROOM_TABLE_EXE);
         sqLiteDatabase.execSQL(CREATE_SOAPBOX_MESSAGES_TABLE_EXE);
+        sqLiteDatabase.execSQL(CREATE_MISSED_CONNECTIONS_TABLE_EXE);
     }
 
     @Override
@@ -98,6 +105,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ CHATMESS_TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ CHATROOM_TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ SOAPBOX_TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ MISSED_CONNECTIONS_TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 
@@ -272,7 +280,6 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
 
             db.insert(SOAPBOX_TABLE_NAME, null, content);
         }
-
         db.close();
     }
 
@@ -301,15 +308,53 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         return soapBoxMessages;
     }
 
+    public long addMissedConnection(ChatMessage missedConnectionMessage){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues content = new ContentValues();
+        content.put(COLUMN_UID, missedConnectionMessage.getUserId());
+        content.put(COLUMN_TIMESTAMP, missedConnectionMessage.getTimeStamp());
+        content.put(COLUMN_MESSAGE_CONTENT, missedConnectionMessage.getContent());
+        long currentRow = db.insert(MISSED_CONNECTIONS_TABLE_NAME, null, content);
+        db.close();
+        return currentRow;
+    }
 
+    public ArrayList<ChatMessage> getMissedConnections(){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(MISSED_CONNECTIONS_TABLE_NAME, null, null, null, null, null, null);
+        ArrayList<ChatMessage> missedConnections = new ArrayList<>();
+        if(cursor.moveToFirst()){
+            while(!cursor.isAfterLast()){
+                String userId = cursor.getString(cursor.getColumnIndex(COLUMN_UID));
+                Integer timeStamp = cursor.getInt(cursor.getColumnIndex(COLUMN_TIMESTAMP));
+                String messageContent = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_CONTENT));
+                long longTime = (long)timeStamp;
+
+                missedConnections.add(new ChatMessage(userId,null,messageContent,longTime));
+                cursor.moveToNext();
+            }
+        }
+        db.close();
+        cursor.close();
+        messageHouseKeeping(MISSED_CONNECTIONS_TABLE_NAME,new ArrayList<ChatMessage>()); //ToDo: This might possibly be faulty.
+        return missedConnections;
+    }
+
+    //ToDo: Call this upon retrieving all the missing information.
+    public void clearMissedConnections(){
+        messageHouseKeeping(MISSED_CONNECTIONS_TABLE_NAME,new ArrayList<ChatMessage>());
+    }
     private void messageHouseKeeping(String tableName, ArrayList<ChatMessage> keptList){
         SQLiteDatabase db = getWritableDatabase();
         if(tableName.equals(SOAPBOX_TABLE_NAME)){ //Might add this to private conversations as well, so keeping it general for now.
             db.execSQL("DROP TABLE IF EXISTS "+ tableName);
+            db.execSQL(CREATE_SOAPBOX_MESSAGES_TABLE_EXE);
             addSoapBoxMessageList(keptList);
+        } else if (tableName.equals(MISSED_CONNECTIONS_TABLE_NAME)){
+            db.execSQL("DROP TABLE IF EXISTS "+ tableName);
+            db.execSQL(CREATE_MISSED_CONNECTIONS_TABLE_EXE);
         }
         db.close();
-
     }
 
     //ToDo: Join search for ChatMessages that are relevant to each room.

@@ -32,7 +32,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 import shuvalov.nikita.twas.AppConstants;
-import shuvalov.nikita.twas.BeaconMessageReciever;
+import shuvalov.nikita.twas.BeaconMessageReceiver;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsHelper;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.FirebaseDatabaseUtils;
@@ -94,9 +94,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         retrieveStoredProfiles();
         getUsersFbdbInformation();
 
-        Intent intent  = new Intent(this, BeaconMessageReciever.class);
-        intent.putExtra(AppConstants.SERVICE_INTENT,AppConstants.START_PUBSUB);
-        startService(intent);
+//        Intent intent  = new Intent(this, BeaconMessageReceiver.class);
+//        intent.putExtra(AppConstants.SERVICE_INTENT,AppConstants.START_PUBSUB);
+//        startService(intent);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Nearby.MESSAGES_API)
@@ -353,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onConnected(@Nullable Bundle connectionHint) {
         backGroundSubscribe();
 //        mNearbyManager.setGoogleApiClient(mGoogleApiClient);
-//        Intent intent  = new Intent(this, BeaconMessageReciever.class);
+//        Intent intent  = new Intent(this, BeaconMessageReceiver.class);
 //        intent.putExtra(AppConstants.SERVICE_INTENT,AppConstants.START_PUBSUB);
 //        startService(intent);
         publish();
@@ -363,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnectionSuspended(int i) {
-        Intent intent  = new Intent(this, BeaconMessageReciever.class);
+        Intent intent  = new Intent(this, BeaconMessageReceiver.class);
         intent.putExtra(AppConstants.SERVICE_INTENT,AppConstants.STOP_PUBSUB);
         stopService(intent);
         NearbyManager.getInstance().setGoogleApiConnected(false);
@@ -403,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public PendingIntent getPendingIntent(){
-        return PendingIntent.getBroadcast(this, 0, new Intent(this, BeaconMessageReciever.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getBroadcast(this, 0, new Intent(this, BeaconMessageReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT);
     }
 //
 //    public void subscribe(){
@@ -414,6 +414,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     protected void onDestroy() {
+        backGroundSubscribe(); //ToDo: Check if user has this option on.
         //ToDo: Find out if this is even necessary
 //        if(mNearbyManager.isPublishing()){
 //            Nearby.Messages.unpublish(mGoogleApiClient,mFindMeMessage);

@@ -23,7 +23,7 @@ import shuvalov.nikita.twas.RecyclersAndHolders.ProfileCollectionRecyclerAdapter
  * Created by NikitaShuvalov on 1/4/17.
  */
 
-public class BeaconMessageReciever extends BroadcastReceiver {
+public class BeaconMessageReceiver extends BroadcastReceiver {
     private Handler mHandler;
     private String mSelfId;
     MessageListener mActiveListener; //This will have to be fed through another class.
@@ -34,7 +34,7 @@ public class BeaconMessageReciever extends BroadcastReceiver {
 
 //    GoogleApiClient mGoogleApiClient;
 
-    public BeaconMessageReciever(){
+    public BeaconMessageReceiver(){
 //        mProfileRecAdapter = ConnectionsHelper.getInstance().getProfileCollectionRecyclerAdapter();
     }
 
@@ -88,7 +88,7 @@ public class BeaconMessageReciever extends BroadcastReceiver {
 //                super.onFound(message);
 //                ChatMessage soapBoxMessage = ChatMessage.getSoapBoxMessageFromBytes(message.getContent());
 //                if(!soapBoxMessage.getContent().equals("")){
-//                    ConnectionsSQLOpenHelper.getInstance(BeaconMessageReciever.this).addSoapBoxMessage(soapBoxMessage);
+//                    ConnectionsSQLOpenHelper.getInstance(BeaconMessageReceiver.this).addSoapBoxMessage(soapBoxMessage);
 //                }
 //                String foundId = soapBoxMessage.getUserId();
 //                FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -105,7 +105,7 @@ public class BeaconMessageReciever extends BroadcastReceiver {
 //                    @Override
 //                    public void onDataChange(DataSnapshot dataSnapshot) {
 //                        Profile strangerProfile = dataSnapshot.getValue(Profile.class);
-//                        ConnectionsSQLOpenHelper.getInstance(BeaconMessageReciever.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
+//                        ConnectionsSQLOpenHelper.getInstance(BeaconMessageReceiver.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
 //                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
 //                        mProfileRecAdapter.notifyDataSetChanged();
 //                    }
@@ -140,7 +140,7 @@ public class BeaconMessageReciever extends BroadcastReceiver {
 //
 //                ChatMessage soapBoxMessage = ChatMessage.getSoapBoxMessageFromBytes(message.getContent());
 //                if(!soapBoxMessage.getContent().equals("")){
-//                    ConnectionsSQLOpenHelper.getInstance(BeaconMessageReciever.this).addSoapBoxMessage(soapBoxMessage);
+//                    ConnectionsSQLOpenHelper.getInstance(BeaconMessageReceiver.this).addSoapBoxMessage(soapBoxMessage);
 //                }
 //
 //                //ToDo: I think I need to put SoapBoxRecyclerAdapter here in order to update any changes.
@@ -171,7 +171,7 @@ public class BeaconMessageReciever extends BroadcastReceiver {
 //    }
 //
 //    public PendingIntent getPendingIntent(){
-//        return PendingIntent.getBroadcast(this, 0, new Intent(this, BeaconMessageReciever.class), PendingIntent.FLAG_UPDATE_CURRENT);
+//        return PendingIntent.getBroadcast(this, 0, new Intent(this, BeaconMessageReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT);
 //    }
 //
 //    @Override
@@ -193,7 +193,7 @@ public class BeaconMessageReciever extends BroadcastReceiver {
 //    }
 //    public void publish(){
 //        Log.d("Service", "publish: called");
-//        Intent intent = new Intent (this, BeaconMessageReciever.class);
+//        Intent intent = new Intent (this, BeaconMessageReceiver.class);
 //        PendingIntent stopSelf = PendingIntent.getService(this,0,intent, PendingIntent.FLAG_CANCEL_CURRENT);
 //        mActivemessage = new com.google.android.gms.nearby.messages.Message(ChatMessage.getBytesForSoapBox(new ChatMessage(mSelfId,"")));
 //
