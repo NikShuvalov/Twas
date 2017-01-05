@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.messages.Message;
 import com.google.android.gms.nearby.messages.MessageListener;
@@ -33,6 +35,7 @@ import java.util.ArrayList;
 
 import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.BeaconMessageReceiver;
+import shuvalov.nikita.twas.BeaconMessageReceiverService;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsHelper;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.FirebaseDatabaseUtils;
@@ -192,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 startActivity(intent);
             }
         });
+
 
         mProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -399,11 +403,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void backGroundSubscribe(){
         SubscribeOptions subscribeOptions = new SubscribeOptions.Builder().setStrategy(Strategy.BLE_ONLY).build();
-        Nearby.Messages.subscribe(mGoogleApiClient,getPendingIntent(), subscribeOptions);
+        Nearby.Messages.subscribe(mGoogleApiClient,getPendingIntent(), subscribeOptions).setResultCallback(new ResultCallback<Status>() {
+            @Override
+            public void onResult(@NonNull Status status) {
+                if(status.isSuccess()){
+                    startService(getBeaconReceiverServiceIntent());
+                }
+
+            }
+        });
     }
 
     public PendingIntent getPendingIntent(){
-        return PendingIntent.getBroadcast(this, 0, new Intent(this, BeaconMessageReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getBroadcast(this, 0, getBeaconReceiverServiceIntent(), PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    public Intent getBeaconReceiverServiceIntent(){
+        return new Intent(this, BeaconMessageReceiverService.class);
     }
 //
 //    public void subscribe(){
@@ -413,8 +429,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
     @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
     protected void onDestroy() {
-        backGroundSubscribe(); //ToDo: Check if user has this option on.
+         //ToDo: Check if user has this option on.
         //ToDo: Find out if this is even necessary
 //        if(mNearbyManager.isPublishing()){
 //            Nearby.Messages.unpublish(mGoogleApiClient,mFindMeMessage);

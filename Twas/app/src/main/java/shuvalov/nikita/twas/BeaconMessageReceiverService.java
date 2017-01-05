@@ -59,6 +59,7 @@ public class BeaconMessageReceiverService extends IntentService {
                     ChatMessage chatMessage = ChatMessage.getSoapBoxMessageFromBytes(message.getContent());
                     long currentMissed = ConnectionsSQLOpenHelper.getInstance(BeaconMessageReceiverService.this).addMissedConnection(chatMessage);
                     updateNotification(currentMissed);
+                    Log.d("Intent Service Test", "Found this many: "+ currentMissed);
                 }
             });
         }
@@ -80,6 +81,6 @@ public class BeaconMessageReceiverService extends IntentService {
                 .setContentIntent(turnOff)
                 .setSmallIcon(android.R.drawable.ic_menu_close_clear_cancel)
                 .setSubText("Click to turn off scan");
-        notificationManager.notify(MESSAGES_NOTIFICATION_ID,noteBuilder.build());
+        notificationManager.notify(MESSAGES_NOTIFICATION_ID, noteBuilder.build());
     }
 }
