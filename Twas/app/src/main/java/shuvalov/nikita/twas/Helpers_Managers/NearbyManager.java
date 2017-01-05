@@ -48,5 +48,11 @@ public class NearbyManager {
         mSubscribing = subscribing;
     }
 
+    public void setGoogleApiClient(GoogleApiClient googleApiClient){
+        mGoogleApiClient = googleApiClient;
+    }
+    public GoogleApiClient getGoogleApiClient(){
+        return mGoogleApiClient;
+    }
 
 }
