@@ -23,28 +23,28 @@
         android:layout_height="match_parent"
         android:layout_below="@id/my_toolbar">
 
-        <Button
-            android:id="@+id/send_butt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:background="@color/colorPrimaryLight"
-            android:text="Send"
-            android:textColor="#ffed4d"/>
+        <!--<Button-->
+            <!--android:id="@+id/send_butt"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:background="@color/colorPrimaryLight"-->
+            <!--android:text="Send"-->
+            <!--android:textColor="#ffed4d"/>-->
 
-        <EditText
-            android:id="@+id/message_entry"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_toLeftOf="@id/send_butt"/>
+        <!--<EditText-->
+            <!--android:id="@+id/message_entry"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:layout_toLeftOf="@id/send_butt"/>-->
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/soapbox_feed_recycler"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@id/send_butt"/>
+            android:layout_height="match_parent"/>
+        <!--android:layout_above="@id/send_butt"-->
 
     </RelativeLayout>
 

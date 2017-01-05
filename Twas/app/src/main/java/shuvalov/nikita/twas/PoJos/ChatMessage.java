@@ -2,6 +2,10 @@ package shuvalov.nikita.twas.PoJos;
 
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 
@@ -11,7 +15,7 @@ import shuvalov.nikita.twas.AppConstants;
  * Created by NikitaShuvalov on 12/20/16.
  */
 
-public class ChatMessage {
+public class ChatMessage implements Serializable{
     String userId; //THe user that submitted this message
     String roomID;  //The room to which this message was submitted
     String content; //The content of the message.
@@ -77,6 +81,17 @@ public class ChatMessage {
                 timeStampAsString);
         return chatMessageAsString.getBytes();
     }
+
+    //ToDo: Serialize it into JsonArray, and Deserialize from that JsonArray if time-permits.
+//    public static ChatMessage getSoapBoxMessageFromBytesJson(byte[] bytes){
+//        JSONArray jsonArray;
+//        try {
+//            jsonArray = new JSONArray(new String(bytes));
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        ChatMessage chatMessage = jsonArray.get
+//    }
 
     public static ChatMessage getSoapBoxMessageFromBytes(byte[] bytes){
         String soapBoxAsString = new String(bytes);

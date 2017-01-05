@@ -78,5 +78,13 @@ public class SelfUserProfileUtils {
         return new Profile(selfUID, selfName, selfBio,selfDOB, selfGender);
     }
 
+    public static void setNewSoapBoxMessage(Context context, String soapBoxString){
+        context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, Context.MODE_PRIVATE).edit().putString(AppConstants.PREF_SOAPBOX_MESSAGE,soapBoxString).commit();
+    }
+
+    public static String getSoapBoxMessage(Context context){
+        return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, Context.MODE_PRIVATE).getString(AppConstants.PREF_SOAPBOX_MESSAGE, "");
+    }
+
 
 }

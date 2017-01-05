@@ -32,16 +32,18 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import shuvalov.nikita.twas.AppConstants;
+import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.FirebaseDatabaseUtils;
 import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
+import shuvalov.nikita.twas.PoJos.ChatMessage;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
 
 public class SelfProfileActivity extends AppCompatActivity {
     private ImageView mProfileImage;
-    private Button mAccessGallery, mTakeSelfie;
+    private Button mAccessGallery, mTakeSelfie, mSoapBoxUpdateButt;
     private FloatingActionButton mSubmit;
-    private EditText mName, mBio;
+    private EditText mName, mBio, mSoapBoxMessage;
     private EditText mDateEntry; //Placeholder, used for debugging.
     private boolean mUpdatedProfileImage = false;
     private Bitmap mChosenProfileImage;
@@ -66,6 +68,7 @@ public class SelfProfileActivity extends AppCompatActivity {
         mProfile = SelfUserProfileUtils.getUsersInfoAsProfile(this);
         mName.setText(mProfile.getName());
         mBio.setText(mProfile.getBio());
+        mSoapBoxMessage.setText(SelfUserProfileUtils.getSoapBoxMessage(this));
 
         if(mProfile.getDOB()!=0){
             long birthdateMillis = mProfile.getDOB();
@@ -140,6 +143,9 @@ public class SelfProfileActivity extends AppCompatActivity {
 
         mDateEntry = (EditText)findViewById(R.id.date_entry); //Used for debugging for now
 
+        mSoapBoxMessage = (EditText)findViewById(R.id.soapbox_status_entry);
+        mSoapBoxUpdateButt = (Button)findViewById(R.id.update_soapbox_message);
+
     }
 
     public void initButtons(){
@@ -163,6 +169,20 @@ public class SelfProfileActivity extends AppCompatActivity {
 
         mAccessGallery.setOnClickListener(imageClickerListener);
         mTakeSelfie.setOnClickListener(imageClickerListener);
+
+        mSoapBoxUpdateButt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String soapBoxString = mSoapBoxMessage.getText().toString();
+                if(soapBoxString.isEmpty()){
+                    Toast.makeText(SelfProfileActivity.this, "SoapBox Message was emptied", Toast.LENGTH_SHORT).show();
+                }
+                SelfUserProfileUtils.setNewSoapBoxMessage(SelfProfileActivity.this,soapBoxString);
+                String selfId = SelfUserProfileUtils.getUserId(SelfProfileActivity.this);
+                ChatMessage soapBoxMessage = new ChatMessage(selfId,soapBoxString);
+                ConnectionsSQLOpenHelper.getInstance(SelfProfileActivity.this).addSoapBoxMessage(soapBoxMessage);
+            }
+        });
 
         mSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -202,7 +222,7 @@ public class SelfProfileActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==AppConstants.PICK_IMAGE_REQUEST||requestCode==AppConstants.TAKE_IMAGE_REQUEST && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+        if((requestCode==AppConstants.PICK_IMAGE_REQUEST||requestCode==AppConstants.TAKE_IMAGE_REQUEST) && (resultCode==RESULT_OK && data!=null && data.getData()!=null)){
             Uri uri = data.getData();
             try {
                 mChosenProfileImage = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);

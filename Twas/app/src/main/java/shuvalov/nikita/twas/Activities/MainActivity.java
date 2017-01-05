@@ -236,14 +236,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void soapBoxDebug(){
         mDebugButton = (Button)findViewById(R.id.soapbox_debug);
-        mDebugButton.setVisibility(View.INVISIBLE);
-//        mDebugButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent  = new Intent(MainActivity.this, SoapBoxFeedActivity.class);
-//                startActivity(intent);
-//            }
-//        });
+//        mDebugButton.setVisibility(View.INVISIBLE);
+        mDebugButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent  = new Intent(MainActivity.this, SoapBoxFeedActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     //ToDo: Move into splash screen activity. Should only be called a single time upon load.
@@ -349,7 +349,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         for(Profile profile: currentStoredProfiles){
             currentStoredIds.add(profile.getUID());
         }
-
         for(String uid: userIdList){
             if(!currentStoredIds.contains(uid)){
                 idsMissingProfiles.add(uid);
@@ -411,8 +410,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void publish(){
-        mFindMeMessage = new Message(ChatMessage.getBytesForSoapBox(new ChatMessage(mId,"")));
-        Log.d("NearBy", "publishing ID: "+ mId);
+        String soapBoxMessageString = SelfUserProfileUtils.getSoapBoxMessage(this);
+        mFindMeMessage = new Message(ChatMessage.getBytesForSoapBox(new ChatMessage(mId,soapBoxMessageString)));
         if(mGoogleApiClient.isConnected()){
 
             //ToDo: Use this for background publishing.
@@ -420,6 +419,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 //            Nearby.Messages.publish(mGoogleApiClient, mFindMeMessage, publishOptions);
 
             Nearby.Messages.publish(mGoogleApiClient,mFindMeMessage);
+            Log.d("NearBy", "publishing ID: "+ mId);
             mNearbyManager.setPublishing(true);
         }else{
             Toast.makeText(this, "Not connected to Google Cloud", Toast.LENGTH_SHORT).show();

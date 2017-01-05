@@ -31,6 +31,7 @@ public class AppConstants {
     public static final String PREF_GENDER = "Self_gender";
 //    public static final String PREF_PICURL = "Self_picurl";
     public static final String PREF_CHATROOM = "Chatroom";
+    public static final String PREF_SOAPBOX_MESSAGE = "My SoapBoxMessage";
 
     public static final String PREF_EMPTY = "Duh-dah, duh-dah, duhhh! For whom the bell tolls!";
 
@@ -43,6 +44,6 @@ public class AppConstants {
 //    public static final String SIGN_UP_USERNAME="user's user'sname";
 //    public static final String SIGN_UP_PASSWORD = "";
 
-    public static final String SOAPBOX_MESSAGE_DELIMITER = "&&&&&&&&&&&&&&&";
+    public static final String SOAPBOX_MESSAGE_DELIMITER = "Œ&œ§×Å¾¶¤";
 
 }
