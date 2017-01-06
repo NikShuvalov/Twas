@@ -4,6 +4,7 @@
     <string name="title_activity_user_log_in">Sign in</string>
 
     <string-array name="months">
+        <item>Month</item>
         <item>January</item>
         <item>February</item>
         <item>March</item>

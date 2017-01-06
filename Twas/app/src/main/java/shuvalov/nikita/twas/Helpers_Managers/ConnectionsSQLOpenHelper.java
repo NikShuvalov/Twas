@@ -273,7 +273,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         content.put(COLUMN_TIMESTAMP, timeStampString);
         content.put(COLUMN_MESSAGE_CONTENT, soapBoxMessage.getContent());
 
-        db.insert(SOAPBOX_TABLE_NAME, null, content);
+        db.insertWithOnConflict(SOAPBOX_TABLE_NAME, null, content,SQLiteDatabase.CONFLICT_IGNORE);
         db.close();
     }
 

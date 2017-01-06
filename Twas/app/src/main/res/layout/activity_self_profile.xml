@@ -51,7 +51,6 @@
             android:id="@+id/name_entry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/custom_name_edittext"
             android:layout_below="@id/update_soapbox_message"
             android:hint="Enter Name"
             android:padding="4dp"
@@ -59,6 +58,8 @@
             android:layout_marginLeft="10dp"
             android:layout_toLeftOf="@id/gender_select"
             android:maxLines="1"/>
+        <!--android:background="@drawable/custom_name_edittext"-->
+
 
         <android.support.v7.widget.CardView
             android:id="@+id/profile_pic_card"
@@ -77,6 +78,8 @@
                     android:id="@+id/profile_image_view"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"/>
+
+                <!--Change to Icons for uploading image-->
                 <Button
                     android:id="@+id/upload_image_gallery"
                     android:layout_width="wrap_content"
@@ -105,37 +108,66 @@
             android:layout_marginLeft="10dp"
             android:layout_below="@id/profile_pic_card"
             android:lines="2"/>
-        <LinearLayout
-            android:id="@+id/birthday_spinner_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_below="@id/about_me_entry">
-            <TextView
-                android:id="@+id/birthday_prompt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="What is your birthday?"
-                />
 
-            <Spinner
-                android:id="@+id/month_spinner"
-                android:layout_width="wrap_content"
+            <android.support.v7.widget.CardView
+                android:id="@+id/birthday_inpput_container"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="3"
-                />
-            <Spinner
-                android:id="@+id/date_spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-            <Spinner
-                android:id="@+id/year_spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"/>
+                android:layout_below="@id/about_me_entry">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/birthday_prompt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Birthday"
+                        android:textColor="#333"
+                        android:textSize="18sp"
+                        />
+                    <LinearLayout
+                        android:id="@+id/entry_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_below="@id/birthday_prompt">
+                        <Spinner
+                            android:id="@+id/month_spinner"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+                        <EditText
+                            android:id="@+id/birth_date_entry"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ems="2"
+                            android:maxLength="2"
+                            android:inputType="number"
+                            android:hint="dd"
+                            android:gravity="center_horizontal"
+                            android:layout_weight="5"/>
+                        <EditText
+                            android:id="@+id/birth_year_entry"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ems="4"
+                            android:hint="yyyy"
+                            android:gravity="center_horizontal"
+                            android:maxLength="4"
+                            android:inputType="number"
+                            android:layout_weight="5"/>
 
-        </LinearLayout>
+                    </LinearLayout>
+                    <Button
+                        android:id="@+id/submit_birthday"
+                        android:text="update birthday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/entry_layout"/>
+
+                </RelativeLayout>
+            </android.support.v7.widget.CardView>
+
 
         <EditText
             android:id="@+id/date_entry"
@@ -143,7 +175,7 @@
             android:layout_height="wrap_content"
             android:inputType="date"
             android:hint="Enter Birthday"
-            android:layout_below="@id/birthday_spinner_container"/>
+            android:layout_below="@id/birthday_inpput_container"/>
 
 
         <android.support.design.widget.FloatingActionButton

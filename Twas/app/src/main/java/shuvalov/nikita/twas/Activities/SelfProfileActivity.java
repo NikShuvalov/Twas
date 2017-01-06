@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,27 +43,30 @@ import shuvalov.nikita.twas.R;
 
 public class SelfProfileActivity extends AppCompatActivity {
     private ImageView mProfileImage;
-    private Button mAccessGallery, mTakeSelfie, mSoapBoxUpdateButt;
+    private Button mAccessGallery, mTakeSelfie, mSoapBoxUpdateButt, mUpdateBirthday;
     private FloatingActionButton mSubmit;
-    private EditText mName, mBio, mSoapBoxMessage;
+    private EditText mName, mBio, mSoapBoxMessage, mBirthdayEntry, mBirthYearEntry;
     private EditText mDateEntry; //Placeholder, used for debugging.
     private boolean mUpdatedProfileImage = false;
     private Bitmap mChosenProfileImage;
-    private Spinner mGenders, mDate, mMonth, mYear;
-    private ArrayAdapter<CharSequence> mGenderAdapter, mDateAdapter, mMonthAdapter, mYearAdapter;
+    private Spinner  mMonthSpinner;
+    private ArrayAdapter<CharSequence> mMonthAdapter;
     private Toolbar mToolbar;
     private Profile mProfile;
+    private int mBirthYear, mBirthMonth, mBirthDate;
+    private int mBirthMonthSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_self_profile);
 
+
         findViews();
         loadSelfImage();
         initButtons();
-        setSpinnerAdapters();
         loadCurrentValues();
+        setSpinnerAdapters();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
@@ -72,34 +76,20 @@ public class SelfProfileActivity extends AppCompatActivity {
         mBio.setText(mProfile.getBio());
         mSoapBoxMessage.setText(SelfUserProfileUtils.getSoapBoxMessage(this));
 
+        mBirthMonth=0;
+        mBirthYear=-1;
+        mBirthDate=-1;
+
         if(mProfile.getDOB()!=0){
             long birthdateMillis = mProfile.getDOB();
             Calendar birthCal = Calendar.getInstance();
             birthCal.setTimeInMillis(birthdateMillis);
-            int year = birthCal.get(Calendar.YEAR);
-            int month = birthCal.get(Calendar.MONTH);
-            int date = birthCal.get(Calendar.DATE);
-            String dateAsString;
+            mBirthYear = birthCal.get(Calendar.YEAR);
+            mBirthMonth = birthCal.get(Calendar.MONTH);
+            mBirthDate = birthCal.get(Calendar.DATE);
 
-            //ToDo: Remove this later probs. For now this snippet keeps the format consistent for birthdate.
-            if(month<10||date<10){
-                String monthString;
-                String dateString;
-                if(month<10){
-                    monthString = 0+String.valueOf(month);
-                }else{
-                    monthString = String.valueOf(month);
-                }
-                if (date < 10) {
-                    dateString = 0+ String.valueOf(date);
-                }else{
-                    dateString = String.valueOf(date);
-                }
-                dateAsString = monthString+dateString+year;
-            }else{
-                dateAsString = String.valueOf(month)+date+year;
-            }
-            mDateEntry.setText(dateAsString);
+            mBirthYearEntry.setText(String.valueOf(mBirthYear));
+            mBirthdayEntry.setText(String.valueOf(mBirthDate));
         }
     }
 
@@ -127,6 +117,7 @@ public class SelfProfileActivity extends AppCompatActivity {
     public void findViews(){
         mProfileImage = (ImageView)findViewById(R.id.profile_image_view);//Populate this if user already has a profile image.
 
+        mUpdateBirthday = (Button)findViewById(R.id.submit_birthday);
         mAccessGallery = (Button)findViewById(R.id.upload_image_gallery);
         mTakeSelfie = (Button)findViewById(R.id.selfie_button);
         mSubmit = (FloatingActionButton) findViewById(R.id.submit_changes_button);
@@ -138,10 +129,10 @@ public class SelfProfileActivity extends AppCompatActivity {
 
         mName = (EditText)findViewById(R.id.name_entry);
         mBio = (EditText)findViewById(R.id.about_me_entry);
-        mGenders = (Spinner)findViewById(R.id.gender_select);
-        mDate = (Spinner)findViewById(R.id.date_spinner);
-        mMonth = (Spinner)findViewById(R.id.month_spinner);
-        mYear = (Spinner)findViewById(R.id.year_spinner);
+
+        mMonthSpinner = (Spinner)findViewById(R.id.month_spinner);
+        mBirthdayEntry = (EditText)findViewById(R.id.birth_date_entry);
+        mBirthYearEntry = (EditText)findViewById(R.id.birth_year_entry);
 
         mDateEntry = (EditText)findViewById(R.id.date_entry); //Used for debugging for now
 
@@ -187,26 +178,76 @@ public class SelfProfileActivity extends AppCompatActivity {
             }
         });
 
+        //FixMe: This only updates the changes locally, you still need to hit the submit button to actually sent out the new information to fbdb.
+        mUpdateBirthday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean validDate = true;
+                switch(mBirthMonthSelected){
+                    case 1:
+                    case 3:
+                    case 5:
+                    case 7:
+                    case 8:
+                    case 10:
+                    case 12:
+                        if(Integer.parseInt(mBirthdayEntry.getText().toString())>31){
+                            mBirthdayEntry.setError("Invalid Date");
+                            validDate=false;
+                        }
+                        break;
+                    case 4:
+                    case 6:
+                    case 9:
+                    case 11:
+                        if(Integer.parseInt(mBirthdayEntry.getText().toString())>30){
+                            mBirthdayEntry.setError("Invalid Date");
+                            validDate=false;
+                        }
+                        break;
+                    case 2:
+                        int year = Integer.parseInt(mBirthYearEntry.getText().toString());
+                        int date = Integer.parseInt(mBirthdayEntry.getText().toString());
+                        if(date>=29){
+                            if(!(date==29 && checkLeapYear(year))){
+                                mBirthdayEntry.setError("Invalid Date");
+                                validDate=false;
+                            }
+                        }
+                        break;
+                }
+                if(validDate){
+                    Calendar birthCalendar = Calendar.getInstance();
+                    int year = Integer.parseInt(mBirthYearEntry.getText().toString());
+                    int date = Integer.parseInt(mBirthdayEntry.getText().toString());
+                    birthCalendar.set(year,mBirthMonth,date);
+                    long dob = birthCalendar.getTimeInMillis();
+                    mProfile.setDOB(dob);
+                }
+            }
+        });
         mSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String name = mName.getText().toString();
                 String bio = mBio.getText().toString();
                 String gender = "Male";
-                String dateOfBirth = mDateEntry.getText().toString();
-                int month = Integer.parseInt(dateOfBirth.substring(0,2));
-                int date = Integer.parseInt(dateOfBirth.substring(2,4));
-                int year = Integer.parseInt(dateOfBirth.substring(4));
-
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(year, month, date);
-
-                long birthInMillis = calendar.getTimeInMillis();
+//                if(!mDateEntry.getText().toString().isEmpty()) {
+//                    String dateOfBirth = mDateEntry.getText().toString();
+//                    int month = Integer.parseInt(dateOfBirth.substring(0, 2));
+//                    int date = Integer.parseInt(dateOfBirth.substring(2, 4));
+//                    int year = Integer.parseInt(dateOfBirth.substring(4));
+//
+//                    Calendar calendar = Calendar.getInstance();
+//                    calendar.set(year, month, date);
+//
+//                    long birthInMillis = calendar.getTimeInMillis();
+//                    mProfile.setDOB(birthInMillis);
+//                }
 
                 mProfile.setName(name);
                 mProfile.setBio(bio);
                 mProfile.setGender(gender);
-                mProfile.setDOB(birthInMillis);
 
                 SelfUserProfileUtils.assignProfileToSharedPreferences(SelfProfileActivity.this, mProfile);
                 if(mUpdatedProfileImage){
@@ -292,25 +333,34 @@ public class SelfProfileActivity extends AppCompatActivity {
         });
     }
     public void setSpinnerAdapters(){
-        mGenderAdapter = ArrayAdapter.createFromResource(this,R.array.genders, android.R.layout.simple_spinner_item);
-        mGenderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mGenders.setAdapter(mGenderAdapter);
-        mGenders.setSelection(0); //ToDo: Selection should be based off of sharedPreferences values.
-
-        mDateAdapter = ArrayAdapter.createFromResource(this,R.array.genders, android.R.layout.simple_spinner_item);
-        mDateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mDate.setAdapter(mDateAdapter);
-        mDate.setSelection(0);//ToDo: Current Selection should be based off of sharedPreferences value, ALSO a selector needed depending on which month it is?
+//        mGenderAdapter = ArrayAdapter.createFromResource(this,R.array.genders, android.R.layout.simple_spinner_item);
+//        mGenderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        mGenders.setAdapter(mGenderAdapter);
+//        mGenders.setSelection(0); //ToDo: Selection should be based off of sharedPreferences values.
 
         mMonthAdapter = ArrayAdapter.createFromResource(this,R.array.months, android.R.layout.simple_spinner_item);
         mMonthAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mMonth.setAdapter(mMonthAdapter);
-        mMonth.setSelection(0); //ToDo: Current Selection should be based of sharedpref
+        mMonthSpinner.setAdapter(mMonthAdapter);
+        mMonthSpinner.setSelection(mBirthMonth);
+        mMonthSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                mBirthMonthSelected = i;
+            }
 
-        mYearAdapter = ArrayAdapter.createFromResource(this,R.array.genders, android.R.layout.simple_spinner_item);
-        mYearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mYear.setAdapter(mYearAdapter);
-        mYear.setSelection(0); //ToDo: Current selection should be based of sharedPref
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
 
+            }
+        });
+
+    }
+    public boolean checkLeapYear(int year){
+        if(year%4!=0){
+            return false;
+        }else if (year%100==0 && year%400!=0){
+            return false;
+        }
+        return true;
     }
 }
