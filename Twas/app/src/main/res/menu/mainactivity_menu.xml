@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="ChatRooms"
+        app:showAsAction="never"
+        android:id="@+id/chatrooms_option"/>
+    <item
+        android:title="SoapBox Feed"
+        app:showAsAction="never"
+        android:id="@+id/soapbox_option"/>
+    <item
+        android:title="Sign Out"
+        app:showAsAction = "never"
+        android:id="@+id/signout_option"/>
+    <item
+        android:title="Profile"
+        app:showAsAction="always"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:id="@+id/self_profile_option"/>
+
+</menu>

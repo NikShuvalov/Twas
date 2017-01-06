@@ -17,59 +17,63 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         />
-    <RelativeLayout
-        android:id="@+id/content_container"
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/profiles_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/my_toolbar">
+        android:layout_below="@id/my_toolbar"
+        android:layout_margin="10dp"/>
 
-        <Button
-            android:id="@+id/soapbox_debug"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="soapBox Feed"/>
+    <!--<RelativeLayout-->
+        <!--android:id="@+id/content_container"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_below="@id/my_toolbar">-->
 
-
-
-        <Button
-            android:id="@+id/send_butt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Go To Messages"
-            android:layout_centerHorizontal="true"/>
-
-        <TextView
-            android:id="@+id/display_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hello World!"
-            android:layout_below="@id/send_butt"
-            android:textSize="20sp"
-            android:textColor="#333"
-            android:layout_centerHorizontal="true"/>
+        <!--<Button-->
+            <!--android:id="@+id/soapbox_debug"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="soapBox Feed"/>-->
 
 
-        <Button
-            android:id="@+id/sign_out_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/display_text"
-            android:layout_centerHorizontal="true"
-            android:text="sign out"/>
 
-        <Button
-            android:id="@+id/self_profile_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/sign_out_button"
-            android:text="Self Profile"
-            android:layout_centerHorizontal="true"/>
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/profiles_recyclerview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/self_profile_button"
-            android:layout_margin="10dp"/>
-    </RelativeLayout>
+        <!--<Button-->
+            <!--android:id="@+id/send_butt"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Go To Messages"-->
+            <!--android:layout_centerHorizontal="true"/>-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/display_text"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Hello World!"-->
+            <!--android:layout_below="@id/send_butt"-->
+            <!--android:textSize="20sp"-->
+            <!--android:textColor="#333"-->
+            <!--android:layout_centerHorizontal="true"/>-->
+
+
+        <!--<Button-->
+            <!--android:id="@+id/sign_out_button"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@id/display_text"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:text="sign out"/>-->
+
+        <!--<Button-->
+            <!--android:id="@+id/self_profile_button"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@id/sign_out_button"-->
+            <!--android:text="Self Profile"-->
+            <!--android:layout_centerHorizontal="true"/>-->
+
+
+    <!--</RelativeLayout>-->
 
 </RelativeLayout>

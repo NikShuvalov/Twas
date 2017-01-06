@@ -12,6 +12,9 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -53,12 +56,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public static final String FOUND_ID_INTENT = "Found id";
 
     Toolbar mToolbar;
-    Button mSendButt, mSignOutButton, mProfileButton;
-    TextView mDisplayText;
+//    Button mSendButt, mSignOutButton, mProfileButton;
+//    TextView mDisplayText;
     String mFoundId;
 
 
-    Button mDebugButton; //FixMe: Remove
+//    Button mDebugButton; //FixMe: Remove
 
     boolean mBackRecentlyPressed;
     RecyclerView mRecyclerView;
@@ -104,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         retrieveStoredProfiles();
         getUsersFbdbInformation();
 
-        soapBoxDebug();
+//        soapBoxDebug();
 
 
         mActiveListener = new MessageListener() {
@@ -175,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         Log.d("MainActivity", "on heard signal, failed attempt to D/L profile ");
                     }
                 });
-                mDisplayText.setText(mFoundId);
+//                mDisplayText.setText(mFoundId);
                 Toast.makeText(MainActivity.this, mFoundId, Toast.LENGTH_SHORT).show();
 
                 //ToDo: Do a count that adds found users, to keep track of active publishing users.
@@ -199,53 +202,52 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onBleSignalChanged(Message message, BleSignal bleSignal) {
                 super.onBleSignalChanged(message, bleSignal);
                 Log.d("Testing Shots fired", "Please clap");
-                mDisplayText.setText(ChatMessage.getSoapBoxMessageFromBytes(message.getContent()).getContent());
+//                mDisplayText.setText(ChatMessage.getSoapBoxMessageFromBytes(message.getContent()).getContent());
             }
         };
 
-        //ToDo:Remove this, simply using for debugging to navigate to chatroomListActivity
-        mSendButt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent chatroomIntent = new Intent(MainActivity.this, ChatRoomListActivity.class);
-                startActivity(chatroomIntent);
-            }
-        });
+//        //ToDo:Remove this, simply using for debugging to navigate to chatroomListActivity
+//        mSendButt.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent chatroomIntent = new Intent(MainActivity.this, ChatRoomListActivity.class);
+//                startActivity(chatroomIntent);
+//            }
+//        });
 
-        mSignOutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseAuth.getInstance().signOut();
-
-                //ToDo: Clear users information in SharedPref and Database, unless if I keep database info tied to specific Users.
-                Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
-                ConnectionsSQLOpenHelper.getInstance(MainActivity.this).clearDatabase();
-                Intent intent = new Intent(MainActivity.this, FirebaseLogInActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-            }
-        });
-
-        mProfileButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent =new Intent(MainActivity.this, SelfProfileActivity.class);
-                startActivity(intent);
-            }
-        });
+//        mSignOutButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                FirebaseAuth.getInstance().signOut();
+//
+//                //ToDo: Clear users information in SharedPref and Database, unless if I keep database info tied to specific Users.
+//                Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
+//                ConnectionsSQLOpenHelper.getInstance(MainActivity.this).clearDatabase();
+//                Intent intent = new Intent(MainActivity.this, FirebaseLogInActivity.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                startActivity(intent);
+//            }
+//        });
+//
+//        mProfileButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent =new Intent(MainActivity.this, SelfProfileActivity.class);
+//                startActivity(intent);
+//            }
+//        });
     }
 
-    public void soapBoxDebug(){
-        mDebugButton = (Button)findViewById(R.id.soapbox_debug);
-//        mDebugButton.setVisibility(View.INVISIBLE);
-        mDebugButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent  = new Intent(MainActivity.this, SoapBoxFeedActivity.class);
-                startActivity(intent);
-            }
-        });
-    }
+//    public void soapBoxDebug(){
+//        mDebugButton = (Button)findViewById(R.id.soapbox_debug);
+////        mDebugButton.setVisibility(View.INVISIBLE);
+//        mDebugButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent  = new Intent(MainActivity.this, SoapBoxFeedActivity.class);
+//                startActivity(intent);
+//            }
+//        });
 
     //ToDo: Move into splash screen activity. Should only be called a single time upon load.
     public void retrieveStoredProfiles(){
@@ -361,11 +363,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
     public void findViews(){
-        mSendButt = (Button)findViewById(R.id.send_butt);
-        mDisplayText = (TextView)findViewById(R.id.display_text);
+//        mSendButt = (Button)findViewById(R.id.send_butt);
+//        mDisplayText = (TextView)findViewById(R.id.display_text);
+//        mSignOutButton = (Button)findViewById(R.id.sign_out_button);
+//        mProfileButton = (Button)findViewById(R.id.self_profile_button);
+
         mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
-        mSignOutButton = (Button)findViewById(R.id.sign_out_button);
-        mProfileButton = (Button)findViewById(R.id.self_profile_button);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Home");
     }
@@ -468,5 +471,46 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             startActivity(intent);
         }
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.mainactivity_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
+        switch(item.getItemId()){
+            case R.id.chatrooms_option:
+                intent = new Intent(MainActivity.this, ChatRoomListActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.soapbox_option:
+                intent  = new Intent(MainActivity.this, SoapBoxFeedActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.signout_option:
+                signSelfOut();
+                break;
+            case R.id.self_profile_option:
+                intent =new Intent(MainActivity.this, SelfProfileActivity.class);
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void signSelfOut(){
+        FirebaseAuth.getInstance().signOut();
+
+        //ToDo: Clear users information in SharedPref and Database, unless if I keep database info tied to specific Users.
+        Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
+        ConnectionsSQLOpenHelper.getInstance(MainActivity.this).clearDatabase();
+        Intent intent = new Intent(MainActivity.this, FirebaseLogInActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 }
