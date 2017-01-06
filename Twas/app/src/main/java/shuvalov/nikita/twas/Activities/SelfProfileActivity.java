@@ -10,6 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -44,17 +47,18 @@ import shuvalov.nikita.twas.R;
 public class SelfProfileActivity extends AppCompatActivity {
     private ImageView mProfileImage;
     private Button mAccessGallery, mTakeSelfie, mSoapBoxUpdateButt, mUpdateBirthday;
-    private FloatingActionButton mSubmit;
+//    private FloatingActionButton mSubmit;
     private EditText mName, mBio, mSoapBoxMessage, mBirthdayEntry, mBirthYearEntry;
-    private EditText mDateEntry; //Placeholder, used for debugging.
+//    private EditText mDateEntry; //Placeholder, used for debugging.
     private boolean mUpdatedProfileImage = false;
     private Bitmap mChosenProfileImage;
-    private Spinner  mMonthSpinner;
-    private ArrayAdapter<CharSequence> mMonthAdapter;
+    private Spinner  mMonthSpinner, mGenderSpinner;
+    private ArrayAdapter<CharSequence> mMonthAdapter, mGenderAdapter;
     private Toolbar mToolbar;
     private Profile mProfile;
     private int mBirthYear, mBirthMonth, mBirthDate;
     private int mBirthMonthSelected;
+    private String mGender;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,10 +121,11 @@ public class SelfProfileActivity extends AppCompatActivity {
     public void findViews(){
         mProfileImage = (ImageView)findViewById(R.id.profile_image_view);//Populate this if user already has a profile image.
 
+        mGenderSpinner = (Spinner)findViewById(R.id.gender_select);
         mUpdateBirthday = (Button)findViewById(R.id.submit_birthday);
         mAccessGallery = (Button)findViewById(R.id.upload_image_gallery);
         mTakeSelfie = (Button)findViewById(R.id.selfie_button);
-        mSubmit = (FloatingActionButton) findViewById(R.id.submit_changes_button);
+//        mSubmit = (FloatingActionButton) findViewById(R.id.submit_changes_button);
         mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("My Profile");
@@ -134,7 +139,7 @@ public class SelfProfileActivity extends AppCompatActivity {
         mBirthdayEntry = (EditText)findViewById(R.id.birth_date_entry);
         mBirthYearEntry = (EditText)findViewById(R.id.birth_year_entry);
 
-        mDateEntry = (EditText)findViewById(R.id.date_entry); //Used for debugging for now
+//        mDateEntry = (EditText)findViewById(R.id.date_entry); //Used for debugging for now
 
         mSoapBoxMessage = (EditText)findViewById(R.id.soapbox_status_entry);
         mSoapBoxUpdateButt = (Button)findViewById(R.id.update_soapbox_message);
@@ -226,41 +231,13 @@ public class SelfProfileActivity extends AppCompatActivity {
                 }
             }
         });
-        mSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String name = mName.getText().toString();
-                String bio = mBio.getText().toString();
-                String gender = "Male";
-//                if(!mDateEntry.getText().toString().isEmpty()) {
-//                    String dateOfBirth = mDateEntry.getText().toString();
-//                    int month = Integer.parseInt(dateOfBirth.substring(0, 2));
-//                    int date = Integer.parseInt(dateOfBirth.substring(2, 4));
-//                    int year = Integer.parseInt(dateOfBirth.substring(4));
-//
-//                    Calendar calendar = Calendar.getInstance();
-//                    calendar.set(year, month, date);
-//
-//                    long birthInMillis = calendar.getTimeInMillis();
-//                    mProfile.setDOB(birthInMillis);
-//                }
+//        mSubmit.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                submitChanges();
+//            }
+//        });
 
-                mProfile.setName(name);
-                mProfile.setBio(bio);
-                mProfile.setGender(gender);
-
-                SelfUserProfileUtils.assignProfileToSharedPreferences(SelfProfileActivity.this, mProfile);
-                if(mUpdatedProfileImage){
-                    uploadProfileImage();
-                }
-
-                //ToDo: I might want to move my dataBase uploads and downloads to a helper class.
-                FirebaseDatabase db = FirebaseDatabase.getInstance();
-                DatabaseReference dbRef = FirebaseDatabaseUtils.getUserProfileRef(db, mProfile.getUID());
-//                DatabaseReference dbRef = db.getReference(mProfile.getUID()).child(AppConstants.FIREBASE_USER_CHILD_PROFILE);
-                dbRef.setValue(mProfile);
-            }
-        });
     }
 
     @Override
@@ -333,10 +310,30 @@ public class SelfProfileActivity extends AppCompatActivity {
         });
     }
     public void setSpinnerAdapters(){
-//        mGenderAdapter = ArrayAdapter.createFromResource(this,R.array.genders, android.R.layout.simple_spinner_item);
-//        mGenderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        mGenders.setAdapter(mGenderAdapter);
-//        mGenders.setSelection(0); //ToDo: Selection should be based off of sharedPreferences values.
+        mGenderAdapter = ArrayAdapter.createFromResource(this,R.array.genders, android.R.layout.simple_spinner_item);
+        mGenderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mGenderSpinner.setAdapter(mGenderAdapter);
+        mGenderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                mGender=(String)adapterView.getItemAtPosition(i);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        mGender = SelfUserProfileUtils.getUsersInfoAsProfile(this).getGender();
+        int selection=0;
+        String[] genders = getResources().getStringArray(R.array.genders);
+        for (int i = 0; i<genders.length;i++){
+            if(genders[i].equals(mGender)){
+                selection=i;
+            }
+        }
+
+        mGenderSpinner.setSelection(selection); //ToDo: Selection should be based off of sharedPreferences values.
 
         mMonthAdapter = ArrayAdapter.createFromResource(this,R.array.months, android.R.layout.simple_spinner_item);
         mMonthAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -355,6 +352,57 @@ public class SelfProfileActivity extends AppCompatActivity {
         });
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuinflater = getMenuInflater();
+        menuinflater.inflate(R.menu.selfprofile_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.submit_changes:
+                submitChanges();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    public void submitChanges(){
+        String name = mName.getText().toString();
+        String bio = mBio.getText().toString();
+
+//                if(!mDateEntry.getText().toString().isEmpty()) {
+//                    String dateOfBirth = mDateEntry.getText().toString();
+//                    int month = Integer.parseInt(dateOfBirth.substring(0, 2));
+//                    int date = Integer.parseInt(dateOfBirth.substring(2, 4));
+//                    int year = Integer.parseInt(dateOfBirth.substring(4));
+//
+//                    Calendar calendar = Calendar.getInstance();
+//                    calendar.set(year, month, date);
+//
+//                    long birthInMillis = calendar.getTimeInMillis();
+//                    mProfile.setDOB(birthInMillis);
+//                }
+
+        mProfile.setName(name);
+        mProfile.setBio(bio);
+        mProfile.setGender(mGender);
+
+        SelfUserProfileUtils.assignProfileToSharedPreferences(SelfProfileActivity.this, mProfile);
+        if(mUpdatedProfileImage){
+            uploadProfileImage();
+        }
+
+        //ToDo: I might want to move my dataBase uploads and downloads to a helper class.
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference dbRef = FirebaseDatabaseUtils.getUserProfileRef(db, mProfile.getUID());
+//                DatabaseReference dbRef = db.getReference(mProfile.getUID()).child(AppConstants.FIREBASE_USER_CHILD_PROFILE);
+        dbRef.setValue(mProfile);
+    }
+
+
+
     public boolean checkLeapYear(int year){
         if(year%4!=0){
             return false;
