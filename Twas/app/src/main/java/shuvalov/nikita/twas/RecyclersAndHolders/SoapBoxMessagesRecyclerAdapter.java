@@ -18,8 +18,8 @@ import shuvalov.nikita.twas.R;
  */
 
 public class SoapBoxMessagesRecyclerAdapter extends RecyclerView.Adapter<ChatMessageViewHolder>{
-    ArrayList<ChatMessage> mChatMessages;
-    String mSelfId;
+    private ArrayList<ChatMessage> mChatMessages;
+    private String mSelfId;
 
     public SoapBoxMessagesRecyclerAdapter(ArrayList<ChatMessage> chatMessages, String selfId) {
         mChatMessages = chatMessages;

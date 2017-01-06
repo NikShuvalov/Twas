@@ -79,4 +79,9 @@ public class FirebaseDatabaseUtils {
         return fbdb.getReference(AppConstants.FIREBASE_CHATROOMS).child(chatroomId).child(AppConstants.FIREBASE_CHATROOM_MESSSAGES);
     }
 
+    public static DatabaseReference getChatroomChatroomNameRef(FirebaseDatabase fbdb, String roomId){
+        return fbdb.getReference(AppConstants.FIREBASE_CHATROOMS).child(roomId).child(AppConstants.FIREBASE_USERS).child("roomName");
+
+    }
+
 }

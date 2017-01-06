@@ -35,6 +35,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsHelper;
@@ -411,6 +412,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void publish(){
         String soapBoxMessageString = SelfUserProfileUtils.getSoapBoxMessage(this);
+//        long timeStamp = Calendar.getInstance().getTimeInMillis();
+
         mFindMeMessage = new Message(ChatMessage.getBytesForSoapBox(new ChatMessage(mId,soapBoxMessageString)));
         if(mGoogleApiClient.isConnected()){
 

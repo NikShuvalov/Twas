@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -199,6 +200,8 @@ public class SoapBoxFeedActivity extends AppCompatActivity implements GoogleApiC
 //        mSend = (Button)findViewById(R.id.send_butt);
 //        mMessageEntry = (EditText)findViewById(R.id.message_entry);
         mRecyclerView = (RecyclerView)findViewById(R.id.soapbox_feed_recycler);
+        setSupportActionBar((Toolbar)findViewById(R.id.my_toolbar));
+        getSupportActionBar().setTitle("SoapBox Feed");
     }
 
     public void recyclerLogic(){

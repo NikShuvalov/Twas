@@ -22,6 +22,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/my_toolbar">
+        <TextView
+            android:id="@+id/prompt_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Click on a message to open profile of sender"
+            android:background="@color/colorPrimaryLight"
+            android:gravity="center_horizontal"
+            android:textSize="18sp"/>
 
         <!--<Button-->
             <!--android:id="@+id/send_butt"-->
@@ -43,7 +51,9 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/soapbox_feed_recycler"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_below="@id/prompt_text"
+            android:paddingTop="10dp"/>
         <!--android:layout_above="@id/send_butt"-->
 
     </RelativeLayout>

@@ -28,7 +28,7 @@ public class ChatMessageViewHolder extends RecyclerView.ViewHolder {
 
     public void bindDataToViews(ChatMessage chatMessage){
         mChatText.setText(chatMessage.getContent());
-        DateFormat sdf = new SimpleDateFormat("hh:mm a");
+        DateFormat sdf = new SimpleDateFormat("hh:mm a MM/dd/yy");
         String timeStamp = sdf.format(chatMessage.getTimeStamp());
         mTimeStampText.setText(timeStamp);
     }

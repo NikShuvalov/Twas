@@ -7,6 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -42,9 +45,10 @@ public class ProfileDetailActivity extends AppCompatActivity {
     TextView mNameText, mBioText, mDOBText;
     ImageView mImageView;
     Toolbar mToolbar;
-    Button mChatInviteButton;
+//    Button mChatInviteButton;
     FirebaseDatabase mFirebaseDatabase;
     String mSelfUserId;
+    Profile mSelectedProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,92 +59,91 @@ public class ProfileDetailActivity extends AppCompatActivity {
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         findViews();
-        final Profile selectedProfile;
         if(getIntent().getStringExtra(AppConstants.ORIGIN_ACTIVITY).equals(AppConstants.ORIGIN_MAIN)){
-            selectedProfile = ConnectionsHelper.getInstance().getProfileByPosition(getIntent().getIntExtra(AppConstants.PREF_HELPER_POSITION,-1));
+            mSelectedProfile = ConnectionsHelper.getInstance().getProfileByPosition(getIntent().getIntExtra(AppConstants.PREF_HELPER_POSITION,-1));
         }else{
-            selectedProfile = ConnectionsSQLOpenHelper.getInstance(this).getConnectionById(getIntent().getStringExtra(AppConstants.PREF_ID));
-            if(selectedProfile==null){
+            mSelectedProfile = ConnectionsSQLOpenHelper.getInstance(this).getConnectionById(getIntent().getStringExtra(AppConstants.PREF_ID));
+            if(mSelectedProfile==null){
                 Toast.makeText(this, "Couldn't load profile of sender", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
 
-        bindDataToViews(selectedProfile);
+        bindDataToViews(mSelectedProfile);
 
 
-        mChatInviteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Check if currentUser and selectedUser already have a chatroom together, to prevent making duplicates
-                DatabaseReference selfReference = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,mSelfUserId);
-                selfReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Iterable<DataSnapshot> chatRoomsData = dataSnapshot.getChildren();
-                        boolean done = false;
-                        while(chatRoomsData.iterator().hasNext() && !done){
-                            ChatRoom chatRoom = chatRoomsData.iterator().next().getValue(ChatRoom.class);
-                            ArrayList<String> userIds = chatRoom.getUserIds();
-                            Log.d("Testing", "onDataChange: "+ userIds.get(0));
-                            Log.d("Testing", "onDataChange: "+ userIds.get(1));
-
-                            //If both user IDs are found in one of the chatrooms that means users already have an existing chatroom together.
-                            if((userIds.get(0).equals(mSelfUserId) && userIds.get(1).equals(selectedProfile.getUID()))||
-                                    (userIds.get(1).equals(mSelfUserId) && userIds.get(0).equals(selectedProfile.getUID()))) {
-                                done = true;
-                                Intent intent = new Intent(ProfileDetailActivity.this, ChatRoomActivity.class);
-                                intent.putExtra(AppConstants.ORIGIN_ACTIVITY, AppConstants.ORIGIN_PROFILE_DETAIL);
-                                intent.putExtra(AppConstants.PREF_CHATROOM, chatRoom.getId());
-                                startActivity(intent);
-                            }
-                        }
-                        if(!done) {
-                            DatabaseReference chatroomsRef = FirebaseDatabaseUtils.getChatroomRef(mFirebaseDatabase, null);
-
-                            DatabaseReference createdChatroom = chatroomsRef.push();
-
-                            Profile selfUser = SelfUserProfileUtils.getUsersInfoAsProfile(ProfileDetailActivity.this);
-
-
-                            ChatRoom chatroom = new ChatRoom();
-                            chatroom.setId(createdChatroom.getKey());
-                            chatroom.addUserToChatroom(selfUser.getUID());
-                            chatroom.addUserToChatroom(selectedProfile.getUID());
-                            createdChatroom.child(AppConstants.FIREBASE_USERS).setValue(chatroom);
-                            DatabaseReference messageReference = FirebaseDatabaseUtils.getChatroomMessagesRef(mFirebaseDatabase, chatroom.getId());
-                            long currentTime = Calendar.getInstance().getTimeInMillis();
-                            ChatMessage initialChatMessage = new ChatMessage(selfUser.getUID(), chatroom.getId(), String.format("%s has started this conversation", selfUser.getName()), currentTime);
-                            messageReference.push().setValue(initialChatMessage);
-
-                            //Adds a reference to the Chatroom to both members' profiles.
-                            FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, selfUser.getUID()).child(chatroom.getId()).setValue(chatroom);
-                            FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, selectedProfile.getUID()).child(chatroom.getId()).setValue(chatroom);
-
-                            //Adds the newly made chatroom and initial message to the local db.
-                            ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addChatRoom(chatroom);
-                            ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addMessage(initialChatMessage);
-
-                            Intent intent = new Intent(ProfileDetailActivity.this, ChatRoomActivity.class);
-                            intent.putExtra(AppConstants.ORIGIN_ACTIVITY, AppConstants.ORIGIN_PROFILE_DETAIL);
-                            intent.putExtra(AppConstants.PREF_CHATROOM, chatroom.getId());
-                            startActivity(intent);
-                        }
-
-
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-
-
-            }
-        });
+//        mChatInviteButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                //Check if currentUser and selectedUser already have a chatroom together, to prevent making duplicates
+//                DatabaseReference selfReference = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,mSelfUserId);
+//                selfReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        Iterable<DataSnapshot> chatRoomsData = dataSnapshot.getChildren();
+//                        boolean done = false;
+//                        while(chatRoomsData.iterator().hasNext() && !done){
+//                            ChatRoom chatRoom = chatRoomsData.iterator().next().getValue(ChatRoom.class);
+//                            ArrayList<String> userIds = chatRoom.getUserIds();
+//                            Log.d("Testing", "onDataChange: "+ userIds.get(0));
+//                            Log.d("Testing", "onDataChange: "+ userIds.get(1));
+//
+//                            //If both user IDs are found in one of the chatrooms that means users already have an existing chatroom together.
+//                            if((userIds.get(0).equals(mSelfUserId) && userIds.get(1).equals(mSelectedProfile.getUID()))||
+//                                    (userIds.get(1).equals(mSelfUserId) && userIds.get(0).equals(mSelectedProfile.getUID()))) {
+//                                done = true;
+//                                Intent intent = new Intent(ProfileDetailActivity.this, ChatRoomActivity.class);
+//                                intent.putExtra(AppConstants.ORIGIN_ACTIVITY, AppConstants.ORIGIN_PROFILE_DETAIL);
+//                                intent.putExtra(AppConstants.PREF_CHATROOM, chatRoom.getId());
+//                                startActivity(intent);
+//                            }
+//                        }
+//                        if(!done) {
+//                            DatabaseReference chatroomsRef = FirebaseDatabaseUtils.getChatroomRef(mFirebaseDatabase, null);
+//
+//                            DatabaseReference createdChatroom = chatroomsRef.push();
+//
+//                            Profile selfUser = SelfUserProfileUtils.getUsersInfoAsProfile(ProfileDetailActivity.this);
+//
+//
+//                            ChatRoom chatroom = new ChatRoom();
+//                            chatroom.setId(createdChatroom.getKey());
+//                            chatroom.addUserToChatroom(selfUser.getUID());
+//                            chatroom.addUserToChatroom(mSelectedProfile.getUID());
+//                            createdChatroom.child(AppConstants.FIREBASE_USERS).setValue(chatroom);
+//                            DatabaseReference messageReference = FirebaseDatabaseUtils.getChatroomMessagesRef(mFirebaseDatabase, chatroom.getId());
+//                            long currentTime = Calendar.getInstance().getTimeInMillis();
+//                            ChatMessage initialChatMessage = new ChatMessage(selfUser.getUID(), chatroom.getId(), String.format("%s has started this conversation", selfUser.getName()), currentTime);
+//                            messageReference.push().setValue(initialChatMessage);
+//
+//                            //Adds a reference to the Chatroom to both members' profiles.
+//                            FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, selfUser.getUID()).child(chatroom.getId()).setValue(chatroom);
+//                            FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, mSelectedProfile.getUID()).child(chatroom.getId()).setValue(chatroom);
+//
+//                            //Adds the newly made chatroom and initial message to the local db.
+//                            ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addChatRoom(chatroom);
+//                            ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addMessage(initialChatMessage);
+//
+//                            Intent intent = new Intent(ProfileDetailActivity.this, ChatRoomActivity.class);
+//                            intent.putExtra(AppConstants.ORIGIN_ACTIVITY, AppConstants.ORIGIN_PROFILE_DETAIL);
+//                            intent.putExtra(AppConstants.PREF_CHATROOM, chatroom.getId());
+//                            startActivity(intent);
+//                        }
+//
+//
+//
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//
+//                    }
+//                });
+//
+//
+//
+//            }
+//        });
     }
 
     public void findViews(){
@@ -151,7 +154,7 @@ public class ProfileDetailActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mImageView = (ImageView)findViewById(R.id.profile_image_view);
-        mChatInviteButton = (Button)findViewById(R.id.chat_invite_button);
+//        mChatInviteButton = (Button)findViewById(R.id.chat_invite_button);
     }
 
     public void bindDataToViews(Profile profile){
@@ -202,6 +205,87 @@ public class ProfileDetailActivity extends AppCompatActivity {
                 mImageView.setImageResource(R.drawable.shakespeare_modern_bard_post);
             }
         });
-        mChatInviteButton.setText(String.format("Invite %s to chat", profile.getName()));
+//        mChatInviteButton.setText(String.format("Invite %s to chat", profile.getName()));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.profile_detail_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.message_opt:
+                startChat();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    public void startChat(){
+        DatabaseReference selfReference = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,mSelfUserId);
+
+        selfReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> chatRoomsData = dataSnapshot.getChildren();
+                boolean done = false;
+                while (chatRoomsData.iterator().hasNext() && !done) {
+                    ChatRoom chatRoom = chatRoomsData.iterator().next().getValue(ChatRoom.class);
+                    ArrayList<String> userIds = chatRoom.getUserIds();
+                    Log.d("Testing", "onDataChange: " + userIds.get(0));
+                    Log.d("Testing", "onDataChange: " + userIds.get(1));
+
+                    //If both user IDs are found in one of the chatrooms that means users already have an existing chatroom together.
+                    if ((userIds.get(0).equals(mSelfUserId) && userIds.get(1).equals(mSelectedProfile.getUID())) ||
+                            (userIds.get(1).equals(mSelfUserId) && userIds.get(0).equals(mSelectedProfile.getUID()))) {
+                        done = true;
+                        Intent intent = new Intent(ProfileDetailActivity.this, ChatRoomActivity.class);
+                        intent.putExtra(AppConstants.ORIGIN_ACTIVITY, AppConstants.ORIGIN_PROFILE_DETAIL);
+                        intent.putExtra(AppConstants.PREF_CHATROOM, chatRoom.getId());
+                        startActivity(intent);
+                    }
+                }
+                if (!done) {
+                    DatabaseReference chatroomsRef = FirebaseDatabaseUtils.getChatroomRef(mFirebaseDatabase, null);
+
+                    DatabaseReference createdChatroom = chatroomsRef.push();
+
+                    Profile selfUser = SelfUserProfileUtils.getUsersInfoAsProfile(ProfileDetailActivity.this);
+
+
+                    ChatRoom chatroom = new ChatRoom();
+                    chatroom.setId(createdChatroom.getKey());
+                    chatroom.addUserToChatroom(selfUser.getUID());
+                    chatroom.addUserToChatroom(mSelectedProfile.getUID());
+                    createdChatroom.child(AppConstants.FIREBASE_USERS).setValue(chatroom);
+                    DatabaseReference messageReference = FirebaseDatabaseUtils.getChatroomMessagesRef(mFirebaseDatabase, chatroom.getId());
+                    long currentTime = Calendar.getInstance().getTimeInMillis();
+                    ChatMessage initialChatMessage = new ChatMessage(selfUser.getUID(), chatroom.getId(), String.format("%s has started this conversation", selfUser.getName()), currentTime);
+                    messageReference.push().setValue(initialChatMessage);
+
+                    //Adds a reference to the Chatroom to both members' profiles.
+                    FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, selfUser.getUID()).child(chatroom.getId()).setValue(chatroom);
+                    FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, mSelectedProfile.getUID()).child(chatroom.getId()).setValue(chatroom);
+
+                    //Adds the newly made chatroom and initial message to the local db.
+                    ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addChatRoom(chatroom);
+                    ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addMessage(initialChatMessage);
+
+                    Intent intent = new Intent(ProfileDetailActivity.this, ChatRoomActivity.class);
+                    intent.putExtra(AppConstants.ORIGIN_ACTIVITY, AppConstants.ORIGIN_PROFILE_DETAIL);
+                    intent.putExtra(AppConstants.PREF_CHATROOM, chatroom.getId());
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }
+

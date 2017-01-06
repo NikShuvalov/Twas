@@ -1,12 +1,18 @@
 package shuvalov.nikita.twas.Activities;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -18,6 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import shuvalov.nikita.twas.AppConstants;
@@ -39,6 +46,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private String mChatRoomId;
     private DatabaseReference mChatRoomRef;
     private ChildEventListener mChatRoomListener;
+    private FirebaseDatabase mFirebaseDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +54,14 @@ public class ChatRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_room);
 
 
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+
         findViews();
         getChatLog();
         recyclerLogic();
         onClickLogic();
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
 
         /* This is going to display all of the chatMessages that belong to this chatRoom in a recyclerView.
@@ -63,9 +75,51 @@ public class ChatRoomActivity extends AppCompatActivity {
         mMessageRecycler = (RecyclerView)findViewById(R.id.message_recycler);
         Toolbar toolbar = (Toolbar)findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("ChatRoom Name or Other UserName");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        MenuInflater menuInflater = getMenuInflater();
+//        menuInflater.inflate(R.menu.chatroom_menu,menu);
+//        return super.onCreateOptionsMenu(menu);
+//    }
+
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch(item.getItemId()){
+//            case (R.id.rename):
+//                AlertDialog renameDialog = new AlertDialog.Builder(this)
+//                        .setView(R.layout.rename_dialog)
+//                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                dialogInterface.dismiss();
+//                            }
+//                        }).create();
+//                renameDialog.show();
+//                final EditText nameEdit = (EditText)renameDialog.findViewById(R.id.new_name_entry);
+//                Button renameButton = (Button) renameDialog.findViewById(R.id.submit_name);
+//                renameButton.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        String newName = nameEdit.getText().toString();
+//                        if (newName.isEmpty()){
+//                            nameEdit.setError("Can't be empty");
+//                        }else{
+//                            //ToDo:Currently this code only updates the Chatroom name for the shared chatRoom, and user's own reference to the chatroom, but not to the other user.
+//                            //FixMe: It updates the name in the fbdb, for self and main but the changes don't show up when reloading the activity.
+//                            FirebaseDatabaseUtils.getChatroomChatroomNameRef(mFirebaseDatabase,mChatRoomId).setValue(newName); //Updates the RoomName as seen from the Chatroom Directory
+//                            FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,SelfUserProfileUtils.getUserId(ChatRoomActivity.this)).child(mChatRoomId).child("roomName").setValue(newName);//Updates the RoomName as seen from selfUser file.
+//                            getSupportActionBar().setTitle(newName);
+//                        }
+//                    }
+//                });
+//
+//                break;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
     public void getChatLog() {
         ChatRoom chatRoom;
@@ -132,6 +186,12 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         mMessageRecycler.setAdapter(mAdapter);
         mMessageRecycler.setLayoutManager(linearLayoutManager);
+//        int size = mAdapter.getItemCount();
+//        if(size==0){
+//            mMessageRecycler.smoothScrollToPosition(0);
+//        }else{
+//            mMessageRecycler.smoothScrollToPosition(size-1);
+//        }
     }
 
 

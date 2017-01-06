@@ -36,6 +36,7 @@ public class ChatMessage implements Serializable{
      * @param content
      */
     public ChatMessage(String userId, String roomId, String content){
+
         this(userId, roomId, content, Calendar.getInstance().getTimeInMillis());
     }
 
@@ -98,7 +99,7 @@ public class ChatMessage implements Serializable{
         Log.d("Log all the things", soapBoxAsString);
 
 
-        if(soapBoxAsString!=null){
+        if(!soapBoxAsString.isEmpty()){
             String[] soapBoxParams = soapBoxAsString.split(AppConstants.SOAPBOX_MESSAGE_DELIMITER);
             Log.d("Log all the things", soapBoxParams[0]);
             Log.d("Log all the things", soapBoxParams[1]);
