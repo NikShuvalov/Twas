@@ -74,6 +74,7 @@ public class ChatMessage implements Serializable{
 
     public static byte[] getBytesForSoapBox(ChatMessage chatMessage){
         String timeStampAsString = String.valueOf(chatMessage.getTimeStamp());
+        Log.d("LIT", "Sent TimeStamp: " + timeStampAsString);
         String split = AppConstants.SOAPBOX_MESSAGE_DELIMITER;
         //[0] = uid, [1] = message, [2] = Timestamp
         String chatMessageAsString = String.format("%s"+split+"%s"+split+"%s",
@@ -106,6 +107,7 @@ public class ChatMessage implements Serializable{
             Log.d("Log all the things", soapBoxParams[2]);
 
             long timeStamp = Long.parseLong(soapBoxParams[2]);
+            Log.d("LIT", "Retrieved TimeStamp: "+timeStamp);
             return new ChatMessage(soapBoxParams[0],null, soapBoxParams[1],timeStamp);
         }
         Log.d("SoapBoxMessage", "SoapBoxMessage didn't parse correctly");

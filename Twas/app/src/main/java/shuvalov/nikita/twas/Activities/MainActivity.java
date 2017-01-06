@@ -415,9 +415,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void publish(){
         String soapBoxMessageString = SelfUserProfileUtils.getSoapBoxMessage(this);
-//        long timeStamp = Calendar.getInstance().getTimeInMillis();
+        long timeStamp = SelfUserProfileUtils.getSoapBoxTimeStamp(this);
 
-        mFindMeMessage = new Message(ChatMessage.getBytesForSoapBox(new ChatMessage(mId,soapBoxMessageString)));
+        mFindMeMessage = new Message(ChatMessage.getBytesForSoapBox(new ChatMessage(mId,null,soapBoxMessageString, timeStamp)));
         if(mGoogleApiClient.isConnected()){
 
             //ToDo: Use this for background publishing.

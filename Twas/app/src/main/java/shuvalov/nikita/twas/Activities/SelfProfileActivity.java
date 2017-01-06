@@ -181,7 +181,8 @@ public class SelfProfileActivity extends AppCompatActivity {
                 }
                 SelfUserProfileUtils.setNewSoapBoxMessage(SelfProfileActivity.this,soapBoxString);
                 String selfId = SelfUserProfileUtils.getUserId(SelfProfileActivity.this);
-                ChatMessage soapBoxMessage = new ChatMessage(selfId,soapBoxString);
+                long timeStamp =SelfUserProfileUtils.getSoapBoxTimeStamp(SelfProfileActivity.this);
+                ChatMessage soapBoxMessage = new ChatMessage(selfId,null,soapBoxString,timeStamp);
                 ConnectionsSQLOpenHelper.getInstance(SelfProfileActivity.this).addSoapBoxMessage(soapBoxMessage);
             }
         });

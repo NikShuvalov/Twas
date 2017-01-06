@@ -3,6 +3,8 @@ package shuvalov.nikita.twas.Helpers_Managers;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Calendar;
+
 import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.PoJos.Profile;
 
@@ -79,11 +81,19 @@ public class SelfUserProfileUtils {
     }
 
     public static void setNewSoapBoxMessage(Context context, String soapBoxString){
-        context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, Context.MODE_PRIVATE).edit().putString(AppConstants.PREF_SOAPBOX_MESSAGE,soapBoxString).commit();
+        SharedPreferences sharedPreferences = context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString(AppConstants.PREF_SOAPBOX_MESSAGE,soapBoxString).apply();
+
+        long timeStamp = Calendar.getInstance().getTimeInMillis();
+        sharedPreferences.edit().putLong(AppConstants.PREF_SOAPBOX_TIMESTAMP, timeStamp).apply();
     }
 
     public static String getSoapBoxMessage(Context context){
         return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, Context.MODE_PRIVATE).getString(AppConstants.PREF_SOAPBOX_MESSAGE, "");
+    }
+
+    public static long getSoapBoxTimeStamp (Context context){
+        return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, Context.MODE_PRIVATE).getLong(AppConstants.PREF_SOAPBOX_TIMESTAMP,-1);
     }
 
 

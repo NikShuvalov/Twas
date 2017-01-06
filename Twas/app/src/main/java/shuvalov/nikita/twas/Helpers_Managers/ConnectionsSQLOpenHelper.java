@@ -21,7 +21,7 @@ import shuvalov.nikita.twas.PoJos.Profile;
 
 public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "CONNECTION_COLLECTION_DB";
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 5;
 
     public static final String PROFILE_TABLE_NAME = "PROFILE_LIST";
     public static final String CHATMESS_TABLE_NAME = "CHAT_MESSAGES_LIST";
@@ -63,7 +63,7 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
             COLUMN_ROOM_NAME+ " TEXT)";
 
     public static final String CREATE_SOAPBOX_MESSAGES_TABLE_EXE = "CREATE TABLE "+ SOAPBOX_TABLE_NAME+
-            " (" + COLUMN_TIMESTAMP+ " INTEGER,"+
+            " (" + COLUMN_TIMESTAMP+ " TEXT,"+
             COLUMN_MESSAGE_CONTENT+ " TEXT,"+
             COLUMN_UID+ " TEXT, "+
             "PRIMARY KEY ("+COLUMN_UID+", "+COLUMN_TIMESTAMP+"))";
@@ -269,7 +269,8 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues content = new ContentValues();
         content.put(COLUMN_UID, soapBoxMessage.getUserId());
-        content.put(COLUMN_TIMESTAMP, soapBoxMessage.getTimeStamp());
+        String timeStampString = String.valueOf(soapBoxMessage.getTimeStamp());
+        content.put(COLUMN_TIMESTAMP, timeStampString);
         content.put(COLUMN_MESSAGE_CONTENT, soapBoxMessage.getContent());
 
         db.insert(SOAPBOX_TABLE_NAME, null, content);
@@ -281,7 +282,8 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         for(ChatMessage soapBoxMessage: soapBoxMessages){
             ContentValues content = new ContentValues();
             content.put(COLUMN_UID, soapBoxMessage.getUserId());
-            content.put(COLUMN_TIMESTAMP, soapBoxMessage.getTimeStamp());
+            String timeStampString = String.valueOf(soapBoxMessage.getTimeStamp());
+            content.put(COLUMN_TIMESTAMP, timeStampString);
             content.put(COLUMN_MESSAGE_CONTENT, soapBoxMessage.getContent());
 
             db.insert(SOAPBOX_TABLE_NAME, null, content);
@@ -299,9 +301,9 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
             while(!cursor.isAfterLast() && count<=100){
                 count++;
                 String userId = cursor.getString(cursor.getColumnIndex(COLUMN_UID));
-                Integer timeStamp = cursor.getInt(cursor.getColumnIndex(COLUMN_TIMESTAMP));
+                String timeStamp = cursor.getString(cursor.getColumnIndex(COLUMN_TIMESTAMP));
                 String messageContent = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_CONTENT));
-                long longTime = (long)timeStamp;
+                long longTime = Long.parseLong(timeStamp);
 
                 soapBoxMessages.add(new ChatMessage(userId,null,messageContent,longTime));
                 cursor.moveToNext();
