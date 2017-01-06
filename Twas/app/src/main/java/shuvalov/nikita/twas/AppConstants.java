@@ -22,6 +22,7 @@ public class AppConstants {
     public static final String ORIGIN_LOG_IN= "login activity";
     public static final String ORIGIN_CHATROOMS = "chatrooms activity";
     public static final String ORIGIN_PROFILE_DETAIL = "profile detail activity";
+    public static final String ORIGIN_SOAPBOX_FEED = "coming from soapbox activity";
 
     public static final String PREF_SELF_USER_PROFILE = "Self_user_profile";
     public static final String PREF_ID = "Self_id";
@@ -32,6 +33,7 @@ public class AppConstants {
 //    public static final String PREF_PICURL = "Self_picurl";
     public static final String PREF_CHATROOM = "Chatroom";
     public static final String PREF_SOAPBOX_MESSAGE = "My SoapBoxMessage";
+    public static final String PREF_HELPER_POSITION = "Position in singleton";
 
     public static final String PREF_EMPTY = "Duh-dah, duh-dah, duhhh! For whom the bell tolls!";
 

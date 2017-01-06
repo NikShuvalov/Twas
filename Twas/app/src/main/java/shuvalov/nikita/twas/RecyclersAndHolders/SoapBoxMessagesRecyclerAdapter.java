@@ -1,5 +1,6 @@
 package shuvalov.nikita.twas.RecyclersAndHolders;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,18 +8,20 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
+import shuvalov.nikita.twas.Activities.ProfileDetailActivity;
+import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.PoJos.ChatMessage;
 import shuvalov.nikita.twas.R;
 
 /**
- * Created by NikitaShuvalov on 1/3/17.
+ * Created by NikitaShuvalov on 1/5/17.
  */
 
-public class ChatMessagesRecyclerAdapter extends RecyclerView.Adapter<ChatMessageViewHolder> {
+public class SoapBoxMessagesRecyclerAdapter extends RecyclerView.Adapter<ChatMessageViewHolder>{
     ArrayList<ChatMessage> mChatMessages;
     String mSelfId;
 
-    public ChatMessagesRecyclerAdapter(ArrayList<ChatMessage> chatMessages, String selfId) {
+    public SoapBoxMessagesRecyclerAdapter(ArrayList<ChatMessage> chatMessages, String selfId) {
         mChatMessages = chatMessages;
         mSelfId = selfId;
     }
@@ -28,7 +31,7 @@ public class ChatMessagesRecyclerAdapter extends RecyclerView.Adapter<ChatMessag
     public ChatMessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         int resource;
         if(viewType==0){
-            resource=R.layout.viewholder_chat_self;
+            resource= R.layout.viewholder_chat_self;
         }else{
             resource = R.layout.viewholder_chat_message;
         }
@@ -37,8 +40,20 @@ public class ChatMessagesRecyclerAdapter extends RecyclerView.Adapter<ChatMessag
     }
 
     @Override
-    public void onBindViewHolder(ChatMessageViewHolder holder, int position) {
+    public void onBindViewHolder(final ChatMessageViewHolder holder, int position) {
         holder.bindDataToViews(mChatMessages.get(position));
+        final String uid = mChatMessages.get(position).getUserId();
+        if (holder.getItemViewType() == 1) {
+            holder.mMessageHolder.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(view.getContext(), ProfileDetailActivity.class);
+                    intent.putExtra(AppConstants.ORIGIN_ACTIVITY, AppConstants.ORIGIN_SOAPBOX_FEED);
+                    intent.putExtra(AppConstants.PREF_ID, uid);
+                    view.getContext().startActivity(intent);
+                }
+            });
+        }
     }
 
     @Override

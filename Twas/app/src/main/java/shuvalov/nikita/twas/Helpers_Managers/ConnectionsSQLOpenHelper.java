@@ -121,7 +121,21 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return profiles;
+    }
 
+    public Profile getConnectionById(String uid){
+        Profile foundProfile;
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(PROFILE_TABLE_NAME,null, COLUMN_UID+ " = ?",new String[]{uid},null,null,null);
+        if(cursor.moveToFirst()){
+            String name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME));
+            String bio = cursor.getString(cursor.getColumnIndex(COLUMN_BIO));
+            String gender = cursor.getString(cursor.getColumnIndex(COLUMN_GENDER));
+            long dob = cursor.getLong(cursor.getColumnIndex(COLUMN_BIRTHDATE));
+            foundProfile = new Profile(uid, name, bio, dob, gender);
+            return foundProfile;
+        }
+        return null;
     }
 
     //Clears database, idea is if user logs out, I wouldn't want other users on this phone to have access to that data.

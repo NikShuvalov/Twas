@@ -15,6 +15,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import shuvalov.nikita.twas.Activities.ProfileDetailActivity;
+import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.Helpers_Managers.FireBaseStorageUtils;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
@@ -51,7 +52,8 @@ public class ProfileCollectionRecyclerAdapter extends RecyclerView.Adapter<Profi
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), ProfileDetailActivity.class);
-                intent.putExtra("Position in singleton", holder.getAdapterPosition());
+                intent.putExtra(AppConstants.ORIGIN_ACTIVITY,AppConstants.ORIGIN_MAIN);
+                intent.putExtra(AppConstants.PREF_HELPER_POSITION, holder.getAdapterPosition());
                 view.getContext().startActivity(intent);
             }
         });

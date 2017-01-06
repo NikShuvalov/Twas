@@ -41,12 +41,13 @@ import shuvalov.nikita.twas.PoJos.ChatMessage;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
 import shuvalov.nikita.twas.RecyclersAndHolders.ChatMessagesRecyclerAdapter;
+import shuvalov.nikita.twas.RecyclersAndHolders.SoapBoxMessagesRecyclerAdapter;
 
 public class SoapBoxFeedActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 //    private Button mSend;
 //    private EditText mMessageEntry;
     private RecyclerView mRecyclerView;
-    private ChatMessagesRecyclerAdapter mMessagesRecyclerAdapter;
+    private SoapBoxMessagesRecyclerAdapter mMessagesRecyclerAdapter;
     private MessageListener mActiveListener;
     String mSelfId;
 
@@ -201,7 +202,7 @@ public class SoapBoxFeedActivity extends AppCompatActivity implements GoogleApiC
     }
 
     public void recyclerLogic(){
-        mMessagesRecyclerAdapter = new ChatMessagesRecyclerAdapter(ConnectionsSQLOpenHelper.getInstance(this).getSoapBoxMessages(),mSelfId);
+        mMessagesRecyclerAdapter = new SoapBoxMessagesRecyclerAdapter(ConnectionsSQLOpenHelper.getInstance(this).getSoapBoxMessages(),mSelfId);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
         mRecyclerView.setAdapter(mMessagesRecyclerAdapter);

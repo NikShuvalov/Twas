@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -54,7 +55,17 @@ public class ProfileDetailActivity extends AppCompatActivity {
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         findViews();
-        final Profile selectedProfile = ConnectionsHelper.getInstance().getProfileByPosition(getIntent().getIntExtra("Position in singleton",-1));
+        final Profile selectedProfile;
+        if(getIntent().getStringExtra(AppConstants.ORIGIN_ACTIVITY).equals(AppConstants.ORIGIN_MAIN)){
+            selectedProfile = ConnectionsHelper.getInstance().getProfileByPosition(getIntent().getIntExtra(AppConstants.PREF_HELPER_POSITION,-1));
+        }else{
+            selectedProfile = ConnectionsSQLOpenHelper.getInstance(this).getConnectionById(getIntent().getStringExtra(AppConstants.PREF_ID));
+            if(selectedProfile==null){
+                Toast.makeText(this, "Couldn't load profile of sender", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+
         bindDataToViews(selectedProfile);
 
 
