@@ -52,22 +52,20 @@ public class SoapBoxFeedActivity extends AppCompatActivity implements GoogleApiC
     private MessageListener mActiveListener;
     String mSelfId;
 
-    Message mActiveMessage;
-
     NearbyManager mNearbyManager;
     GoogleApiClient mGoogleApiClient;
 
-//    DatabaseReference mSelfProfileRef;
-//    DatabaseReference mSelfConnectionsRef;
-//    DatabaseReference mSelfChatroomsRef;
-//    FirebaseDatabase mFirebaseDatabase;
+    DatabaseReference mSelfProfileRef;
+    DatabaseReference mSelfConnectionsRef;
+    DatabaseReference mSelfChatroomsRef;
+    FirebaseDatabase mFirebaseDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_soap_box_feed);
 
-//        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
 
         mSelfId = SelfUserProfileUtils.getUserId(this);
 
@@ -119,80 +117,79 @@ public class SoapBoxFeedActivity extends AppCompatActivity implements GoogleApiC
 //                }
 //            }
 //        });
-//        createNearbyListener();
+        createNearbyListener();
     }
 
-//    public void createNearbyListener(){
-//        mSelfProfileRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mSelfId);
-//            mSelfConnectionsRef = FirebaseDatabaseUtils.getUserConnectionsRef(mFirebaseDatabase, mSelfId);
-//            mSelfChatroomsRef = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, mSelfId);
-//
-//            mActiveListener = new MessageListener() {
-//                @Override
-//                public void onFound(Message message) {
-//                    ChatMessage soapBoxMessage = ChatMessage.getSoapBoxMessageFromBytes(message.getContent());
-//                    Log.d("SoapBoxActivity", "Found Message: "+soapBoxMessage.getContent()+" "+soapBoxMessage.getUserId());
-//                    Log.d("SoapBoxActivityListener", "...these active?");
-//
-//                    if (!soapBoxMessage.getContent().equals("")) {
-//                        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//                        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(SoapBoxFeedActivity.this);
-//
-//                        ConnectionsSQLOpenHelper.getInstance(SoapBoxFeedActivity.this).addSoapBoxMessage(soapBoxMessage);
-//                        notificationBuilder.setContentText(soapBoxMessage.getContent()).setContentTitle("New SoapBoxMessage");
-//                        notificationManager.notify(0,notificationBuilder.build());;
-//                    }
-//                    String foundId = soapBoxMessage.getUserId();
-////                mFoundId = new String(message.getContent()); //Gets message from other phone, which holds just that phone's UID for now.
-//
-//
-//                    //ToDo: Figure out what I can store as a value for the stranger Connections, maybe a counter?
-//                    //Idea: If using a counter 0-10 encounters = Stranger, 11-25 Familiar, 26-50 Regular, 51-99 Acquaintance,100-499 Friendly, 500+ whatever
-//                    mSelfConnectionsRef.child(foundId).setValue(foundId); //Adds stranger's UID to user's connectionsList.
-//
-//                    DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, foundId);
-////                DatabaseReference strangerRef = FirebaseDatabaseUtils.getChildReference(mFirebaseDatabase, mFoundId, AppConstants.theoneforprofiles);
-//
-//                    //Gets the stranger's profile information.
-//                    strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(DataSnapshot dataSnapshot) {
-//                            Profile strangerProfile = dataSnapshot.getValue(Profile.class);
-//                            ConnectionsSQLOpenHelper.getInstance(SoapBoxFeedActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
-//                            ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
-//
-////                            mProfileRecAdapter.notifyDataSetChanged();
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(DatabaseError databaseError) {
-//                            Log.d("MainActivity", "on heard signal, failed attempt to D/L profile ");
-//                        }
-//                    });
-//
-//                    //ToDo: Do a count that adds found users, to keep track of active publishing users.
-//                }
-//
-//                @Override
-//                public void onLost(Message message) {
-//                    super.onLost(message);
-//
-//                    //ToDo: Do a count that removes found users, to keep track of active publishing users.
-//
-//                }
-//
-//                @Override
-//                public void onDistanceChanged(Message message, Distance distance) {
-//                    super.onDistanceChanged(message, distance);
-//                }
-//
-//                @Override
-//                public void onBleSignalChanged(Message message, BleSignal bleSignal) {
-//                    super.onBleSignalChanged(message, bleSignal);
-//                    Log.d("Testing Shots fired", "Please clap");
-//                }
-//            };
-//        }
+    public void createNearbyListener(){
+        mSelfProfileRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mSelfId);
+        mSelfConnectionsRef = FirebaseDatabaseUtils.getUserConnectionsRef(mFirebaseDatabase, mSelfId);
+        mSelfChatroomsRef = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, mSelfId);
+
+        mActiveListener = new MessageListener() {
+            @Override
+            public void onFound(Message message) {
+                ChatMessage soapBoxMessage = ChatMessage.getSoapBoxMessageFromBytes(message.getContent());
+                Log.d("SoapBoxActivity", "Found Message: "+soapBoxMessage.getContent()+" "+soapBoxMessage.getUserId());
+                Log.d("SoapBoxActivityListener", "...these active?");
+
+                if (!soapBoxMessage.getContent().equals("")) {
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(SoapBoxFeedActivity.this);
+
+                    ConnectionsSQLOpenHelper.getInstance(SoapBoxFeedActivity.this).addSoapBoxMessage(soapBoxMessage);
+                    notificationBuilder.setContentText(soapBoxMessage.getContent()).setContentTitle("New SoapBoxMessage");
+                    notificationManager.notify(0,notificationBuilder.build());;
+                }
+                String foundId = soapBoxMessage.getUserId();
+//                mFoundId = new String(message.getContent()); //Gets message from other phone, which holds just that phone's UID for now.
+
+
+                //ToDo: Figure out what I can store as a value for the stranger Connections, maybe a counter?
+                //Idea: If using a counter 0-10 encounters = Stranger, 11-25 Familiar, 26-50 Regular, 51-99 Acquaintance,100-499 Friendly, 500+ whatever
+                mSelfConnectionsRef.child(foundId).setValue(foundId); //Adds stranger's UID to user's connectionsList.
+
+                DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, foundId);
+//                DatabaseReference strangerRef = FirebaseDatabaseUtils.getChildReference(mFirebaseDatabase, mFoundId, AppConstants.theoneforprofiles);
+
+                //Gets the stranger's profile information.
+                strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Profile strangerProfile = dataSnapshot.getValue(Profile.class);
+                        ConnectionsSQLOpenHelper.getInstance(SoapBoxFeedActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
+                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+
+//                            mProfileRecAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+
+                //ToDo: Do a count that adds found users, to keep track of active publishing users.
+            }
+
+            @Override
+            public void onLost(Message message) {
+                super.onLost(message);
+
+                //ToDo: Do a count that removes found users, to keep track of active publishing users.
+
+            }
+
+            @Override
+            public void onDistanceChanged(Message message, Distance distance) {
+                super.onDistanceChanged(message, distance);
+            }
+
+            @Override
+            public void onBleSignalChanged(Message message, BleSignal bleSignal) {
+                super.onBleSignalChanged(message, bleSignal);
+                Log.d("Testing Shots fired", "Please clap");
+            }
+        };
+    }
 
 
 
@@ -220,22 +217,16 @@ public class SoapBoxFeedActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-//        subscribe();
+        subscribe();
         publish();
-
-//        mNearbyManager.setupForListening(mSelfId,this).beginListening(mGoogleApiClient);
-
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        NearbyManager.getInstance().setGoogleApiConnected(false);
-
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
     @Override
@@ -247,28 +238,40 @@ public class SoapBoxFeedActivity extends AppCompatActivity implements GoogleApiC
     }
 
     @Override
-    protected void onDestroy() {
-        if(mGoogleApiClient!=null){
-            mGoogleApiClient.disconnect();
-
-        }
-        super.onDestroy();
-    }
-
-    public void publish(){
-        String id = SelfUserProfileUtils.getUserId(this);
-        String soapBoxMessageString = SelfUserProfileUtils.getUserId(this);
-        mActiveMessage = new Message(ChatMessage.getBytesForSoapBox(new ChatMessage(id,soapBoxMessageString)));
-        Nearby.Messages.publish(mGoogleApiClient, mActiveMessage);
-    }
-
-    @Override
     protected void onPause() {
+        if(mNearbyManager.isPublishing()){
+            Nearby.Messages.unpublish(mGoogleApiClient,mNearbyManager.getActiveMessage());
+            mNearbyManager.setPublishing(false);
+        }
+        if(mNearbyManager.isSubscribing()){
+            Nearby.Messages.unsubscribe(mGoogleApiClient,mActiveListener);
+            mNearbyManager.setSubscribing(false);
+        }
         super.onPause();
     }
+
+
+    public void publish(){
+        if(mGoogleApiClient.isConnected()){
+            Nearby.Messages.publish(mGoogleApiClient, mNearbyManager.getActiveMessage());
+            mNearbyManager.setPublishing(true);
+        }else{
+            Toast.makeText(this, "Not connected to Google Cloud", Toast.LENGTH_SHORT).show();
+            Log.d("MainActivity", "publish: failed");
+        }
+    }
+
 
     public void subscribe(){
         Nearby.Messages.subscribe(mGoogleApiClient, mActiveListener);
         mNearbyManager.setSubscribing(true);
+    }
+
+    //Use this once user can set up a new message in this activity.
+    public void setUpActiveMessage(){
+        String soapBoxMessageString = SelfUserProfileUtils.getSoapBoxMessage(this);
+        long timeStamp = SelfUserProfileUtils.getSoapBoxTimeStamp(this);
+        Message message  = new Message(ChatMessage.getBytesForSoapBox(new ChatMessage(SelfUserProfileUtils.getUserId(this),null,soapBoxMessageString, timeStamp)));
+        mNearbyManager.setActiveMessage(message);
     }
 }

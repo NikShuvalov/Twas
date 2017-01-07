@@ -27,6 +27,7 @@ import shuvalov.nikita.twas.PoJos.Profile;
 public class NearbyManager {
     private boolean mGoogleApiConnected, mPublishing, mSubscribing;
     private GoogleApiClient mGoogleApiClient;
+    private Message mActiveMessage;
 //    private MessageListener mActiveListener;
 //
 //    private String mSelfId;
@@ -54,14 +55,6 @@ public class NearbyManager {
 //        mFirebaseDatabase = FirebaseDatabase.getInstance();
     }
 
-    public boolean isGoogleApiConnected() {
-        return mGoogleApiConnected;
-    }
-
-    public void setGoogleApiConnected(boolean googleApiConnected) {
-        mGoogleApiConnected = googleApiConnected;
-    }
-
     public boolean isPublishing() {
         return mPublishing;
     }
@@ -83,6 +76,14 @@ public class NearbyManager {
     }
     public GoogleApiClient getGoogleApiClient(){
         return mGoogleApiClient;
+    }
+
+    public void setActiveMessage(Message message){
+        mActiveMessage = message;
+    }
+
+    public Message getActiveMessage(){
+        return mActiveMessage;
     }
 
 

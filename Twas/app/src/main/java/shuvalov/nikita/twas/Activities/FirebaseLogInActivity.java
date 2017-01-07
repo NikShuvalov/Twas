@@ -97,7 +97,6 @@ public class FirebaseLogInActivity extends AppCompatActivity implements GoogleAp
             public void onClick(View view) {
                 switch (view.getId()) {
                     case (R.id.sign_up_text):
-//                            createNewUserWithEmail(email,password);
                         Intent intent = new Intent(FirebaseLogInActivity.this, SignUpActivity.class);
                         startActivity(intent);
                         break;
@@ -118,21 +117,11 @@ public class FirebaseLogInActivity extends AppCompatActivity implements GoogleAp
                     default:
                         Toast.makeText(FirebaseLogInActivity.this, "Well....\n this is embarassing", Toast.LENGTH_SHORT).show();
                 }
-
-
             }
         };
         mSignIn.setOnClickListener(logInListener);
         mSignUp.setOnClickListener(logInListener);
     }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if(AppConstants.SIGN_UP_REQUESTCODE==requestCode && resultCode == RESULT_OK){
-//            data.getStringExtra()
-//        }
-//    }
-
 
     public void findViews(){
         mEmailEntry= (EditText)findViewById(R.id.email_entry);
@@ -157,29 +146,6 @@ public class FirebaseLogInActivity extends AppCompatActivity implements GoogleAp
     protected void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    public void createNewUserWithEmail(String email, String password){
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d("Log-In Activity", "createUserWithEmail:onComplete:" + task.isSuccessful());
-                        if (!task.isSuccessful()) {
-                            Toast.makeText(FirebaseLogInActivity.this, "An Error Occurred",
-                                    Toast.LENGTH_SHORT).show();
-                        }else{
-                            String userId = mAuth.getCurrentUser().getUid();
-                            if(!SelfUserProfileUtils.compareStoredIdWithCurrentId(FirebaseLogInActivity.this,userId)){ //If logged in id doesn't match id stored in sharedPref.
-                                SelfUserProfileUtils.clearUserProfile(FirebaseLogInActivity.this); //We clear the user Preferences. This is a back-up check; typically the preferences should be cleared on sign-out.
-                                SelfUserProfileUtils.setUserId(FirebaseLogInActivity.this, userId);
-                                ConnectionsSQLOpenHelper.getInstance(FirebaseLogInActivity.this).clearDatabase();
-                            }
-                        }
-
-                    }
-                });
-
     }
 
     public void signInUserWithEmail(String email, String password){

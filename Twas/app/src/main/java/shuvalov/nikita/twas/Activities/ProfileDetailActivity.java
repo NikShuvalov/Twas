@@ -3,6 +3,7 @@ package shuvalov.nikita.twas.Activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -16,8 +17,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.nearby.Nearby;
+import com.google.android.gms.nearby.messages.BleSignal;
+import com.google.android.gms.nearby.messages.Distance;
+import com.google.android.gms.nearby.messages.Message;
+import com.google.android.gms.nearby.messages.MessageListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,13 +43,14 @@ import shuvalov.nikita.twas.Helpers_Managers.ConnectionsHelper;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.FireBaseStorageUtils;
 import shuvalov.nikita.twas.Helpers_Managers.FirebaseDatabaseUtils;
+import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
 import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.ChatMessage;
 import shuvalov.nikita.twas.PoJos.ChatRoom;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
 
-public class ProfileDetailActivity extends AppCompatActivity {
+public class ProfileDetailActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
     TextView mNameText, mBioText, mDOBText, mGenderText;
     ImageView mImageView;
@@ -48,12 +58,25 @@ public class ProfileDetailActivity extends AppCompatActivity {
     FirebaseDatabase mFirebaseDatabase;
     String mSelfUserId;
     Profile mSelectedProfile;
+    private GoogleApiClient mGoogleApiClient;
+    private NearbyManager mNearbyManager;
+    private MessageListener mActiveListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_detail);
 
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Nearby.MESSAGES_API)
+                .addConnectionCallbacks(this)
+                .enableAutoManage(this, this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+        mNearbyManager = NearbyManager.getInstance();
         mSelfUserId = SelfUserProfileUtils.getUserId(ProfileDetailActivity.this);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -70,79 +93,101 @@ public class ProfileDetailActivity extends AppCompatActivity {
 
         bindDataToViews(mSelectedProfile);
 
+        mActiveListener = new MessageListener() {
+            @Override
+            public void onFound(Message message) {
+                super.onFound(message);
+                ChatMessage soapBoxMessage = ChatMessage.getSoapBoxMessageFromBytes(message.getContent());
+                if (!soapBoxMessage.getContent().equals("")) {
+                    ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addSoapBoxMessage(soapBoxMessage);
+                }
+                String mFoundId = soapBoxMessage.getUserId();
 
-//        mChatInviteButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                //Check if currentUser and selectedUser already have a chatroom together, to prevent making duplicates
-//                DatabaseReference selfReference = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,mSelfUserId);
-//                selfReference.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                        Iterable<DataSnapshot> chatRoomsData = dataSnapshot.getChildren();
-//                        boolean done = false;
-//                        while(chatRoomsData.iterator().hasNext() && !done){
-//                            ChatRoom chatRoom = chatRoomsData.iterator().next().getValue(ChatRoom.class);
-//                            ArrayList<String> userIds = chatRoom.getUserIds();
-//                            Log.d("Testing", "onDataChange: "+ userIds.get(0));
-//                            Log.d("Testing", "onDataChange: "+ userIds.get(1));
+
+                //ToDo: Figure out what I can store as a value for the stranger Connections, maybe a counter?
+                //Idea: If using a counter 0-10 encounters = Stranger, 11-25 Familiar, 26-50 Regular, 51-99 Acquaintance,100-499 Friendly, 500+ whatever
+                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,SelfUserProfileUtils.getUserId(ProfileDetailActivity.this)).child(mFoundId).setValue(mFoundId); //Adds stranger's UID to user's connectionsList.
+
+
+                DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mFoundId);
+
+//                DatabaseReference strangerRef = FirebaseDatabaseUtils.getChildReference(mFirebaseDatabase, mFoundId, AppConstants.theoneforprofiles);
+
+//                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MainActivity.this);
 //
-//                            //If both user IDs are found in one of the chatrooms that means users already have an existing chatroom together.
-//                            if((userIds.get(0).equals(mSelfUserId) && userIds.get(1).equals(mSelectedProfile.getUID()))||
-//                                    (userIds.get(1).equals(mSelfUserId) && userIds.get(0).equals(mSelectedProfile.getUID()))) {
-//                                done = true;
-//                                Intent intent = new Intent(ProfileDetailActivity.this, ChatRoomActivity.class);
-//                                intent.putExtra(AppConstants.ORIGIN_ACTIVITY, AppConstants.ORIGIN_PROFILE_DETAIL);
-//                                intent.putExtra(AppConstants.PREF_CHATROOM, chatRoom.getId());
-//                                startActivity(intent);
-//                            }
-//                        }
-//                        if(!done) {
-//                            DatabaseReference chatroomsRef = FirebaseDatabaseUtils.getChatroomRef(mFirebaseDatabase, null);
-//
-//                            DatabaseReference createdChatroom = chatroomsRef.push();
-//
-//                            Profile selfUser = SelfUserProfileUtils.getUsersInfoAsProfile(ProfileDetailActivity.this);
-//
-//
-//                            ChatRoom chatroom = new ChatRoom();
-//                            chatroom.setId(createdChatroom.getKey());
-//                            chatroom.addUserToChatroom(selfUser.getUID());
-//                            chatroom.addUserToChatroom(mSelectedProfile.getUID());
-//                            createdChatroom.child(AppConstants.FIREBASE_USERS).setValue(chatroom);
-//                            DatabaseReference messageReference = FirebaseDatabaseUtils.getChatroomMessagesRef(mFirebaseDatabase, chatroom.getId());
-//                            long currentTime = Calendar.getInstance().getTimeInMillis();
-//                            ChatMessage initialChatMessage = new ChatMessage(selfUser.getUID(), chatroom.getId(), String.format("%s has started this conversation", selfUser.getName()), currentTime);
-//                            messageReference.push().setValue(initialChatMessage);
-//
-//                            //Adds a reference to the Chatroom to both members' profiles.
-//                            FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, selfUser.getUID()).child(chatroom.getId()).setValue(chatroom);
-//                            FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, mSelectedProfile.getUID()).child(chatroom.getId()).setValue(chatroom);
-//
-//                            //Adds the newly made chatroom and initial message to the local db.
-//                            ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addChatRoom(chatroom);
-//                            ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addMessage(initialChatMessage);
-//
-//                            Intent intent = new Intent(ProfileDetailActivity.this, ChatRoomActivity.class);
-//                            intent.putExtra(AppConstants.ORIGIN_ACTIVITY, AppConstants.ORIGIN_PROFILE_DETAIL);
-//                            intent.putExtra(AppConstants.PREF_CHATROOM, chatroom.getId());
-//                            startActivity(intent);
-//                        }
-//
-//
-//
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//
-//                    }
-//                });
-//
-//
-//
-//            }
-//        });
+////                ConnectionsSQLOpenHelper.getInstance().addSoapBoxMessage(soapBoxMessage);
+//                notificationBuilder.setContentText(soapBoxMessage.getContent()).setContentTitle("New SoapBoxMessage").setSmallIcon(android.R.drawable.ic_dialog_alert);
+//                notificationManager.notify(0,notificationBuilder.build());
+
+                //ToDo: Move this listener into a service. It should always be going.
+
+                //Listens to ownChatrooms... I think.
+                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,SelfUserProfileUtils.getUserId(ProfileDetailActivity.this))
+                        .addChildEventListener(new ChildEventListener() {
+                            @Override
+                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                //This method should give a notification if a new chatroom and/or message is created.
+                            }
+
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                            }
+
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                //Gets the stranger's profile information.
+                strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Profile strangerProfile = dataSnapshot.getValue(Profile.class);
+                        ConnectionsSQLOpenHelper.getInstance(ProfileDetailActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
+                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d("MainActivity", "on heard signal, failed attempt to D/L profile ");
+                    }
+                });
+
+                //ToDo: Do a count that adds found users, to keep track of active publishing users.
+            }
+
+            @Override
+            public void onLost(Message message) {
+                super.onLost(message);
+//                Toast.makeText(MainActivity.this, "Lost the signal", Toast.LENGTH_SHORT).show();
+
+                //ToDo: Do a count that removes found users, to keep track of active publishing users.
+
+            }
+
+            @Override
+            public void onDistanceChanged(Message message, Distance distance) {
+                super.onDistanceChanged(message, distance);
+            }
+
+            @Override
+            public void onBleSignalChanged(Message message, BleSignal bleSignal) {
+                super.onBleSignalChanged(message, bleSignal);
+                Log.d("Testing Shots fired", "Please clap");
+            }
+        };
     }
 
     public void findViews(){
@@ -289,6 +334,58 @@ public class ProfileDetailActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(mNearbyManager.isPublishing()){
+            Nearby.Messages.unpublish(mGoogleApiClient,mNearbyManager.getActiveMessage());
+            mNearbyManager.setPublishing(false);
+        }
+        if(mNearbyManager.isSubscribing()){
+            Nearby.Messages.unsubscribe(mGoogleApiClient,mActiveListener);
+            mNearbyManager.setSubscribing(false);
+        }
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        publish();
+        subscribe();
+    }
+
+    public void publish(){
+        //Actually does the sending
+        if(mGoogleApiClient.isConnected()){
+            Nearby.Messages.publish(mGoogleApiClient,mNearbyManager.getActiveMessage());
+            mNearbyManager.setPublishing(true);
+        }else{
+            Toast.makeText(this, "Not connected to Google Cloud", Toast.LENGTH_SHORT).show();
+            Log.d("MainActivity", "publish: failed");
+        }
+    }
+
+    public void subscribe(){
+        Nearby.Messages.subscribe(mGoogleApiClient, mActiveListener);
+        mNearbyManager.setSubscribing(true);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 }
 

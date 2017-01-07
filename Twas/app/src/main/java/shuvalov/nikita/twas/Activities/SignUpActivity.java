@@ -56,7 +56,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                                 Toast.makeText(SignUpActivity.this, "Something went wrong",
                                         Toast.LENGTH_SHORT).show();
                             }
-
                         }else{
                             String userId = mAuth.getCurrentUser().getUid();
                             if(!SelfUserProfileUtils.compareStoredIdWithCurrentId(SignUpActivity.this,userId)){ //If logged in id doesn't match id stored in sharedPref.
@@ -67,10 +66,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                             startActivity(intent);
                         }
-
                     }
                 });
-
     }
 
     @Override

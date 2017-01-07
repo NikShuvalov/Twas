@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,10 +25,21 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.nearby.Nearby;
+import com.google.android.gms.nearby.messages.BleSignal;
+import com.google.android.gms.nearby.messages.Distance;
+import com.google.android.gms.nearby.messages.Message;
+import com.google.android.gms.nearby.messages.MessageListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -38,14 +50,16 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import shuvalov.nikita.twas.AppConstants;
+import shuvalov.nikita.twas.Helpers_Managers.ConnectionsHelper;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.FirebaseDatabaseUtils;
+import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
 import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.ChatMessage;
 import shuvalov.nikita.twas.PoJos.Profile;
 import shuvalov.nikita.twas.R;
 
-public class SelfProfileActivity extends AppCompatActivity {
+public class SelfProfileActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,GoogleApiClient.ConnectionCallbacks {
     private ImageView mProfileImage;
     private Button mAccessGallery, mTakeSelfie, mSoapBoxUpdateButt, mUpdateBirthday;
 //    private FloatingActionButton mSubmit;
@@ -60,11 +74,25 @@ public class SelfProfileActivity extends AppCompatActivity {
     private int mBirthYear, mBirthMonth, mBirthDate;
     private int mBirthMonthSelected;
     private String mGender;
+    private GoogleApiClient mGoogleApiClient;
+    private NearbyManager mNearbyManager;
+    private FirebaseDatabase mFirebaseDatabase;
+    private MessageListener mActiveListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_self_profile);
+
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mNearbyManager = NearbyManager.getInstance();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Nearby.MESSAGES_API)
+                .addConnectionCallbacks(this)
+                .enableAutoManage(this, this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
 
 
         findViews();
@@ -73,6 +101,102 @@ public class SelfProfileActivity extends AppCompatActivity {
         loadCurrentValues();
         setSpinnerAdapters();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+        mActiveListener = new MessageListener() {
+            @Override
+            public void onFound(Message message) {
+                super.onFound(message);
+                ChatMessage soapBoxMessage = ChatMessage.getSoapBoxMessageFromBytes(message.getContent());
+                if (!soapBoxMessage.getContent().equals("")) {
+                    ConnectionsSQLOpenHelper.getInstance(SelfProfileActivity.this).addSoapBoxMessage(soapBoxMessage);
+                }
+                String mFoundId = soapBoxMessage.getUserId();
+
+
+                //ToDo: Figure out what I can store as a value for the stranger Connections, maybe a counter?
+                //Idea: If using a counter 0-10 encounters = Stranger, 11-25 Familiar, 26-50 Regular, 51-99 Acquaintance,100-499 Friendly, 500+ whatever
+                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,SelfUserProfileUtils.getUserId(SelfProfileActivity.this)).child(mFoundId).setValue(mFoundId); //Adds stranger's UID to user's connectionsList.
+
+
+                DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mFoundId);
+
+//                DatabaseReference strangerRef = FirebaseDatabaseUtils.getChildReference(mFirebaseDatabase, mFoundId, AppConstants.theoneforprofiles);
+
+//                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MainActivity.this);
+//
+////                ConnectionsSQLOpenHelper.getInstance().addSoapBoxMessage(soapBoxMessage);
+//                notificationBuilder.setContentText(soapBoxMessage.getContent()).setContentTitle("New SoapBoxMessage").setSmallIcon(android.R.drawable.ic_dialog_alert);
+//                notificationManager.notify(0,notificationBuilder.build());
+
+                //ToDo: Move this listener into a service. It should always be going.
+
+                //Listens to ownChatrooms... I think.
+                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,SelfUserProfileUtils.getUserId(SelfProfileActivity.this))
+                        .addChildEventListener(new ChildEventListener() {
+                            @Override
+                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                //This method should give a notification if a new chatroom and/or message is created.
+                            }
+
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                            }
+
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                //Gets the stranger's profile information.
+                strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Profile strangerProfile = dataSnapshot.getValue(Profile.class);
+                        ConnectionsSQLOpenHelper.getInstance(SelfProfileActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
+                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d("MainActivity", "on heard signal, failed attempt to D/L profile ");
+                    }
+                });
+
+                //ToDo: Do a count that adds found users, to keep track of active publishing users.
+            }
+
+            @Override
+            public void onLost(Message message) {
+                super.onLost(message);
+//                Toast.makeText(MainActivity.this, "Lost the signal", Toast.LENGTH_SHORT).show();
+
+                //ToDo: Do a count that removes found users, to keep track of active publishing users.
+
+            }
+
+            @Override
+            public void onDistanceChanged(Message message, Distance distance) {
+                super.onDistanceChanged(message, distance);
+            }
+
+            @Override
+            public void onBleSignalChanged(Message message, BleSignal bleSignal) {
+                super.onBleSignalChanged(message, bleSignal);
+                Log.d("Testing Shots fired", "Please clap");
+            }
+        };
     }
 
     public void loadCurrentValues(){
@@ -184,7 +308,7 @@ public class SelfProfileActivity extends AppCompatActivity {
             }
         });
 
-        //FixMe: This only updates the changes locally, you still need to hit the submit button to actually sent out the new information to fbdb.
+        //FixMe: This only updates the changes locally, you still need to hit the submit button to actually send out the new information to fbdb.
         mUpdateBirthday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -462,5 +586,56 @@ public class SelfProfileActivity extends AppCompatActivity {
         byte[] iconBytes = boas.toByteArray();
         Log.d("IconImage", "IconFileSize: "+iconBytes.length);
         SelfUserProfileUtils.setProfileIconImageFile(this,iconBytes);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        publish();
+        subscribe();
+    }
+
+    public void publish(){
+        if(mGoogleApiClient.isConnected()){
+            Nearby.Messages.publish(mGoogleApiClient, mNearbyManager.getActiveMessage());
+            mNearbyManager.setPublishing(true);
+        }else{
+            Toast.makeText(this, "Not connected to Google Cloud", Toast.LENGTH_SHORT).show();
+            Log.d("MainActivity", "publish: failed");
+        }
+    }
+
+    public void subscribe(){
+        Nearby.Messages.subscribe(mGoogleApiClient, mActiveListener);
+        mNearbyManager.setSubscribing(true);
+    }
+
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    protected void onPause() {
+        if(mNearbyManager.isPublishing()){
+            Nearby.Messages.unpublish(mGoogleApiClient,mNearbyManager.getActiveMessage());
+            mNearbyManager.setPublishing(false);
+        }
+        if(mNearbyManager.isSubscribing()){
+            Nearby.Messages.unsubscribe(mGoogleApiClient,mActiveListener);
+            mNearbyManager.setSubscribing(false);
+        }
+        super.onPause();
     }
 }

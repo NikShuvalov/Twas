@@ -61,12 +61,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public static final String FOUND_ID_INTENT = "Found id";
 
     Toolbar mToolbar;
-//    Button mSendButt, mSignOutButton, mProfileButton;
-//    TextView mDisplayText;
     String mFoundId;
 
 
-//    Button mDebugButton; //FixMe: Remove
 
     boolean mBackRecentlyPressed;
     RecyclerView mRecyclerView;
@@ -96,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mBackRecentlyPressed=false;
+        mBackRecentlyPressed = false;
 
         mNearbyManager = NearbyManager.getInstance();
 
@@ -120,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onFound(Message message) {
                 super.onFound(message);
                 ChatMessage soapBoxMessage = ChatMessage.getSoapBoxMessageFromBytes(message.getContent());
-                if(!soapBoxMessage.getContent().equals("")) {
+                if (!soapBoxMessage.getContent().equals("")) {
                     ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addSoapBoxMessage(soapBoxMessage);
                 }
                 mFoundId = soapBoxMessage.getUserId();
@@ -207,55 +204,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onBleSignalChanged(Message message, BleSignal bleSignal) {
                 super.onBleSignalChanged(message, bleSignal);
                 Log.d("Testing Shots fired", "Please clap");
-//                mDisplayText.setText(ChatMessage.getSoapBoxMessageFromBytes(message.getContent()).getContent());
             }
         };
-
-//        //ToDo:Remove this, simply using for debugging to navigate to chatroomListActivity
-//        mSendButt.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent chatroomIntent = new Intent(MainActivity.this, ChatRoomListActivity.class);
-//                startActivity(chatroomIntent);
-//            }
-//        });
-
-//        mSignOutButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                FirebaseAuth.getInstance().signOut();
-//
-//                //ToDo: Clear users information in SharedPref and Database, unless if I keep database info tied to specific Users.
-//                Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
-//                ConnectionsSQLOpenHelper.getInstance(MainActivity.this).clearDatabase();
-//                Intent intent = new Intent(MainActivity.this, FirebaseLogInActivity.class);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                startActivity(intent);
-//            }
-//        });
-//
-//        mProfileButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent =new Intent(MainActivity.this, SelfProfileActivity.class);
-//                startActivity(intent);
-//            }
-//        });
     }
-
-//    public void soapBoxDebug(){
-//        mDebugButton = (Button)findViewById(R.id.soapbox_debug);
-////        mDebugButton.setVisibility(View.INVISIBLE);
-//        mDebugButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent  = new Intent(MainActivity.this, SoapBoxFeedActivity.class);
-//                startActivity(intent);
-//            }
-//        });
 
     //ToDo: Move into splash screen activity. Should only be called a single time upon load.
     public void retrieveStoredProfiles(){
+        Log.d("MainActivity", "Retrieving Stored Preferences ");
         ArrayList<Profile> storedProfiles = ConnectionsSQLOpenHelper.getInstance(this).getAllConnections();
         ConnectionsHelper.getInstance().addProfileConnectionsToCollection(storedProfiles);
         mProfileRecAdapter.notifyDataSetChanged();
@@ -391,7 +346,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(@Nullable Bundle connectionHint) {
-        NearbyManager.getInstance().setGoogleApiConnected(true);
         NearbyManager.getInstance().setGoogleApiClient(mGoogleApiClient);
         publish();
         subscribe();
@@ -400,9 +354,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnectionSuspended(int i) {
-        NearbyManager.getInstance().setGoogleApiConnected(false);
-
-
     }
 
     @Override
@@ -418,18 +369,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-    public void publish(){
+    //ToDo: This will have to be a helper Method possibly.
+    public void setUpActiveMessage(){
         String soapBoxMessageString = SelfUserProfileUtils.getSoapBoxMessage(this);
         long timeStamp = SelfUserProfileUtils.getSoapBoxTimeStamp(this);
-
         mFindMeMessage = new Message(ChatMessage.getBytesForSoapBox(new ChatMessage(mId,null,soapBoxMessageString, timeStamp)));
+        mNearbyManager.setActiveMessage(mFindMeMessage);
+    }
+
+    public void publish(){
+        //Initially sets up the ActiveMessage to be sent out.
+        if(mNearbyManager.getActiveMessage()==null){
+            setUpActiveMessage();
+        }
+
+        //Actually does the sending
         if(mGoogleApiClient.isConnected()){
-
-            //ToDo: Use this for background publishing.
-//            PublishOptions publishOptions = new PublishOptions.Builder().setStrategy(Strategy.BLE_ONLY).build();
-//            Nearby.Messages.publish(mGoogleApiClient, mFindMeMessage, publishOptions);
-
-            Nearby.Messages.publish(mGoogleApiClient,mFindMeMessage);
+            Nearby.Messages.publish(mGoogleApiClient,mNearbyManager.getActiveMessage());
             Log.d("NearBy", "publishing ID: "+ mId);
             mNearbyManager.setPublishing(true);
         }else{
@@ -437,6 +393,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             Log.d("MainActivity", "publish: failed");
         }
     }
+
     public void subscribe(){
         Nearby.Messages.subscribe(mGoogleApiClient, mActiveListener);
         mNearbyManager.setSubscribing(true);
@@ -444,22 +401,34 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
     @Override
-    protected void onStop() {
+    protected void onPause() {
         if(mNearbyManager.isPublishing()){
-            Nearby.Messages.unpublish(mGoogleApiClient,mFindMeMessage);
+            Nearby.Messages.unpublish(mGoogleApiClient, mNearbyManager.getActiveMessage());
             mNearbyManager.setPublishing(false);
         }
         if(mNearbyManager.isSubscribing()){
-            Nearby.Messages.unsubscribe(mGoogleApiClient,mActiveListener);
+            Nearby.Messages.unsubscribe(mGoogleApiClient, mActiveListener);
             mNearbyManager.setSubscribing(false);
         }
-        super.onStop();
+        super.onPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
         mBackRecentlyPressed=false;
+        if(mGoogleApiClient.isConnected()){
+            if(!mNearbyManager.isPublishing()){
+                publish();
+            }
+            if(!mNearbyManager.isSubscribing()){
+                subscribe();
+            }
+
+        }else{
+            mGoogleApiClient.connect();
+        }
     }
 
     @Override
@@ -483,20 +452,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.mainactivity_menu,menu);
+
+        //Sets user's Profile Icon Image in toolbar.
         String iconImageDataAsString = SelfUserProfileUtils.getProfileIconImageFile(this);
         if(!iconImageDataAsString.equals("")){
             byte[] iconImageData = Base64.decode(iconImageDataAsString,Base64.DEFAULT);
-            Log.d("IconImage", "size: "+iconImageData.length);
-
-//            Bitmap iconImageBitmap = BitmapFactory.decodeByteArray(iconImageData,0,iconImageData.length);
-//            Drawable iconImage = new BitmapDrawable(iconImageBitmap);
-
             Drawable iconImage = new BitmapDrawable(BitmapFactory.decodeByteArray(iconImageData,0,iconImageData.length));
             menu.findItem(R.id.self_profile_option).setIcon(iconImage);
         }else{
             //ToDo: Set a default image Icon here.
             menu.findItem(R.id.self_profile_option).setIcon(R.drawable.shakespeare_modern_bard_post);
         }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -525,10 +492,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void signSelfOut(){
         FirebaseAuth.getInstance().signOut();
-
-        //ToDo: Clear users information in SharedPref and Database, unless if I keep database info tied to specific Users.
         Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
-        ConnectionsSQLOpenHelper.getInstance(MainActivity.this).clearDatabase();
+
         Intent intent = new Intent(MainActivity.this, FirebaseLogInActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
