@@ -2,6 +2,7 @@ package shuvalov.nikita.twas.Activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -51,7 +52,7 @@ public class SelfProfileActivity extends AppCompatActivity {
     private EditText mName, mBio, mSoapBoxMessage, mBirthdayEntry, mBirthYearEntry;
 //    private EditText mDateEntry; //Placeholder, used for debugging.
     private boolean mUpdatedProfileImage = false;
-    private Bitmap mChosenProfileImage;
+    private Bitmap mChosenProfileImage, mProfileIconImage;
     private Spinner  mMonthSpinner, mGenderSpinner;
     private ArrayAdapter<CharSequence> mMonthAdapter, mGenderAdapter;
     private Toolbar mToolbar;
@@ -249,7 +250,8 @@ public class SelfProfileActivity extends AppCompatActivity {
         if((requestCode==AppConstants.PICK_IMAGE_REQUEST||requestCode==AppConstants.TAKE_IMAGE_REQUEST) && (resultCode==RESULT_OK && data!=null && data.getData()!=null)){
             Uri uri = data.getData();
             try {
-                mChosenProfileImage = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
+                mProfileIconImage = mChosenProfileImage = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
+
                 mProfileImage.setImageBitmap(mChosenProfileImage);
                 mUpdatedProfileImage=true;
             } catch (IOException e) {
@@ -330,6 +332,7 @@ public class SelfProfileActivity extends AppCompatActivity {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Toast.makeText(SelfProfileActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
+                updateImageIconFile();
             }
         });
     }
@@ -448,4 +451,16 @@ public class SelfProfileActivity extends AppCompatActivity {
 //                height, filter);
 //        return newBitmap;
 //    }
+    public void updateImageIconFile(){
+
+        ByteArrayOutputStream boas = new ByteArrayOutputStream();
+
+        //FixMe: Dimensions might need to be adjusted for the profileIconImage.
+        mProfileIconImage = Bitmap.createScaledBitmap(mProfileIconImage, 350,
+                350, true);
+        mProfileIconImage.compress(Bitmap.CompressFormat.JPEG,2, boas);
+        byte[] iconBytes = boas.toByteArray();
+        Log.d("IconImage", "IconFileSize: "+iconBytes.length);
+        SelfUserProfileUtils.setProfileIconImageFile(this,iconBytes);
+    }
 }

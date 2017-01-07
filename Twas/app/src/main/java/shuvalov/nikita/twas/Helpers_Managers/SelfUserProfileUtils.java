@@ -2,6 +2,7 @@ package shuvalov.nikita.twas.Helpers_Managers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Base64;
 
 import java.util.Calendar;
 
@@ -95,6 +96,16 @@ public class SelfUserProfileUtils {
     public static long getSoapBoxTimeStamp (Context context){
         return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, Context.MODE_PRIVATE).getLong(AppConstants.PREF_SOAPBOX_TIMESTAMP,-1);
     }
+
+    public static void setProfileIconImageFile(Context context,byte[] bytes){
+        String iconImageFile = Base64.encodeToString(bytes,Base64.DEFAULT);
+        context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE,Context.MODE_PRIVATE).edit().putString(AppConstants.PREF_ICON_IMAGE_FILE, iconImageFile).apply();
+    }
+
+    public static String getProfileIconImageFile(Context context){
+        return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, Context.MODE_PRIVATE).getString(AppConstants.PREF_ICON_IMAGE_FILE, "");
+    }
+
 
 
 }

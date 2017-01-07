@@ -3,6 +3,10 @@ package shuvalov.nikita.twas.Activities;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +15,7 @@ import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -475,8 +480,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.mainactivity_menu,menu);
+        String iconImageDataAsString = SelfUserProfileUtils.getProfileIconImageFile(this);
+        if(!iconImageDataAsString.equals("")){
+            byte[] iconImageData = Base64.decode(iconImageDataAsString,Base64.DEFAULT);
+            Log.d("IconImage", "size: "+iconImageData.length);
+
+//            Bitmap iconImageBitmap = BitmapFactory.decodeByteArray(iconImageData,0,iconImageData.length);
+//            Drawable iconImage = new BitmapDrawable(iconImageBitmap);
+
+            Drawable iconImage = new BitmapDrawable(BitmapFactory.decodeByteArray(iconImageData,0,iconImageData.length));
+            menu.findItem(R.id.self_profile_option).setIcon(iconImage);
+        }else{
+            //ToDo: Set a default image Icon here.
+            menu.findItem(R.id.self_profile_option).setIcon(R.drawable.shakespeare_modern_bard_post);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
