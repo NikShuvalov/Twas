@@ -22,6 +22,7 @@ import com.google.android.gms.nearby.messages.BleSignal;
 import com.google.android.gms.nearby.messages.Distance;
 import com.google.android.gms.nearby.messages.Message;
 import com.google.android.gms.nearby.messages.MessageListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -58,6 +59,7 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
     public GoogleApiClient mGoogleApiClient;
     private NearbyManager mNearbyManager;
     private MessageListener mActiveListener;
+    private String mOtherUserId, mSelfUserId;
 
 
     @Override
@@ -65,6 +67,7 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
+        mSelfUserId = SelfUserProfileUtils.getUserId(this);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
 
@@ -251,6 +254,7 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
             chatRoom = ChatRoomsHelper.getInstance().getChatRoomAtPosition(chatRoomPos);
             getSupportActionBar().setTitle(chatRoom.getRoomName());
             mChatRoomId = chatRoom.getId();
+            getOtherUsersId(chatRoom);
         } else if (getIntent().getStringExtra(AppConstants.ORIGIN_ACTIVITY).equals(AppConstants.ORIGIN_PROFILE_DETAIL)) {
             mChatRoomId = getIntent().getStringExtra(AppConstants.PREF_CHATROOM);
         }
@@ -308,7 +312,7 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
     }
 
     public void recyclerLogic(){
-        mAdapter = new ChatMessagesRecyclerAdapter(ChatMessagesHelper.getInstance().getChatLog(),SelfUserProfileUtils.getUserId(this));//True Code
+        mAdapter = new ChatMessagesRecyclerAdapter(ChatMessagesHelper.getInstance().getChatLog(),mSelfUserId);//True Code
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
@@ -332,11 +336,30 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
                 }else{
                     String chatContent = mMessageEntry.getText().toString();
                     mMessageEntry.setText("");
-                    String userId = SelfUserProfileUtils.getUserId(ChatRoomActivity.this);
                     long timeStamp = Calendar.getInstance().getTimeInMillis();
 
-                    ChatMessage chatMessage = new ChatMessage(userId,mChatRoomId,chatContent,timeStamp);
-                    mChatRoomRef.push().setValue(chatMessage);
+                    ChatMessage chatMessage = new ChatMessage(mSelfUserId, mChatRoomId,chatContent,timeStamp);
+                    mChatRoomRef.push().setValue(chatMessage).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            //If pushing value is successful then let's increment up the other users unread message count.
+                            final DatabaseReference unreadMessagesRef = FirebaseDatabaseUtils.getOtherUsersUnreadMessagesRef(mFirebaseDatabase,mOtherUserId,mChatRoomId);
+                            unreadMessagesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    long numOfUnread = (long)dataSnapshot.getValue();
+                                    numOfUnread++;
+                                    unreadMessagesRef.setValue(numOfUnread);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                        }
+                    });
                 }
             }
         });
@@ -380,6 +403,14 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
         super.onStart();
         if(mGoogleApiClient!= null){
             mGoogleApiClient.connect();
+        }
+    }
+    public void getOtherUsersId(ChatRoom chatRoom){
+        ArrayList<String> userIds = chatRoom.getUserIds();
+        if(userIds.get(0).equals(mSelfUserId)){
+            mOtherUserId = userIds.get(1);
+        }else{
+            mOtherUserId=userIds.get(0);
         }
     }
 }

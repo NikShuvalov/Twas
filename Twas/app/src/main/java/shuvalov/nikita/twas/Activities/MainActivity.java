@@ -494,6 +494,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         FirebaseAuth.getInstance().signOut();
         Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
 
+        ConnectionsSQLOpenHelper.getInstance(this).clearDatabase();
         Intent intent = new Intent(MainActivity.this, FirebaseLogInActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);

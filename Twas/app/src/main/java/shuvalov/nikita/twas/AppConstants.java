@@ -16,6 +16,7 @@ public class AppConstants {
     public static final String FIREBASE_CHATROOMS = "Chatrooms";
     public static final String FIREBASE_CHATROOM_MESSSAGES = "Messages";
     public static final String FIREBASE_USERS = "Users";
+    public static final String FIREBASE_UNREAD_MESSAGES = "unreadMessages";
 
     public static final String ORIGIN_ACTIVITY = "where is intent coming from?";
     public static final String ORIGIN_MAIN = "main activity";

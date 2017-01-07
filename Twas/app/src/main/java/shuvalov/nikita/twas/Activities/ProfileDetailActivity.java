@@ -316,6 +316,7 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
 
                     //Adds a reference to the Chatroom to both members' profiles.
                     FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, selfUser.getUID()).child(chatroom.getId()).setValue(chatroom);
+                    chatroom.unreadMessages++;
                     FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, mSelectedProfile.getUID()).child(chatroom.getId()).setValue(chatroom);
 
                     //Adds the newly made chatroom and initial message to the local db.

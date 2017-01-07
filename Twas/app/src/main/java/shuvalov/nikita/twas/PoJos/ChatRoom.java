@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class ChatRoom {
     String id, roomName; //Room ID is a unique identifier for the room, room name is the nickname for the room.
     ArrayList<String> userIds;
+    public long unreadMessages;
 
     public static final String DEFAULT_NAME = "Generic Room"; //I want to use a random name generator. Just have to figure out the words to use.
 
@@ -26,6 +27,7 @@ public class ChatRoom {
     public ChatRoom(){
         this.userIds = new ArrayList<>();
         this.roomName = DEFAULT_NAME;
+        unreadMessages = 0;
     }
 
     public void setId(String id) {
@@ -43,8 +45,6 @@ public class ChatRoom {
     public String getRoomName() {
         return roomName;
     }
-
-
 
     public void addUserToChatroom(String uid){
         userIds.add(uid);
