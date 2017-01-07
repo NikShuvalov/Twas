@@ -199,6 +199,8 @@ public class SoapBoxFeedActivity extends AppCompatActivity implements GoogleApiC
         mRecyclerView = (RecyclerView)findViewById(R.id.soapbox_feed_recycler);
         setSupportActionBar((Toolbar)findViewById(R.id.my_toolbar));
         getSupportActionBar().setTitle("SoapBox Feed");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
     }
 
     public void recyclerLogic(){

@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import shuvalov.nikita.twas.AppConstants;
+import shuvalov.nikita.twas.ChatRoomMessageService;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsHelper;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.FirebaseDatabaseUtils;
@@ -141,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 mSelfChatroomsRef.addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        //ToDo: Maybe add a boolean here for first find.
                         Toast.makeText(MainActivity.this, "New ChatRoom", Toast.LENGTH_SHORT).show();
                     }
 
@@ -367,6 +369,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if(mGoogleApiClient!= null){
             mGoogleApiClient.connect();
         }
+        Intent intent = new Intent(MainActivity.this, ChatRoomMessageService.class);
+        startService(intent);
+
     }
 
     //ToDo: This will have to be a helper Method possibly.
