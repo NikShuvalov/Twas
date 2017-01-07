@@ -257,7 +257,10 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
             getOtherUsersId(chatRoom);
         } else if (getIntent().getStringExtra(AppConstants.ORIGIN_ACTIVITY).equals(AppConstants.ORIGIN_PROFILE_DETAIL)) {
             mChatRoomId = getIntent().getStringExtra(AppConstants.PREF_CHATROOM);
+            mOtherUserId = getIntent().getStringExtra(AppConstants.PREF_OTHER_UID);
         }
+
+        FirebaseDatabaseUtils.getUsersUnreadMessagesRef(mFirebaseDatabase,mSelfUserId,mChatRoomId).setValue(0);
 
         ChatMessagesHelper.getInstance().cleanChatLog(mChatRoomId);
         mChatRoomRef = FirebaseDatabaseUtils.getChatroomMessagesRef(FirebaseDatabase.getInstance(), mChatRoomId);
@@ -342,8 +345,9 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
                     mChatRoomRef.push().setValue(chatMessage).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+
                             //If pushing value is successful then let's increment up the other users unread message count.
-                            final DatabaseReference unreadMessagesRef = FirebaseDatabaseUtils.getOtherUsersUnreadMessagesRef(mFirebaseDatabase,mOtherUserId,mChatRoomId);
+                            final DatabaseReference unreadMessagesRef = FirebaseDatabaseUtils.getUsersUnreadMessagesRef(mFirebaseDatabase,mOtherUserId,mChatRoomId);
                             unreadMessagesRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {

@@ -83,8 +83,8 @@ public class FirebaseDatabaseUtils {
         return fbdb.getReference(AppConstants.FIREBASE_CHATROOMS).child(roomId).child(AppConstants.FIREBASE_USERS).child("roomName");
     }
 
-    public static DatabaseReference getOtherUsersUnreadMessagesRef(FirebaseDatabase fbdb, String otherId, String chatroomId){
-        return fbdb.getReference(AppConstants.FIREBASE_USERS).child(otherId).child(AppConstants.FIREBASE_CHATROOMS).child(chatroomId).child(AppConstants.FIREBASE_UNREAD_MESSAGES);
+    public static DatabaseReference getUsersUnreadMessagesRef(FirebaseDatabase fbdb, String uid, String chatroomId){
+        return fbdb.getReference(AppConstants.FIREBASE_USERS).child(uid).child(AppConstants.FIREBASE_CHATROOMS).child(chatroomId).child(AppConstants.FIREBASE_UNREAD_MESSAGES);
     }
 
 }

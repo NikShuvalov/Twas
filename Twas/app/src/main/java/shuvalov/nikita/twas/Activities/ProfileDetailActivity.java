@@ -293,6 +293,7 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
                         Intent intent = new Intent(ProfileDetailActivity.this, ChatRoomActivity.class);
                         intent.putExtra(AppConstants.ORIGIN_ACTIVITY, AppConstants.ORIGIN_PROFILE_DETAIL);
                         intent.putExtra(AppConstants.PREF_CHATROOM, chatRoom.getId());
+                        intent.putExtra(AppConstants.PREF_OTHER_UID, mSelectedProfile.getUID());
                         startActivity(intent);
                     }
                 }
@@ -326,6 +327,7 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
                     Intent intent = new Intent(ProfileDetailActivity.this, ChatRoomActivity.class);
                     intent.putExtra(AppConstants.ORIGIN_ACTIVITY, AppConstants.ORIGIN_PROFILE_DETAIL);
                     intent.putExtra(AppConstants.PREF_CHATROOM, chatroom.getId());
+                    intent.putExtra(AppConstants.PREF_OTHER_UID, mSelectedProfile.getUID());
                     startActivity(intent);
                 }
             }
