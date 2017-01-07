@@ -42,10 +42,9 @@ import shuvalov.nikita.twas.R;
 
 public class ProfileDetailActivity extends AppCompatActivity {
 
-    TextView mNameText, mBioText, mDOBText;
+    TextView mNameText, mBioText, mDOBText, mGenderText;
     ImageView mImageView;
     Toolbar mToolbar;
-//    Button mChatInviteButton;
     FirebaseDatabase mFirebaseDatabase;
     String mSelfUserId;
     Profile mSelectedProfile;
@@ -149,12 +148,12 @@ public class ProfileDetailActivity extends AppCompatActivity {
     public void findViews(){
         mBioText = (TextView)findViewById(R.id.bio_text);
         mNameText = (TextView)findViewById(R.id.name_text);
-        mDOBText = (TextView)findViewById(R.id.dob_text);
+        mDOBText = (TextView)findViewById(R.id.age_text);
         mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
+        mGenderText = (TextView)findViewById(R.id.gender_text);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mImageView = (ImageView)findViewById(R.id.profile_image_view);
-//        mChatInviteButton = (Button)findViewById(R.id.chat_invite_button);
     }
 
     public void bindDataToViews(Profile profile){
@@ -163,6 +162,7 @@ public class ProfileDetailActivity extends AppCompatActivity {
         String userName = profile.getName();
         mNameText.setText(userName);
         getSupportActionBar().setTitle(userName);
+
 
         long birthdateMillis = profile.getDOB();
         Calendar birthCal = Calendar.getInstance();
@@ -185,11 +185,13 @@ public class ProfileDetailActivity extends AppCompatActivity {
             }else{
                 dateString = String.valueOf(date);
             }
-            dateAsString = monthString+dateString+year;
+            dateAsString = monthString+"/"+dateString+"/"+year;
         }else{
-            dateAsString = String.valueOf(month)+date+year;
+            dateAsString = String.valueOf(month)+"/"+date+"/"+year;
         }
         mDOBText.setText(dateAsString);
+
+
 
         StorageReference imageStoreRef = FireBaseStorageUtils.getProfilePicStorageRef(profile.getUID());
         imageStoreRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -205,7 +207,8 @@ public class ProfileDetailActivity extends AppCompatActivity {
                 mImageView.setImageResource(R.drawable.shakespeare_modern_bard_post);
             }
         });
-//        mChatInviteButton.setText(String.format("Invite %s to chat", profile.getName()));
+
+        mGenderText.setText(profile.getGender());
     }
 
     @Override

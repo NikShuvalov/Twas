@@ -220,6 +220,9 @@ public class SelfProfileActivity extends AppCompatActivity {
                             }
                         }
                         break;
+                    default:
+                        Toast.makeText(SelfProfileActivity.this, "No month selected", Toast.LENGTH_SHORT).show();
+                        validDate=false;
                 }
                 if(validDate){
                     Calendar birthCalendar = Calendar.getInstance();
@@ -280,16 +283,37 @@ public class SelfProfileActivity extends AppCompatActivity {
 
         //Checks to see if the imageSize is larger than the firebase limit. If so, it scales the image down to an allowed amount.
         long imageSize = byteArrayOutputStream.toByteArray().length;
-        byte[] imgStream = byteArrayOutputStream.toByteArray();
+        byte[] imgStream;
+        Log.d("Image", "Resized image size "+imageSize);
+
         if(imageSize> AppConstants.FIREBASE_MAX_PHOTO_SIZE){
-            Toast.makeText(this, "Image file too large", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Image shrunk due to large size", Toast.LENGTH_LONG).show();
+            //ToDo: This will make it smaller.
 
-//                    double scaledDownRatio = (double)AppConstants.FIREBASE_MAX_PHOTO_SIZE/(double)imageSize;
-//                    int scaledQuality = (int)(scaledDownRatio*100)-1;
-//                    chosenProfileImage = shrinkBitmap(imgStream, scaledDownRatio);
+            //ToDo: try to keep actual aspect ratio.
+            double aspectRatio = mChosenProfileImage.getHeight()/mChosenProfileImage.getWidth();
 
-//                    chosenProfileImage.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
-//                    imgStream = byteArrayOutputStream.toByteArray();
+            Log.d("Image", "Height: "+mChosenProfileImage.getHeight()+ "Width: "+mChosenProfileImage.getWidth());
+            int height  = 768;
+            int width= 1024;
+
+            if(aspectRatio>1.0){
+                height = 1024;
+                width = 768;
+            }
+
+            mChosenProfileImage = Bitmap.createScaledBitmap(mChosenProfileImage, width,
+                    height, true);
+
+            byteArrayOutputStream = new ByteArrayOutputStream();
+
+            mChosenProfileImage.compress(Bitmap.CompressFormat.JPEG,100, byteArrayOutputStream);
+
+            //Checks to see if the imageSize is larger than the firebase limit. If so, it scales the image down to an allowed amount.
+            imageSize = byteArrayOutputStream.toByteArray().length;
+            imgStream = byteArrayOutputStream.toByteArray();
+            Log.d("Image", "Resized image size "+imageSize);
+
         }else{
             imgStream = byteArrayOutputStream.toByteArray();
         }
@@ -402,7 +426,6 @@ public class SelfProfileActivity extends AppCompatActivity {
     }
 
 
-
     public boolean checkLeapYear(int year){
         if(year%4!=0){
             return false;
@@ -411,4 +434,18 @@ public class SelfProfileActivity extends AppCompatActivity {
         }
         return true;
     }
+
+    //http://stackoverflow.com/questions/8471226/how-to-resize-image-bitmap-to-a-given-size
+//    public static Bitmap scaleDown(Bitmap realImage, float maxImageSize,
+//                                   boolean filter) {
+//        float ratio = Math.min(
+//                (float) maxImageSize / realImage.getWidth(),
+//                (float) maxImageSize / realImage.getHeight());
+//        int width = Math.round((float) ratio * realImage.getWidth());
+//        int height = Math.round((float) ratio * realImage.getHeight());
+//
+//        Bitmap newBitmap = Bitmap.createScaledBitmap(realImage, width,
+//                height, filter);
+//        return newBitmap;
+//    }
 }
