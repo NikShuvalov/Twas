@@ -55,12 +55,12 @@ public class ChatRoomMessageService extends Service {
 
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(ChatRoomMessageService.this);
 
-                String notificationText;
-                if(numOfUnread.equals("1")){
-                    notificationText = "You have an unread message";
-                }else{
-                    notificationText = String.format("You have %s unread messages",numOfUnread);
-                }
+                String notificationText = "You have new message(s)";
+//                if(numOfUnread.equals("1")){
+//                    notificationText = "You have an unread message";
+//                }else{
+//                    notificationText = String.format("You have %s unread messages",numOfUnread);
+//                }
                 //ToDo: Add a sound?
                 builder.setAutoCancel(true)
                         .setContentTitle("TWAS")
@@ -70,7 +70,6 @@ public class ChatRoomMessageService extends Service {
 
                 NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 notificationManager.notify(1492, builder.build());
-
             }
 
 
