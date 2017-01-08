@@ -36,12 +36,12 @@ public class SoapBoxMessagesRecyclerAdapter extends RecyclerView.Adapter<ChatMes
             resource = R.layout.viewholder_chat_message;
         }
         View view = LayoutInflater.from(parent.getContext()).inflate(resource,null);
-        return new ChatMessageViewHolder(view);
+        return new ChatMessageViewHolder(view,-1);
     }
 
     @Override
     public void onBindViewHolder(final ChatMessageViewHolder holder, int position) {
-        holder.bindDataToViews(mChatMessages.get(position));
+        holder.bindDataToViews(mChatMessages.get(position),-1);
         final String uid = mChatMessages.get(position).getUserId();
         if (holder.getItemViewType() == 1) {
             holder.mMessageHolder.setOnClickListener(new View.OnClickListener() {

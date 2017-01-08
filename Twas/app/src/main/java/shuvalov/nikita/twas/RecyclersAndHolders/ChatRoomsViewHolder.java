@@ -15,6 +15,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.FireBaseStorageUtils;
 import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.ChatRoom;
@@ -27,7 +28,7 @@ import static android.content.Context.CONNECTIVITY_SERVICE;
  */
 
 public class ChatRoomsViewHolder extends RecyclerView.ViewHolder {
-    TextView mChatRoomIdText;
+    TextView mChatRoomIdText, mChatMemberNameText;
     ImageView mImageView;
     CardView mCardContainer;
 
@@ -36,6 +37,7 @@ public class ChatRoomsViewHolder extends RecyclerView.ViewHolder {
         mChatRoomIdText = (TextView)itemView.findViewById(R.id.chatroom_name_text);
         mImageView = (ImageView)itemView.findViewById(R.id.image_view);
         mCardContainer = (CardView)itemView.findViewById(R.id.chatroom_card);
+        mChatMemberNameText = (TextView)itemView.findViewById(R.id.chat_member_text);
     }
     public void bindDataToView(ChatRoom chatRoom){
         mChatRoomIdText.setText(chatRoom.getRoomName());
@@ -43,6 +45,15 @@ public class ChatRoomsViewHolder extends RecyclerView.ViewHolder {
 
         if(SelfUserProfileUtils.getUserId(mChatRoomIdText.getContext()).equals(id)){ //If This is the same as the user's id, then let's set it to the other user's id.
             id = chatRoom.getUserIds().get(1);
+            String name = ConnectionsSQLOpenHelper.getInstance(mChatRoomIdText.getContext()).getConnectionById(id).getName();
+            String details;
+            if(name.isEmpty()){
+                details = "Chatting with an unnamed one\n(Because they have not set up their name yet)";
+            }else{
+                details = "Chatting with "+ name;
+            }
+            mChatMemberNameText.setText(details);
+
         }
         StorageReference imageRef = FireBaseStorageUtils.getProfilePicStorageRef(id);
 

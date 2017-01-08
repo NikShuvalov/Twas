@@ -14,10 +14,10 @@ import shuvalov.nikita.twas.AppConstants;
 
 public class FirebaseDatabaseUtils {
 
-    public static DatabaseReference getChildReference(FirebaseDatabase fbdb, String uid, String childPath){
-        return fbdb.getReference(uid).child(childPath);
-
-    }
+//    public static DatabaseReference getChildReference(FirebaseDatabase fbdb, String uid, String childPath){
+//        return fbdb.getReference(uid).child(childPath);
+//
+//    }
 
     /**
      *  Returns reference to Root->Users->User->Profile

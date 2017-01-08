@@ -57,7 +57,7 @@ public class SoapBoxFeedActivity extends AppCompatActivity implements GoogleApiC
 
     DatabaseReference mSelfProfileRef;
     DatabaseReference mSelfConnectionsRef;
-    DatabaseReference mSelfChatroomsRef;
+//    DatabaseReference mSelfChatroomsRef;
     FirebaseDatabase mFirebaseDatabase;
 
     @Override
@@ -123,7 +123,7 @@ public class SoapBoxFeedActivity extends AppCompatActivity implements GoogleApiC
     public void createNearbyListener(){
         mSelfProfileRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mSelfId);
         mSelfConnectionsRef = FirebaseDatabaseUtils.getUserConnectionsRef(mFirebaseDatabase, mSelfId);
-        mSelfChatroomsRef = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, mSelfId);
+//        mSelfChatroomsRef = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, mSelfId);
 
         mActiveListener = new MessageListener() {
             @Override

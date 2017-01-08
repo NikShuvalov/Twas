@@ -54,7 +54,8 @@ import shuvalov.nikita.twas.R;
 
 public class ProfileDetailActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
-    TextView mNameText, mBioText, mAgeText, mGenderText;
+    TextView mNameText, mBioText,  mGenderText;
+    TextView mAgeText;
     ImageView mImageView;
     Toolbar mToolbar;
     FirebaseDatabase mFirebaseDatabase;
@@ -114,45 +115,36 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
 
                 DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mFoundId);
 
-//                DatabaseReference strangerRef = FirebaseDatabaseUtils.getChildReference(mFirebaseDatabase, mFoundId, AppConstants.theoneforprofiles);
-
-//                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MainActivity.this);
+//                //ToDo: Move this listener into a service. It should always be going.
 //
-////                ConnectionsSQLOpenHelper.getInstance().addSoapBoxMessage(soapBoxMessage);
-//                notificationBuilder.setContentText(soapBoxMessage.getContent()).setContentTitle("New SoapBoxMessage").setSmallIcon(android.R.drawable.ic_dialog_alert);
-//                notificationManager.notify(0,notificationBuilder.build());
-
-                //ToDo: Move this listener into a service. It should always be going.
-
-                //Listens to ownChatrooms... I think.
-                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,SelfUserProfileUtils.getUserId(ProfileDetailActivity.this))
-                        .addChildEventListener(new ChildEventListener() {
-                            @Override
-                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                                //This method should give a notification if a new chatroom and/or message is created.
-                            }
-
-                            @Override
-                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                            }
-
-                            @Override
-                            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                            }
-
-                            @Override
-                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
+//                //Listens to ownChatrooms... I think.
+//                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,SelfUserProfileUtils.getUserId(ProfileDetailActivity.this))
+//                        .addChildEventListener(new ChildEventListener() {
+//                            @Override
+//                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                                //This method should give a notification if a new chatroom and/or message is created.
+//                            }
+//
+//                            @Override
+//                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onCancelled(DatabaseError databaseError) {
+//
+//                            }
+//                        });
                 //Gets the stranger's profile information.
                 strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -207,7 +199,7 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
     }
 
     public void bindDataToViews(Profile profile){
-        mBioText.setText(profile.getBio());
+        mBioText.setText("About me:\n\t\t\t"+profile.getBio());
 
         String userName = profile.getName();
         mNameText.setText(userName);
@@ -272,10 +264,10 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
 
 
         if(profile.getGender().equals("Gender")) {
-            mGenderText.setText("Gender N/A");
+            mGenderText.setText("Gender: N/A");
         }
         else{
-            mGenderText.setText(profile.getGender());
+            mGenderText.setText("Gender: "+profile.getGender());
         }
     }
 
@@ -327,11 +319,8 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
                 }
                 if (!done) {
                     DatabaseReference chatroomsRef = FirebaseDatabaseUtils.getChatroomRef(mFirebaseDatabase, null);
-
                     DatabaseReference createdChatroom = chatroomsRef.push();
-
                     Profile selfUser = SelfUserProfileUtils.getUsersInfoAsProfile(ProfileDetailActivity.this);
-
 
                     ChatRoom chatroom = new ChatRoom();
                     chatroom.setId(createdChatroom.getKey());

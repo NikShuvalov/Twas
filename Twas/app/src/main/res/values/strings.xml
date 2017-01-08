@@ -21,8 +21,8 @@
 
     <string-array name="genders">
         <item>Gender</item>
-        <item>Male</item>
-        <item>Fair Maiden</item>
+        <item>Gentleman</item>
+        <item>Lady</item>
         <item>Neither</item>
         <item>Unicorn</item>
     </string-array>

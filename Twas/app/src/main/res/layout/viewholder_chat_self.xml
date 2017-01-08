@@ -44,6 +44,6 @@
     <Space
         android:layout_below="@id/message_card"
         android:layout_width="match_parent"
-        android:layout_height="5dp"/>
+        android:layout_height="10dp"/>
 
 </RelativeLayout>

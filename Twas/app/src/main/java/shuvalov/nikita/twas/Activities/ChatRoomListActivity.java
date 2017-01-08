@@ -152,33 +152,33 @@ public class ChatRoomListActivity extends AppCompatActivity implements GoogleApi
                 //ToDo: Move this listener into a service. It should always be going.
 
                 //Listens to ownChatrooms... I think.
-                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,SelfUserProfileUtils.getUserId(ChatRoomListActivity.this))
-                        .addChildEventListener(new ChildEventListener() {
-                            @Override
-                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                                //This method should give a notification if a new chatroom and/or message is created.
-                            }
-
-                            @Override
-                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                            }
-
-                            @Override
-                            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                            }
-
-                            @Override
-                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
+//                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,SelfUserProfileUtils.getUserId(ChatRoomListActivity.this))
+//                        .addChildEventListener(new ChildEventListener() {
+//                            @Override
+//                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                                //This method should give a notification if a new chatroom and/or message is created.
+//                            }
+//
+//                            @Override
+//                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onCancelled(DatabaseError databaseError) {
+//
+//                            }
+//                        });
                 //Gets the stranger's profile information.
                 strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     Profile mProfile;
     DatabaseReference mSelfProfileRef;
     DatabaseReference mSelfConnectionsRef;
-    DatabaseReference mSelfChatroomsRef;
+//    DatabaseReference mSelfChatroomsRef;
     FirebaseDatabase mFirebaseDatabase;
 
 
@@ -173,33 +173,33 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                 DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mFoundId);
 
-                mSelfChatroomsRef.addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        //ToDo: Maybe add a boolean here for first find.
-//                        Toast.makeText(MainActivity.this, "New ChatRoom", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+//                mSelfChatroomsRef.addChildEventListener(new ChildEventListener() {
+//                    @Override
+//                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                        //ToDo: Maybe add a boolean here for first find.
+////                        Toast.makeText(MainActivity.this, "New ChatRoom", Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                    @Override
+//                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//
+//                    }
+//                });
 
                 //Gets the stranger's profile information.
                 strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -268,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         mSelfProfileRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase,mId);
         mSelfConnectionsRef = FirebaseDatabaseUtils.getUserConnectionsRef(mFirebaseDatabase, mId);
-        mSelfChatroomsRef = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,mId);
+//        mSelfChatroomsRef = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,mId);
 
         //Check for logged-in user's profile information, in case it was updated on another device.
         mSelfProfileRef.addListenerForSingleValueEvent(new ValueEventListener() {

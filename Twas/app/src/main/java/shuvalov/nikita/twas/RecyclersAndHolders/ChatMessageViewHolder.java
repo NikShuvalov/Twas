@@ -8,6 +8,7 @@ import android.widget.TextView;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.PoJos.ChatMessage;
 import shuvalov.nikita.twas.R;
 
@@ -16,20 +17,28 @@ import shuvalov.nikita.twas.R;
  */
 
 public class ChatMessageViewHolder extends RecyclerView.ViewHolder {
-    TextView mChatText, mTimeStampText;
+    TextView mChatText, mTimeStampText, mSenderNameText;
     CardView mMessageHolder;
 
-    public ChatMessageViewHolder(View itemView) {
+    public ChatMessageViewHolder(View itemView, int viewType) {
         super(itemView);
         mChatText = (TextView) itemView.findViewById(R.id.chat_message_text);
         mTimeStampText = (TextView)itemView.findViewById(R.id.timestamp_text);
         mMessageHolder = (CardView)itemView.findViewById(R.id.message_card);
+        if(viewType==1){
+            mSenderNameText = (TextView)itemView.findViewById(R.id.sender_name_text);
+        }
     }
 
-    public void bindDataToViews(ChatMessage chatMessage){
+    public void bindDataToViews(ChatMessage chatMessage, int viewType){
         mChatText.setText(chatMessage.getContent());
         DateFormat sdf = new SimpleDateFormat("hh:mm a MM/dd/yy");
         String timeStamp = sdf.format(chatMessage.getTimeStamp());
         mTimeStampText.setText(timeStamp);
+        if(viewType==1){
+            String name = ConnectionsSQLOpenHelper.getInstance(mSenderNameText.getContext()).getConnectionById(chatMessage.getUserId()).getName();
+            String sentByText = "Sent by "+name;
+            mSenderNameText.setText(sentByText);
+        }
     }
 }

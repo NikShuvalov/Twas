@@ -33,12 +33,12 @@ public class ChatMessagesRecyclerAdapter extends RecyclerView.Adapter<ChatMessag
             resource = R.layout.viewholder_chat_message;
         }
         View view = LayoutInflater.from(parent.getContext()).inflate(resource,null);
-        return new ChatMessageViewHolder(view);
+        return new ChatMessageViewHolder(view, viewType);
     }
 
     @Override
     public void onBindViewHolder(ChatMessageViewHolder holder, int position) {
-        holder.bindDataToViews(mChatMessages.get(position));
+        holder.bindDataToViews(mChatMessages.get(position),holder.getItemViewType());
     }
 
     @Override

@@ -45,8 +45,20 @@
         android:layout_toRightOf="@id/message_card"
         android:layout_alignBottom="@id/message_card"/>
     <Space
+        android:id="@+id/divider"
         android:layout_below="@id/message_card"
         android:layout_width="match_parent"
         android:layout_height="5dp"/>
+    <TextView
+        android:id="@+id/sender_name_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/divider"
+        android:textSize="10sp"
+        android:textColor="#aaa"/>
+    <Space
+        android:layout_below="@id/sender_name_text"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"/>
 
 </RelativeLayout>

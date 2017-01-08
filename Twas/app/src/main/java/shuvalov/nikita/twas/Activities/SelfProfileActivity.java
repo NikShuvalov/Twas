@@ -131,33 +131,33 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
 
                 //Listens to ownChatrooms... I think.
                 //ToDo: Double-check if still used, otherwise let's get rid of it.
-                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,SelfUserProfileUtils.getUserId(SelfProfileActivity.this))
-                        .addChildEventListener(new ChildEventListener() {
-                            @Override
-                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                                //This method should give a notification if a new chatroom and/or message is created.
-                            }
-
-                            @Override
-                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                            }
-
-                            @Override
-                            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                            }
-
-                            @Override
-                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
+//                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,SelfUserProfileUtils.getUserId(SelfProfileActivity.this))
+//                        .addChildEventListener(new ChildEventListener() {
+//                            @Override
+//                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                                //This method should give a notification if a new chatroom and/or message is created.
+//                            }
+//
+//                            @Override
+//                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onCancelled(DatabaseError databaseError) {
+//
+//                            }
+//                        });
                 //Gets the stranger's profile information.
                 strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -491,7 +491,7 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 mGender=(String)adapterView.getItemAtPosition(i);
                 if(!mGenderInit){
-                    mGenderInit=false;
+                    mGenderInit=true;
                 }else{
                     mChangesMade=true;
                 }
@@ -650,6 +650,9 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             submitChanges();
+                            if(!mUpdatedProfileImage){
+                                finish();
+                            }
                         }
                     })
                     .setNegativeButton("Dismiss changes", new DialogInterface.OnClickListener() {

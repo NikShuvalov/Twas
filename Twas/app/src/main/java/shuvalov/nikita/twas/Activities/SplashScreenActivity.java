@@ -33,7 +33,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     DatabaseReference mSelfProfileRef;
     DatabaseReference mSelfConnectionsRef;
-    DatabaseReference mSelfChatroomsRef;
+//    DatabaseReference mSelfChatroomsRef;
     FirebaseDatabase mFirebaseDatabase;
 
 
@@ -119,7 +119,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 
         mSelfProfileRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mId);
         mSelfConnectionsRef = FirebaseDatabaseUtils.getUserConnectionsRef(mFirebaseDatabase, mId);
-        mSelfChatroomsRef = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, mId);
+//        mSelfChatroomsRef = FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase, mId);
 
         //Check for logged-in user's profile information, in case it was updated on another device.
         mSelfProfileRef.addListenerForSingleValueEvent(new ValueEventListener() {
