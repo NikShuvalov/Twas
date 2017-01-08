@@ -1,12 +1,16 @@
 package shuvalov.nikita.twas.RecyclersAndHolders;
 
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -15,6 +19,8 @@ import shuvalov.nikita.twas.Helpers_Managers.FireBaseStorageUtils;
 import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.ChatRoom;
 import shuvalov.nikita.twas.R;
+
+import static android.content.Context.CONNECTIVITY_SERVICE;
 
 /**
  * Created by NikitaShuvalov on 1/3/17.
@@ -39,11 +45,19 @@ public class ChatRoomsViewHolder extends RecyclerView.ViewHolder {
             id = chatRoom.getUserIds().get(1);
         }
         StorageReference imageRef = FireBaseStorageUtils.getProfilePicStorageRef(id);
-        imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                Picasso.with(mImageView.getContext()).load(uri).into(mImageView);
-            }
-        });
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) mCardContainer.getContext().getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if(networkInfo!=null && networkInfo.isConnected()){
+            imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Picasso.with(mImageView.getContext()).load(uri).into(mImageView);
+                }
+            });
+        }else{
+            mImageView.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+        }
+
     }
 }

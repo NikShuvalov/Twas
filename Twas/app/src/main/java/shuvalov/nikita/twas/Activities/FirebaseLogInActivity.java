@@ -1,6 +1,8 @@
 package shuvalov.nikita.twas.Activities;
 
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -82,7 +84,6 @@ public class FirebaseLogInActivity extends AppCompatActivity implements GoogleAp
                         SelfUserProfileUtils.setUserId(FirebaseLogInActivity.this, userId);
 
                     }
-                    Toast.makeText(FirebaseLogInActivity.this, "Signed as "+ userId, Toast.LENGTH_SHORT).show();
                     Log.d("AuthStateChanged", "Logged in as "+ user.getUid());
                     Intent intent = new Intent(FirebaseLogInActivity.this, MainActivity.class);
                     startActivity(intent);
@@ -107,11 +108,20 @@ public class FirebaseLogInActivity extends AppCompatActivity implements GoogleAp
                         if (mPasswordEntry.getText().toString().isEmpty()) {
                             mPasswordEntry.setError("Password field is empty");
                         } else {
-                            String email = mEmailEntry.getText().toString();
-                            String password = mPasswordEntry.getText().toString();
 
-                            mPasswordEntry.setText("");
-                            signInUserWithEmail(email, password);
+                            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                            if(networkInfo!=null && networkInfo.isConnected()){
+                                String email = mEmailEntry.getText().toString();
+                                String password = mPasswordEntry.getText().toString();
+
+                                mPasswordEntry.setText("");
+                                signInUserWithEmail(email.trim(), password);
+                            }else{
+                                Toast.makeText(FirebaseLogInActivity.this, "No internet connection", Toast.LENGTH_SHORT).show();
+                            }
+
+
                         }
                         break;
                     default:
@@ -159,7 +169,6 @@ public class FirebaseLogInActivity extends AppCompatActivity implements GoogleAp
                             Toast.makeText(FirebaseLogInActivity.this, "Password doesn't match username",
                                     Toast.LENGTH_SHORT).show();
                         }else{
-                            Toast.makeText(FirebaseLogInActivity.this, "Logged in as blah-blah", Toast.LENGTH_SHORT).show();
                             String userId = mAuth.getCurrentUser().getUid();
                             if(!SelfUserProfileUtils.compareStoredIdWithCurrentId(FirebaseLogInActivity.this,userId)){ //If logged in id doesn't match id stored in sharedPref.
                                 SelfUserProfileUtils.clearUserProfile(FirebaseLogInActivity.this); //We clear the user Preferences. This is a back-up check; typically the preferences should be cleared on sign-out.

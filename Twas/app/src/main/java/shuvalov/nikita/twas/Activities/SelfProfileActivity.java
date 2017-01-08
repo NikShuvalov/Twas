@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -530,7 +532,13 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.submit_changes:
-                submitChanges();
+                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                if(networkInfo!=null && networkInfo.isConnected()){
+                    submitChanges();
+                }else{
+                    Toast.makeText(this, "No connection, can't save changes", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case android.R.id.home:
                 onBackPressed();
@@ -633,7 +641,9 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onBackPressed() {
-        if(mChangesMade || mUpdatedProfileImage){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if((mChangesMade || mUpdatedProfileImage) && networkInfo!=null && networkInfo.isConnected()){
             new AlertDialog.Builder(this).setTitle("Hold on")
                     .setMessage("You made changes, but haven't saved them.")
                     .setPositiveButton("Submit Changes", new DialogInterface.OnClickListener() {

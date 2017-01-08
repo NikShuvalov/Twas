@@ -8,8 +8,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -66,8 +69,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     Toolbar mToolbar;
     String mFoundId;
 
-
-
     boolean mBackRecentlyPressed;
     RecyclerView mRecyclerView;
 
@@ -94,8 +95,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         mBackRecentlyPressed = false;
-
         mNearbyManager = NearbyManager.getInstance();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -107,9 +109,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         findViews();
         setUpRecyclerView();
-//        retrieveStoredProfiles();
-        getUsersFbdbInformation();
 
+        if(networkInfo!=null && networkInfo.isConnected()){ //If we have internet, sync profile data.
+            getUsersFbdbInformation();
+        }else{//If no internet access, use last synced data.
+            retrieveStoredProfiles();
+            Toast.makeText(this, "No connection detected", Toast.LENGTH_LONG).show();
+        }
 
         if(mProfileRecAdapter.getItemCount()==0 && !SelfUserProfileUtils.getAskedForFriendship(this)){
             new AlertDialog.Builder(this).setTitle("You have no connections yet =(")
@@ -171,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         //ToDo: Maybe add a boolean here for first find.
-                        Toast.makeText(MainActivity.this, "New ChatRoom", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, "New ChatRoom", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -239,12 +245,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     //ToDo: Move into splash screen activity. Should only be called a single time upon load.
-//    public void retrieveStoredProfiles(){
-//        Log.d("MainActivity", "Retrieving Stored Preferences ");
-//        ArrayList<Profile> storedProfiles = ConnectionsSQLOpenHelper.getInstance(this).getAllConnections();
-//        ConnectionsHelper.getInstance().addProfileConnectionsToCollection(storedProfiles);
-//        mProfileRecAdapter.notifyDataSetChanged();
-//    }
+    public void retrieveStoredProfiles(){
+        Log.d("MainActivity", "Retrieving Stored Preferences ");
+        ArrayList<Profile> storedProfiles = ConnectionsSQLOpenHelper.getInstance(this).getAllConnections();
+        ConnectionsHelper.getInstance().addProfileConnectionsToCollection(storedProfiles);
+        mProfileRecAdapter.notifyDataSetChanged();
+    }
 
     //ToDo: Move method to another activity/class. So that we don't end up doing database check/syncs everytime we navigate back to here.
     public void getUsersFbdbInformation(){
@@ -441,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             Log.d("NearBy", "publishing ID: "+ mId);
             mNearbyManager.setPublishing(true);
         }else{
-            Toast.makeText(this, "Not connected to Google Cloud", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Lapse in connection", Toast.LENGTH_SHORT).show();
             Log.d("MainActivity", "publish: failed");
         }
     }

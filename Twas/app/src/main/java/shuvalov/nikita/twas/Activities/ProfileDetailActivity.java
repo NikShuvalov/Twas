@@ -1,6 +1,8 @@
 package shuvalov.nikita.twas.Activities;
 
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -61,6 +63,7 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
     private GoogleApiClient mGoogleApiClient;
     private NearbyManager mNearbyManager;
     private MessageListener mActiveListener;
+    private ConnectivityManager mConnectivityManager;
 
 
     @Override
@@ -68,7 +71,7 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_detail);
 
-
+        mConnectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Nearby.MESSAGES_API)
                 .addConnectionCallbacks(this)
@@ -247,22 +250,26 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
         String ageString = age+ " years old";
         mAgeText.setText(ageString);
 
+        NetworkInfo networkInfo = mConnectivityManager.getActiveNetworkInfo();
+        if(networkInfo!=null && networkInfo.isConnected()){
+            StorageReference imageStoreRef = FireBaseStorageUtils.getProfilePicStorageRef(profile.getUID());
+            imageStoreRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Picasso.with(ProfileDetailActivity.this)
+                            .load(uri)
+                            .into(mImageView);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    mImageView.setImageResource(R.drawable.shakespeare_modern_bard_post);
+                }
+            });
+        }else{
+            mImageView.setImageResource(R.drawable.shakespeare_modern_bard_post);
+        }
 
-
-        StorageReference imageStoreRef = FireBaseStorageUtils.getProfilePicStorageRef(profile.getUID());
-        imageStoreRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                Picasso.with(ProfileDetailActivity.this)
-                        .load(uri)
-                        .into(mImageView);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                mImageView.setImageResource(R.drawable.shakespeare_modern_bard_post);
-            }
-        });
 
         if(profile.getGender().equals("Gender")) {
             mGenderText.setText("Gender N/A");
@@ -283,7 +290,12 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.message_opt:
-                startChat();
+                NetworkInfo networkInfo = mConnectivityManager.getActiveNetworkInfo();
+                if(networkInfo!=null && networkInfo.isConnected()){
+                    startChat();
+                }else{
+                    Toast.makeText(this, "No internet connection, can't load chatrooms", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);

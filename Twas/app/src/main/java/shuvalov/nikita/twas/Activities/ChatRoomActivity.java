@@ -1,5 +1,7 @@
 package shuvalov.nikita.twas.Activities;
 
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -189,6 +191,12 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
                 Log.d("Testing Shots fired", "Please clap");
             }
         };
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if(networkInfo==null || !networkInfo.isConnected()){
+            Toast.makeText(this, "No connection, can't load messages", Toast.LENGTH_LONG).show();
+            //ToDo: Save messages in SQLDB and load messages when no connectivity.
+        }
     }
 
 
