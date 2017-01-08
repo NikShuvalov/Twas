@@ -154,8 +154,10 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Profile strangerProfile = dataSnapshot.getValue(Profile.class);
-                        ConnectionsSQLOpenHelper.getInstance(ChatRoomActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
-                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+                        if(strangerProfile!=null) {
+                            ConnectionsSQLOpenHelper.getInstance(ChatRoomActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
+                            ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+                        }
                     }
 
                     @Override

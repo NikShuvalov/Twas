@@ -171,9 +171,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Profile strangerProfile = dataSnapshot.getValue(Profile.class);
-                        ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
-                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
-                        mProfileRecAdapter.notifyDataSetChanged();
+                        if(strangerProfile!=null){
+                            ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
+                            ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+                            mProfileRecAdapter.notifyDataSetChanged();
+                        }
                     }
 
                     @Override
@@ -293,9 +295,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Profile profile = dataSnapshot.getValue(Profile.class);
-                    ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(profile);
-                    int profilesListSize = ConnectionsHelper.getInstance().addProfileToCollection(profile);
-                    mProfileRecAdapter.notifyItemInserted(profilesListSize-1);
+                    if(profile!=null){
+                        ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(profile);
+                        int profilesListSize = ConnectionsHelper.getInstance().addProfileToCollection(profile);
+                        mProfileRecAdapter.notifyItemInserted(profilesListSize-1);
+
+                    }
                 }
 
                 @Override

@@ -182,8 +182,10 @@ public class ChatRoomListActivity extends AppCompatActivity implements GoogleApi
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Profile strangerProfile = dataSnapshot.getValue(Profile.class);
-                        ConnectionsSQLOpenHelper.getInstance(ChatRoomListActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
-                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+                        if(strangerProfile!=null) {
+                            ConnectionsSQLOpenHelper.getInstance(ChatRoomListActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
+                            ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+                        }
                     }
 
                     @Override

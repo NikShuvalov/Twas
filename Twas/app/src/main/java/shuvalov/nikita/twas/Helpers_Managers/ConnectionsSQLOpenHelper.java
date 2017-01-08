@@ -150,17 +150,20 @@ public class ConnectionsSQLOpenHelper extends SQLiteOpenHelper {
 
     //Adds a new profile connection to db. Gets called when user receives token from another phone.
     public long addNewConnection(Profile profile){
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues content = new ContentValues();
-        content.put(COLUMN_UID, profile.getUID());
-        content.put(COLUMN_NAME, profile.getName());
-        content.put(COLUMN_BIO, profile.getBio());
-        content.put(COLUMN_GENDER, profile.getGender());
-        content.put(COLUMN_BIRTHDATE, profile.getDOB());
+        if(profile!=null){
+            SQLiteDatabase db = getWritableDatabase();
+            ContentValues content = new ContentValues();
+            content.put(COLUMN_UID, profile.getUID());
+            content.put(COLUMN_NAME, profile.getName());
+            content.put(COLUMN_BIO, profile.getBio());
+            content.put(COLUMN_GENDER, profile.getGender());
+            content.put(COLUMN_BIRTHDATE, profile.getDOB());
 
-        long row=db.insertWithOnConflict(PROFILE_TABLE_NAME, null, content, SQLiteDatabase.CONFLICT_REPLACE);
-        db.close();
-        return row;//ToDo: Not sure why I'm returning a value, but might serve useful. (Remove if proves unnecessary)
+            long row=db.insertWithOnConflict(PROFILE_TABLE_NAME, null, content, SQLiteDatabase.CONFLICT_REPLACE);
+            db.close();
+            return row;//ToDo: Not sure why I'm returning a value, but might serve useful. (Remove if proves unnecessary)
+        }
+        return 0;
     }
 
     //Adds a collection of userProfile connections to db. Gets called on log-in, if database is empty.

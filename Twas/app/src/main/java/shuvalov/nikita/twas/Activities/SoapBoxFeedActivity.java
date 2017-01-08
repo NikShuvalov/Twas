@@ -156,10 +156,11 @@ public class SoapBoxFeedActivity extends AppCompatActivity implements GoogleApiC
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Profile strangerProfile = dataSnapshot.getValue(Profile.class);
-                        ConnectionsSQLOpenHelper.getInstance(SoapBoxFeedActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
-                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+                        if(strangerProfile!=null) {
+                            ConnectionsSQLOpenHelper.getInstance(SoapBoxFeedActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
+                            ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+                        }
 
-//                            mProfileRecAdapter.notifyDataSetChanged();
                     }
 
                     @Override

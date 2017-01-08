@@ -164,8 +164,10 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Profile strangerProfile = dataSnapshot.getValue(Profile.class);
-                        ConnectionsSQLOpenHelper.getInstance(SelfProfileActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
-                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+                        if(strangerProfile!=null) {
+                            ConnectionsSQLOpenHelper.getInstance(SelfProfileActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
+                            ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+                        }
                     }
 
                     @Override
@@ -374,6 +376,7 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
         if((requestCode==AppConstants.PICK_IMAGE_REQUEST||requestCode==AppConstants.TAKE_IMAGE_REQUEST) && (resultCode==RESULT_OK && data!=null && data.getData()!=null)){
             Uri uri = data.getData();
             try {
+
                 mProfileIconImage = mChosenProfileImage = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
 
                 mProfileImage.setImageBitmap(mChosenProfileImage);
