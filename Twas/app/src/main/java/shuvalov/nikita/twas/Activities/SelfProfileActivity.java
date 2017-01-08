@@ -1,5 +1,6 @@
 package shuvalov.nikita.twas.Activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -8,10 +9,14 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,6 +28,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -62,9 +68,7 @@ import shuvalov.nikita.twas.R;
 public class SelfProfileActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,GoogleApiClient.ConnectionCallbacks {
     private ImageView mProfileImage;
     private Button mAccessGallery, mTakeSelfie, mSoapBoxUpdateButt, mUpdateBirthday;
-//    private FloatingActionButton mSubmit;
     private EditText mName, mBio, mSoapBoxMessage, mBirthdayEntry, mBirthYearEntry;
-//    private EditText mDateEntry; //Placeholder, used for debugging.
     private boolean mUpdatedProfileImage = false;
     private Bitmap mChosenProfileImage, mProfileIconImage;
     private Spinner  mMonthSpinner, mGenderSpinner;
@@ -78,6 +82,7 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
     private NearbyManager mNearbyManager;
     private FirebaseDatabase mFirebaseDatabase;
     private MessageListener mActiveListener;
+    private boolean mChangesMade, mGenderInit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,18 +125,10 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
 
                 DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mFoundId);
 
-//                DatabaseReference strangerRef = FirebaseDatabaseUtils.getChildReference(mFirebaseDatabase, mFoundId, AppConstants.theoneforprofiles);
-
-//                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MainActivity.this);
-//
-////                ConnectionsSQLOpenHelper.getInstance().addSoapBoxMessage(soapBoxMessage);
-//                notificationBuilder.setContentText(soapBoxMessage.getContent()).setContentTitle("New SoapBoxMessage").setSmallIcon(android.R.drawable.ic_dialog_alert);
-//                notificationManager.notify(0,notificationBuilder.build());
-
                 //ToDo: Move this listener into a service. It should always be going.
 
                 //Listens to ownChatrooms... I think.
+                //ToDo: Double-check if still used, otherwise let's get rid of it.
                 FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,SelfUserProfileUtils.getUserId(SelfProfileActivity.this))
                         .addChildEventListener(new ChildEventListener() {
                             @Override
@@ -222,6 +219,7 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
             mBirthYearEntry.setText(String.valueOf(mBirthYear));
             mBirthdayEntry.setText(String.valueOf(mBirthDate));
         }
+        mChangesMade=false;
     }
 
     public void loadSelfImage(){
@@ -252,25 +250,38 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
         mUpdateBirthday = (Button)findViewById(R.id.submit_birthday);
         mAccessGallery = (Button)findViewById(R.id.upload_image_gallery);
         mTakeSelfie = (Button)findViewById(R.id.selfie_button);
-//        mSubmit = (FloatingActionButton) findViewById(R.id.submit_changes_button);
         mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("My Profile");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        TextWatcher textWatcher = new TextWatcher() {
+
+            public void afterTextChanged(Editable s) {
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {
+                mChangesMade=true;
+            }
+        };
 
         mName = (EditText)findViewById(R.id.name_entry);
+        mName.addTextChangedListener(textWatcher);
+
+
         mBio = (EditText)findViewById(R.id.about_me_entry);
+        mBio.addTextChangedListener(textWatcher);
 
         mMonthSpinner = (Spinner)findViewById(R.id.month_spinner);
         mBirthdayEntry = (EditText)findViewById(R.id.birth_date_entry);
         mBirthYearEntry = (EditText)findViewById(R.id.birth_year_entry);
 
-//        mDateEntry = (EditText)findViewById(R.id.date_entry); //Used for debugging for now
-
         mSoapBoxMessage = (EditText)findViewById(R.id.soapbox_status_entry);
         mSoapBoxUpdateButt = (Button)findViewById(R.id.update_soapbox_message);
-
     }
 
     public void initButtons(){
@@ -352,22 +363,16 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
                         validDate=false;
                 }
                 if(validDate){
+                    mChangesMade=true;
                     Calendar birthCalendar = Calendar.getInstance();
                     int year = Integer.parseInt(mBirthYearEntry.getText().toString());
                     int date = Integer.parseInt(mBirthdayEntry.getText().toString());
-                    birthCalendar.set(year,mBirthMonth,date);
+                    birthCalendar.set(year,mBirthMonthSelected,date);
                     long dob = birthCalendar.getTimeInMillis();
                     mProfile.setDOB(dob);
                 }
             }
         });
-//        mSubmit.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                submitChanges();
-//            }
-//        });
-
     }
 
     @Override
@@ -463,21 +468,11 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
             }
         });
     }
+
     public void setSpinnerAdapters(){
         mGenderAdapter = ArrayAdapter.createFromResource(this,R.array.genders, android.R.layout.simple_spinner_item);
         mGenderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mGenderSpinner.setAdapter(mGenderAdapter);
-        mGenderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                mGender=(String)adapterView.getItemAtPosition(i);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
         mGender = SelfUserProfileUtils.getUsersInfoAsProfile(this).getGender();
         int selection=0;
         String[] genders = getResources().getStringArray(R.array.genders);
@@ -487,12 +482,28 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
             }
         }
 
-        mGenderSpinner.setSelection(selection); //ToDo: Selection should be based off of sharedPreferences values.
+        mGenderSpinner.setSelection(selection);
+        mGenderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                mGender=(String)adapterView.getItemAtPosition(i);
+                if(!mGenderInit){
+                    mGenderInit=false;
+                }else{
+                    mChangesMade=true;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         mMonthAdapter = ArrayAdapter.createFromResource(this,R.array.months, android.R.layout.simple_spinner_item);
         mMonthAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mMonthSpinner.setAdapter(mMonthAdapter);
-        mMonthSpinner.setSelection(mBirthMonth);
+        mMonthSpinner.setSelection(mBirthMonth-1);
         mMonthSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -519,25 +530,17 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
         switch(item.getItemId()){
             case R.id.submit_changes:
                 submitChanges();
+                break;
+            case android.R.id.home:
+                onBackPressed();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
     public void submitChanges(){
         String name = mName.getText().toString();
         String bio = mBio.getText().toString();
-
-//                if(!mDateEntry.getText().toString().isEmpty()) {
-//                    String dateOfBirth = mDateEntry.getText().toString();
-//                    int month = Integer.parseInt(dateOfBirth.substring(0, 2));
-//                    int date = Integer.parseInt(dateOfBirth.substring(2, 4));
-//                    int year = Integer.parseInt(dateOfBirth.substring(4));
-//
-//                    Calendar calendar = Calendar.getInstance();
-//                    calendar.set(year, month, date);
-//
-//                    long birthInMillis = calendar.getTimeInMillis();
-//                    mProfile.setDOB(birthInMillis);
-//                }
 
         mProfile.setName(name);
         mProfile.setBio(bio);
@@ -551,10 +554,10 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
         //ToDo: I might want to move my dataBase uploads and downloads to a helper class.
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference dbRef = FirebaseDatabaseUtils.getUserProfileRef(db, mProfile.getUID());
-//                DatabaseReference dbRef = db.getReference(mProfile.getUID()).child(AppConstants.FIREBASE_USER_CHILD_PROFILE);
         dbRef.setValue(mProfile);
+        mChangesMade=false;
+        finish();
     }
-
 
     public boolean checkLeapYear(int year){
         if(year%4!=0){
@@ -565,19 +568,6 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
         return true;
     }
 
-    //http://stackoverflow.com/questions/8471226/how-to-resize-image-bitmap-to-a-given-size
-//    public static Bitmap scaleDown(Bitmap realImage, float maxImageSize,
-//                                   boolean filter) {
-//        float ratio = Math.min(
-//                (float) maxImageSize / realImage.getWidth(),
-//                (float) maxImageSize / realImage.getHeight());
-//        int width = Math.round((float) ratio * realImage.getWidth());
-//        int height = Math.round((float) ratio * realImage.getHeight());
-//
-//        Bitmap newBitmap = Bitmap.createScaledBitmap(realImage, width,
-//                height, filter);
-//        return newBitmap;
-//    }
     public void updateImageIconFile(){
 
         ByteArrayOutputStream boas = new ByteArrayOutputStream();
@@ -626,7 +616,6 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
     @Override
@@ -640,5 +629,34 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
             mNearbyManager.setSubscribing(false);
         }
         super.onPause();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mChangesMade || mUpdatedProfileImage){
+            new AlertDialog.Builder(this).setTitle("Hold on")
+                    .setMessage("You made changes, but haven't saved them.")
+                    .setPositiveButton("Submit Changes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            submitChanges();
+                        }
+                    })
+                    .setNegativeButton("Dismiss changes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                            finish();
+                        }
+                    }).create().show();
+        }else{
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        mGenderInit=mChangesMade=false;
+        super.onResume();
     }
 }

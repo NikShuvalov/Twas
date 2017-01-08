@@ -7,8 +7,8 @@ android {
         applicationId "shuvalov.nikita.twas"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 2
-        versionName "0.2 (Ajax)"
+        versionCode 3
+        versionName "0.3 (Amiens)"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

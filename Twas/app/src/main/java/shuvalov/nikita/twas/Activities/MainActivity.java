@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         findViews();
         setUpRecyclerView();
-        retrieveStoredProfiles();
+//        retrieveStoredProfiles();
         getUsersFbdbInformation();
 
 
@@ -239,12 +239,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     //ToDo: Move into splash screen activity. Should only be called a single time upon load.
-    public void retrieveStoredProfiles(){
-        Log.d("MainActivity", "Retrieving Stored Preferences ");
-        ArrayList<Profile> storedProfiles = ConnectionsSQLOpenHelper.getInstance(this).getAllConnections();
-        ConnectionsHelper.getInstance().addProfileConnectionsToCollection(storedProfiles);
-        mProfileRecAdapter.notifyDataSetChanged();
-    }
+//    public void retrieveStoredProfiles(){
+//        Log.d("MainActivity", "Retrieving Stored Preferences ");
+//        ArrayList<Profile> storedProfiles = ConnectionsSQLOpenHelper.getInstance(this).getAllConnections();
+//        ConnectionsHelper.getInstance().addProfileConnectionsToCollection(storedProfiles);
+//        mProfileRecAdapter.notifyDataSetChanged();
+//    }
 
     //ToDo: Move method to another activity/class. So that we don't end up doing database check/syncs everytime we navigate back to here.
     public void getUsersFbdbInformation(){
@@ -294,12 +294,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     connectionsList.add(profileUid);
 
                 }
-                //ToDo: Use the list of connections and compare with what we have in the database, then fill in what's missing.
-                ArrayList<String> missingIds = checkForMissingProfiles(connectionsList);
-                if(!missingIds.isEmpty()){
-                    Log.d("Retrieve Connections", "Some Missing Ids");
-                    retrieveMissingProfiles(missingIds);
-                }
+                syncUserProfiles(connectionsList);
+//                //ToDo: Use the list of connections and compare with what we have in the database, then fill in what's missing.
+//                ArrayList<String> missingIds = checkForMissingProfiles(connectionsList);
+//                if(!missingIds.isEmpty()){
+//                    Log.d("Retrieve Connections", "Some Missing Ids");
+//                    retrieveMissingProfiles(missingIds);
+//                }
             }
 
             @Override
@@ -309,19 +310,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
     }
 
-    //ToDo: Move method to another activity/class
-    public void retrieveMissingProfiles(ArrayList<String> missingIdList){
-        for(String uid:missingIdList){
-            DatabaseReference profileRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase,uid);
-            profileRef.addListenerForSingleValueEvent(new ValueEventListener() {
+    //ToDo: Do this during splash screen animation ideally.
+    public void syncUserProfiles(ArrayList<String> userIds){
+//        final ArrayList<Profile> syncedProfiles = new ArrayList<>();
+        for(String userId: userIds){
+            DatabaseReference userProfileReference = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase,userId);
+            userProfileReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Profile profile = dataSnapshot.getValue(Profile.class);
-                    if(profile!=null){
-                        ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(profile);
-                        int profilesListSize = ConnectionsHelper.getInstance().addProfileToCollection(profile);
-                        mProfileRecAdapter.notifyItemInserted(profilesListSize-1);
-                    }
+                    Profile userProfile = dataSnapshot.getValue(Profile.class);
+//                    syncedProfiles.add(userProfile);
+                    ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(userProfile);
+                    ConnectionsHelper.getInstance().addProfileConnectionsToCollection(ConnectionsSQLOpenHelper.getInstance(MainActivity.this).getAllConnections());
+                    mProfileRecAdapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -330,24 +331,50 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 }
             });
         }
+//        ConnectionsSQLOpenHelper.getInstance(this).addCollection(syncedProfiles);
+//        ConnectionsHelper.getInstance().addProfileConnectionsToCollection(syncedProfiles);
+//        mProfileRecAdapter.notifyDataSetChanged();
     }
 
     //ToDo: Move method to another activity/class
-    public ArrayList<String> checkForMissingProfiles(ArrayList<String> userIdList){
-        ArrayList<Profile> currentStoredProfiles = ConnectionsSQLOpenHelper.getInstance(MainActivity.this).getAllConnections();
-        ArrayList<String> currentStoredIds = new ArrayList<>();
-        ArrayList<String> idsMissingProfiles = new ArrayList<>();
-        for(Profile profile: currentStoredProfiles){
-            currentStoredIds.add(profile.getUID());
-        }
-        for(String uid: userIdList){
-            if(!currentStoredIds.contains(uid)){
-                idsMissingProfiles.add(uid);
-            }
-        }
+//    public void retrieveMissingProfiles(ArrayList<String> missingIdList){
+//        for(String uid:missingIdList){
+//            DatabaseReference profileRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase,uid);
+//            profileRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot dataSnapshot) {
+//                    Profile profile = dataSnapshot.getValue(Profile.class);
+//                    if(profile!=null){
+//                        ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(profile);
+//                        int profilesListSize = ConnectionsHelper.getInstance().addProfileToCollection(profile);
+//                        mProfileRecAdapter.notifyItemInserted(profilesListSize-1);
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {
+//
+//                }
+//            });
+//        }
+//    }
 
-        return idsMissingProfiles;
-    }
+    //ToDo: Move method to another activity/class
+//    public ArrayList<String> checkForMissingProfiles(ArrayList<String> userIdList){
+//        ArrayList<Profile> currentStoredProfiles = ConnectionsSQLOpenHelper.getInstance(MainActivity.this).getAllConnections();
+//        ArrayList<String> currentStoredIds = new ArrayList<>();
+//        ArrayList<String> idsMissingProfiles = new ArrayList<>();
+//        for(Profile profile: currentStoredProfiles){
+//            currentStoredIds.add(profile.getUID());
+//        }
+//        for(String uid: userIdList){
+//            if(!currentStoredIds.contains(uid)){
+//                idsMissingProfiles.add(uid);
+//            }
+//        }
+//
+//        return idsMissingProfiles;
+//    }
 
 
     public void findViews(){
