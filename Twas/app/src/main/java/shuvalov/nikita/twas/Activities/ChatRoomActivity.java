@@ -105,7 +105,7 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
 
                 //ToDo: Figure out what I can store as a value for the stranger Connections, maybe a counter?
                 //Idea: If using a counter 0-10 encounters = Stranger, 11-25 Familiar, 26-50 Regular, 51-99 Acquaintance,100-499 Friendly, 500+ whatever
-                FirebaseDatabaseUtils.getUserChatroomsRef(mFirebaseDatabase,SelfUserProfileUtils.getUserId(ChatRoomActivity.this)).child(mFoundId).setValue(mFoundId); //Adds stranger's UID to user's connectionsList.
+                FirebaseDatabaseUtils.getUserConnectionsRef(mFirebaseDatabase, SelfUserProfileUtils.getUserId(ChatRoomActivity.this)).child(mFoundId).setValue(mFoundId); //Adds stranger's UID to user's connectionsList.
 
 
                 DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mFoundId);

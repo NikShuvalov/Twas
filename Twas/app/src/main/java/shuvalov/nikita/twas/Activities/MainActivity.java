@@ -325,11 +325,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
     public void findViews(){
-//        mSendButt = (Button)findViewById(R.id.send_butt);
-//        mDisplayText = (TextView)findViewById(R.id.display_text);
-//        mSignOutButton = (Button)findViewById(R.id.sign_out_button);
-//        mProfileButton = (Button)findViewById(R.id.self_profile_button);
-
         mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Home");
@@ -351,7 +346,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         NearbyManager.getInstance().setGoogleApiClient(mGoogleApiClient);
         publish();
         subscribe();
-//        mNearbyManager.setupForListening(mId,this).beginListening();
     }
 
     @Override
