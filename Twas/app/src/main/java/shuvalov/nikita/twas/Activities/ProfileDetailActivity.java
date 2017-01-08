@@ -52,7 +52,7 @@ import shuvalov.nikita.twas.R;
 
 public class ProfileDetailActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
-    TextView mNameText, mBioText, mDOBText, mGenderText;
+    TextView mNameText, mBioText, mAgeText, mGenderText;
     ImageView mImageView;
     Toolbar mToolbar;
     FirebaseDatabase mFirebaseDatabase;
@@ -195,7 +195,7 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
     public void findViews(){
         mBioText = (TextView)findViewById(R.id.bio_text);
         mNameText = (TextView)findViewById(R.id.name_text);
-        mDOBText = (TextView)findViewById(R.id.age_text);
+        mAgeText = (TextView)findViewById(R.id.age_text);
         mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
         mGenderText = (TextView)findViewById(R.id.gender_text);
         setSupportActionBar(mToolbar);
@@ -212,31 +212,40 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
 
 
         long birthdateMillis = profile.getDOB();
-        Calendar birthCal = Calendar.getInstance();
-        birthCal.setTimeInMillis(birthdateMillis);
-        int year = birthCal.get(Calendar.YEAR);
-        int month = birthCal.get(Calendar.MONTH);
-        int date = birthCal.get(Calendar.DATE);
-        String dateAsString;
 
-        if(month<10||date<10){
-            String monthString;
-            String dateString;
-            if(month<10){
-                monthString = 0+String.valueOf(month);
-            }else{
-                monthString = String.valueOf(month);
-            }
-            if (date < 10) {
-                dateString = 0+ String.valueOf(date);
-            }else{
-                dateString = String.valueOf(date);
-            }
-            dateAsString = monthString+"/"+dateString+"/"+year;
-        }else{
-            dateAsString = String.valueOf(month)+"/"+date+"/"+year;
-        }
-        mDOBText.setText(dateAsString);
+        Calendar birthCal = Calendar.getInstance();
+
+        //This code works as DOB string
+//        birthCal.setTimeInMillis(birthdateMillis);
+//        int year = birthCal.get(Calendar.YEAR);
+//        int month = birthCal.get(Calendar.MONTH);
+//        int date = birthCal.get(Calendar.DATE);
+//        String dateAsString;
+//        if(month<10||date<10){
+//            String monthString;
+//            String dateString;
+//            if(month<10){
+//                monthString = 0+String.valueOf(month);
+//            }else{
+//                monthString = String.valueOf(month);
+//            }
+//            if (date < 10) {
+//                dateString = 0+ String.valueOf(date);
+//            }else{
+//                dateString = String.valueOf(date);
+//            }
+//            dateAsString = monthString+"/"+dateString+"/"+year;
+//        }else{
+//            dateAsString = String.valueOf(month)+"/"+date+"/"+year;
+//        }
+
+        //This code displays age instead of DOB.
+        long now = birthCal.getTimeInMillis();
+        long diff = Math.abs(now - birthdateMillis);
+        birthCal.setTimeInMillis(diff);
+        long age = birthCal.get(Calendar.YEAR)-1970;
+        String ageString = age+ " years old";
+        mAgeText.setText(ageString);
 
 
 
@@ -255,7 +264,12 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
             }
         });
 
-        mGenderText.setText(profile.getGender());
+        if(profile.getGender().equals("Gender")) {
+            mGenderText.setText("Gender N/A");
+        }
+        else{
+            mGenderText.setText(profile.getGender());
+        }
     }
 
     @Override

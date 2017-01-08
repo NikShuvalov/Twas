@@ -465,6 +465,7 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Toast.makeText(SelfProfileActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
                 updateImageIconFile();
+                finish();
             }
         });
     }
@@ -556,7 +557,6 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
         DatabaseReference dbRef = FirebaseDatabaseUtils.getUserProfileRef(db, mProfile.getUID());
         dbRef.setValue(mProfile);
         mChangesMade=false;
-        finish();
     }
 
     public boolean checkLeapYear(int year){
