@@ -156,7 +156,7 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Profile strangerProfile = dataSnapshot.getValue(Profile.class);
-                        if(strangerProfile!=null) {
+                        if (strangerProfile != null) {
                             ConnectionsSQLOpenHelper.getInstance(ChatRoomActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
                             ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
                         }
@@ -193,18 +193,18 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
         };
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if(networkInfo==null || !networkInfo.isConnected()){
+        if (networkInfo == null || !networkInfo.isConnected()) {
             Toast.makeText(this, "No connection, can't load messages", Toast.LENGTH_LONG).show();
             //ToDo: Save messages in SQLDB and load messages when no connectivity.
         }
     }
 
 
-    public void findViews(){
-        mSendButton = (Button)findViewById(R.id.send_butt);
-        mMessageEntry = (EditText)findViewById(R.id.message_entry);
-        mMessageRecycler = (RecyclerView)findViewById(R.id.message_recycler);
-        Toolbar toolbar = (Toolbar)findViewById(R.id.my_toolbar);
+    public void findViews() {
+        mSendButton = (Button) findViewById(R.id.send_butt);
+        mMessageEntry = (EditText) findViewById(R.id.message_entry);
+        mMessageRecycler = (RecyclerView) findViewById(R.id.message_recycler);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
@@ -270,7 +270,7 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
             mOtherUserId = getIntent().getStringExtra(AppConstants.PREF_OTHER_UID);
         }
 
-        FirebaseDatabaseUtils.getUsersUnreadMessagesRef(mFirebaseDatabase,mSelfUserId,mChatRoomId).setValue(0);
+        FirebaseDatabaseUtils.getUsersUnreadMessagesRef(mFirebaseDatabase, mSelfUserId, mChatRoomId).setValue(0);
 
         ChatMessagesHelper.getInstance().cleanChatLog(mChatRoomId);
         mChatRoomRef = FirebaseDatabaseUtils.getChatroomMessagesRef(FirebaseDatabase.getInstance(), mChatRoomId);
@@ -280,8 +280,8 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
                 ChatMessage newMessage = dataSnapshot.getValue(ChatMessage.class);
                 ChatMessagesHelper.getInstance().addChatMessage(newMessage);
                 ConnectionsSQLOpenHelper.getInstance(ChatRoomActivity.this).addMessage(newMessage);
-                mAdapter.notifyItemInserted(mAdapter.getItemCount()-1);
-                mMessageRecycler.smoothScrollToPosition(mAdapter.getItemCount()-1);
+                mAdapter.notifyItemInserted(mAdapter.getItemCount() - 1);
+                mMessageRecycler.smoothScrollToPosition(mAdapter.getItemCount() - 1);
             }
 
             @Override
@@ -311,12 +311,12 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
     protected void onPause() {
         super.onPause();
 
-        if(mNearbyManager.isPublishing()){
-            Nearby.Messages.unpublish(mGoogleApiClient,mNearbyManager.getActiveMessage());
+        if (mNearbyManager.isPublishing()) {
+            Nearby.Messages.unpublish(mGoogleApiClient, mNearbyManager.getActiveMessage());
             mNearbyManager.setPublishing(false);
         }
-        if(mNearbyManager.isSubscribing()){
-            Nearby.Messages.unsubscribe(mGoogleApiClient,mActiveListener);
+        if (mNearbyManager.isSubscribing()) {
+            Nearby.Messages.unsubscribe(mGoogleApiClient, mActiveListener);
             mNearbyManager.setSubscribing(false);
         }
         mChatRoomRef.removeEventListener(mChatRoomListener);
@@ -324,8 +324,8 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
         mGoogleApiClient.disconnect();
     }
 
-    public void recyclerLogic(){
-        mAdapter = new ChatMessagesRecyclerAdapter(ChatMessagesHelper.getInstance().getChatLog(),mSelfUserId);//True Code
+    public void recyclerLogic() {
+        mAdapter = new ChatMessagesRecyclerAdapter(ChatMessagesHelper.getInstance().getChatLog(), mSelfUserId);//True Code
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
@@ -340,28 +340,28 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
     }
 
 
-    public void onClickLogic(){
+    public void onClickLogic() {
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mMessageEntry.getText().toString().equals("")){
+                if (mMessageEntry.getText().toString().equals("")) {
                     mMessageEntry.setError("Message can't be empty");
-                }else{
+                } else {
                     String chatContent = mMessageEntry.getText().toString();
                     mMessageEntry.setText("");
                     long timeStamp = Calendar.getInstance().getTimeInMillis();
 
-                    ChatMessage chatMessage = new ChatMessage(mSelfUserId, mChatRoomId,chatContent,timeStamp);
+                    ChatMessage chatMessage = new ChatMessage(mSelfUserId, mChatRoomId, chatContent, timeStamp);
                     mChatRoomRef.push().setValue(chatMessage).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
 
                             //If pushing value is successful then let's increment up the other users unread message count.
-                            final DatabaseReference unreadMessagesRef = FirebaseDatabaseUtils.getUsersUnreadMessagesRef(mFirebaseDatabase,mOtherUserId,mChatRoomId);
+                            final DatabaseReference unreadMessagesRef = FirebaseDatabaseUtils.getUsersUnreadMessagesRef(mFirebaseDatabase, mOtherUserId, mChatRoomId);
                             unreadMessagesRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    long numOfUnread = (long)dataSnapshot.getValue();
+                                    long numOfUnread = (long) dataSnapshot.getValue();
                                     numOfUnread++;
                                     unreadMessagesRef.setValue(numOfUnread);
                                 }
@@ -396,18 +396,18 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
     }
 
 
-
-    public void publish(){
-        if(mGoogleApiClient.isConnected()){
-            Nearby.Messages.publish(mGoogleApiClient,mNearbyManager.getActiveMessage());
+    public void publish() {
+        if (mGoogleApiClient.isConnected()) {
+            Nearby.Messages.publish(mGoogleApiClient, mNearbyManager.getActiveMessage());
             Log.d("NearBy", "publishing ID");
             mNearbyManager.setPublishing(true);
-        }else{
+        } else {
             Toast.makeText(this, "Not connected to Google Cloud", Toast.LENGTH_SHORT).show();
             Log.d("MainActivity", "publish: failed");
         }
     }
-    public void subscribe(){
+
+    public void subscribe() {
         Nearby.Messages.subscribe(mGoogleApiClient, mActiveListener);
         mNearbyManager.setSubscribing(true);
     }
@@ -415,16 +415,17 @@ public class ChatRoomActivity extends AppCompatActivity implements GoogleApiClie
     @Override
     protected void onStart() {
         super.onStart();
-        if(mGoogleApiClient!= null){
+        if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
         }
     }
-    public void getOtherUsersId(ChatRoom chatRoom){
+
+    public void getOtherUsersId(ChatRoom chatRoom) {
         ArrayList<String> userIds = chatRoom.getUserIds();
-        if(userIds.get(0).equals(mSelfUserId)){
+        if (userIds.get(0).equals(mSelfUserId)) {
             mOtherUserId = userIds.get(1);
-        }else{
-            mOtherUserId=userIds.get(0);
+        } else {
+            mOtherUserId = userIds.get(0);
         }
     }
 }

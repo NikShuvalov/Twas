@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                 SelfUserProfileUtils.setNewSoapBoxMessage(MainActivity.this,soapBoxString);
                 String selfId = SelfUserProfileUtils.getUserId(MainActivity.this);
-                long timeStamp =SelfUserProfileUtils.getSoapBoxTimeStamp(MainActivity.this);
+                long timeStamp =SelfUserProfileUtils.getSoapBoxTimeStamp(MainActivity.this); //FixMe: I'm not sure why I put this here. Important?
                 ChatMessage soapBoxMessage = new ChatMessage(selfId,null,soapBoxString,timeStamp);
                 ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addSoapBoxMessage(soapBoxMessage);
                 if(soapBoxString.isEmpty()){
@@ -260,9 +260,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 }else{
                     Toast.makeText(MainActivity.this, "Updated SoapBox Message", Toast.LENGTH_SHORT).show();
                 }
+                mSoapBoxMessage.setText("");
             }
         });
-
     }
 
     //ToDo: Move into splash screen activity. Should only be called a single time upon load.
@@ -447,7 +447,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
     @Override

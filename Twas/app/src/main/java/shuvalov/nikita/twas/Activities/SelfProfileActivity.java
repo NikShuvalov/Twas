@@ -61,6 +61,7 @@ import shuvalov.nikita.twas.AppConstants;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsHelper;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.FirebaseDatabaseUtils;
+import shuvalov.nikita.twas.Helpers_Managers.MyCalendarUtils;
 import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
 import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.ChatMessage;
@@ -71,9 +72,7 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
     private ImageView mProfileImage;
     private ImageView mAccessGallery, mTakeSelfie;
     private Button mUpdateBirthday;
-//    private Button mSoapBoxUpdateButt;
     private EditText mName, mBio, mBirthdayEntry, mBirthYearEntry;
-//    private EditText mSoapBoxMessage;
     private boolean mUpdatedProfileImage = false;
     private Bitmap mChosenProfileImage, mProfileIconImage;
     private Spinner  mMonthSpinner, mGenderSpinner;
@@ -207,8 +206,6 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
         mProfile = SelfUserProfileUtils.getUsersInfoAsProfile(this);
         mName.setText(mProfile.getName());
         mBio.setText(mProfile.getBio());
-//        mSoapBoxMessage.setText(SelfUserProfileUtils.getSoapBoxMessage(this));
-
         mBirthMonth=0;
         mBirthYear=-1;
         mBirthDate=-1;
@@ -284,9 +281,6 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
         mMonthSpinner = (Spinner)findViewById(R.id.month_spinner);
         mBirthdayEntry = (EditText)findViewById(R.id.birth_date_entry);
         mBirthYearEntry = (EditText)findViewById(R.id.birth_year_entry);
-
-//        mSoapBoxMessage = (EditText)findViewById(R.id.soapbox_status_entry);
-//        mSoapBoxUpdateButt = (Button)findViewById(R.id.update_soapbox_message);
     }
 
     public void initButtons(){
@@ -311,20 +305,6 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
         mAccessGallery.setOnClickListener(imageClickerListener);
         mTakeSelfie.setOnClickListener(imageClickerListener);
 
-//        mSoapBoxUpdateButt.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                String soapBoxString = mSoapBoxMessage.getText().toString();
-//                if(soapBoxString.isEmpty()){
-//                    Toast.makeText(SelfProfileActivity.this, "SoapBox Message was emptied", Toast.LENGTH_SHORT).show();
-//                }
-//                SelfUserProfileUtils.setNewSoapBoxMessage(SelfProfileActivity.this,soapBoxString);
-//                String selfId = SelfUserProfileUtils.getUserId(SelfProfileActivity.this);
-//                long timeStamp =SelfUserProfileUtils.getSoapBoxTimeStamp(SelfProfileActivity.this);
-//                ChatMessage soapBoxMessage = new ChatMessage(selfId,null,soapBoxString,timeStamp);
-//                ConnectionsSQLOpenHelper.getInstance(SelfProfileActivity.this).addSoapBoxMessage(soapBoxMessage);
-//            }
-//        });
 
         //FixMe: This only updates the changes locally, you still need to hit the submit button to actually send out the new information to fbdb.
         mUpdateBirthday.setOnClickListener(new View.OnClickListener() {
@@ -357,7 +337,7 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
                         int year = Integer.parseInt(mBirthYearEntry.getText().toString());
                         int date = Integer.parseInt(mBirthdayEntry.getText().toString());
                         if(date>=29){
-                            if(!(date==29 && checkLeapYear(year))){
+                            if(!(date==29 && MyCalendarUtils.checkLeapYear(year))){
                                 mBirthdayEntry.setError("Invalid Date");
                                 validDate=false;
                             }
@@ -570,14 +550,6 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
         mChangesMade=false;
     }
 
-    public boolean checkLeapYear(int year){
-        if(year%4!=0){
-            return false;
-        }else if (year%100==0 && year%400!=0){
-            return false;
-        }
-        return true;
-    }
 
     public void updateImageIconFile(){
 

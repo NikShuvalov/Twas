@@ -45,6 +45,7 @@ import shuvalov.nikita.twas.Helpers_Managers.ConnectionsHelper;
 import shuvalov.nikita.twas.Helpers_Managers.ConnectionsSQLOpenHelper;
 import shuvalov.nikita.twas.Helpers_Managers.FireBaseStorageUtils;
 import shuvalov.nikita.twas.Helpers_Managers.FirebaseDatabaseUtils;
+import shuvalov.nikita.twas.Helpers_Managers.MyCalendarUtils;
 import shuvalov.nikita.twas.Helpers_Managers.NearbyManager;
 import shuvalov.nikita.twas.Helpers_Managers.SelfUserProfileUtils;
 import shuvalov.nikita.twas.PoJos.ChatMessage;
@@ -236,10 +237,8 @@ public class ProfileDetailActivity extends AppCompatActivity implements GoogleAp
 
         //This code displays age instead of DOB.
         long now = birthCal.getTimeInMillis();
-        long diff = Math.abs(now - birthdateMillis);
-        birthCal.setTimeInMillis(diff);
-        long age = birthCal.get(Calendar.YEAR)-1970;
-        String ageString = age+ " years old";
+        String ageString = MyCalendarUtils.getAgeAsString(now,birthdateMillis);
+
         mAgeText.setText(ageString);
 
         NetworkInfo networkInfo = mConnectivityManager.getActiveNetworkInfo();

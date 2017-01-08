@@ -175,7 +175,6 @@ public class FirebaseLogInActivity extends AppCompatActivity implements GoogleAp
                                 SelfUserProfileUtils.setUserId(FirebaseLogInActivity.this, userId);
                                 ConnectionsSQLOpenHelper.getInstance(FirebaseLogInActivity.this).clearDatabase();
                             }
-                            //ToDo: On Successful log-in download all of user's made connections.
                         }
 
                     }
