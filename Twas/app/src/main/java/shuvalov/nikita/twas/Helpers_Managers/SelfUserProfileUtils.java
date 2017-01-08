@@ -32,17 +32,6 @@ public class SelfUserProfileUtils {
                 .commit();
     }
 
-//    /**
-//     * Adds user's picUrl in case it didn't exist when the profile was initially put into sharedPreferences.
-//     *
-//     * @param context
-//     * @param picUrl
-//     * @return True if url add successfully.
-//     */
-//    public static boolean addUserProfilePicUrl(Context context, String picUrl){
-//        return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE,Context.MODE_PRIVATE).edit().putString(AppConstants.PREF_PICURL,picUrl).commit();
-//    }
-
     /**
      * Clears the user preferences. Called on sign-out.
      * @param context
@@ -102,9 +91,18 @@ public class SelfUserProfileUtils {
         context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE,Context.MODE_PRIVATE).edit().putString(AppConstants.PREF_ICON_IMAGE_FILE, iconImageFile).apply();
     }
 
+
     public static String getProfileIconImageFile(Context context){
         return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, Context.MODE_PRIVATE).getString(AppConstants.PREF_ICON_IMAGE_FILE, "");
     }
+
+    public static void setAskedForFriendship(Context context){
+        context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, Context.MODE_PRIVATE).edit().putBoolean(AppConstants.PREF_PROMPT_FRIENDSHIP,true).apply();
+    }
+    public static boolean getAskedForFriendship(Context context){
+        return context.getSharedPreferences(AppConstants.PREF_SELF_USER_PROFILE, Context.MODE_PRIVATE).getBoolean(AppConstants.PREF_PROMPT_FRIENDSHIP,false);
+    }
+
 
 
 

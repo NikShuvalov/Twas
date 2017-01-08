@@ -31,13 +31,13 @@ public class AppConstants {
     public static final String PREF_DOB = "Self_dob";
     public static final String PREF_BIO = "Self_bio";
     public static final String PREF_GENDER = "Self_gender";
-//    public static final String PREF_PICURL = "Self_picurl";
     public static final String PREF_CHATROOM = "Chatroom";
     public static final String PREF_SOAPBOX_MESSAGE = "My SoapBoxMessage";
     public static final String PREF_SOAPBOX_TIMESTAMP = "TimeStamp";
     public static final String PREF_HELPER_POSITION = "Position in singleton";
     public static final String PREF_ICON_IMAGE_FILE = "Profile Icon toolbar image";
     public static final String PREF_OTHER_UID = "Other user's id";
+    public static final String PREF_PROMPT_FRIENDSHIP = "Friend?";
 
     public static final String PREF_EMPTY = "Duh-dah, duh-dah, duhhh! For whom the bell tolls!";
 
@@ -51,5 +51,7 @@ public class AppConstants {
 //    public static final String SIGN_UP_PASSWORD = "";
 
     public static final String SOAPBOX_MESSAGE_DELIMITER = "Œ&œ§×Å¾¶¤";
+
+    public static final String MY_USER_ID = "kJMkHw25FyPGiRAsW5pGan83GDl2";
 
 }

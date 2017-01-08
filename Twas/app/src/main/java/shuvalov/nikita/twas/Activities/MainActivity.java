@@ -2,6 +2,7 @@ package shuvalov.nikita.twas.Activities;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
@@ -74,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public GoogleApiClient mGoogleApiClient;
     Message mFindMeMessage;
-//    Message mActiveMessage;
     MessageListener mActiveListener;
 
 
@@ -86,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
     String mId;
-//    String[] navOptions= new String[]{"Profile","Home", "Settings","SoapBox Feed","Invite Friends", "Donate", "About"};
 
 
     @Override
@@ -110,8 +110,45 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         retrieveStoredProfiles();
         getUsersFbdbInformation();
 
-//        soapBoxDebug();
 
+        if(mProfileRecAdapter.getItemCount()==0 && !SelfUserProfileUtils.getAskedForFriendship(this)){
+            new AlertDialog.Builder(this).setTitle("You have no connections yet =(")
+                    .setMessage("That's okay though; I'll be your friend!")
+                    .setPositiveButton("Save me from my solitude!", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            mSelfConnectionsRef.child(AppConstants.MY_USER_ID).setValue(AppConstants.MY_USER_ID);
+                            DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, AppConstants.MY_USER_ID);
+                            SelfUserProfileUtils.setAskedForFriendship(MainActivity.this);
+
+                            strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    Profile strangerProfile = dataSnapshot.getValue(Profile.class);
+                                    if (strangerProfile != null) {
+                                        ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
+                                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+                                        mProfileRecAdapter.notifyDataSetChanged();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                        }
+                    })
+                    .setNegativeButton("No thanks, I prefer an empty screen", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Toast.makeText(MainActivity.this, "I'm sorry I annoyed you with my friendship", Toast.LENGTH_SHORT).show();
+                            SelfUserProfileUtils.setAskedForFriendship(MainActivity.this);
+                            dialogInterface.dismiss();
+                        }
+                    }).create().show();
+        }
 
         mActiveListener = new MessageListener() {
             @Override
@@ -122,7 +159,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addSoapBoxMessage(soapBoxMessage);
                 }
                 mFoundId = soapBoxMessage.getUserId();
-//                mFoundId = new String(message.getContent()); //Gets message from other phone, which holds just that phone's UID for now.
 
 
                 //ToDo: Figure out what I can store as a value for the stranger Connections, maybe a counter?
@@ -130,14 +166,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 mSelfConnectionsRef.child(mFoundId).setValue(mFoundId); //Adds stranger's UID to user's connectionsList.
 
                 DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, mFoundId);
-//                DatabaseReference strangerRef = FirebaseDatabaseUtils.getChildReference(mFirebaseDatabase, mFoundId, AppConstants.theoneforprofiles);
-
-//                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MainActivity.this);
-//
-////                ConnectionsSQLOpenHelper.getInstance().addSoapBoxMessage(soapBoxMessage);
-//                notificationBuilder.setContentText(soapBoxMessage.getContent()).setContentTitle("New SoapBoxMessage").setSmallIcon(android.R.drawable.ic_dialog_alert);
-//                notificationManager.notify(0,notificationBuilder.build());
 
                 mSelfChatroomsRef.addChildEventListener(new ChildEventListener() {
                     @Override
@@ -166,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                     }
                 });
+
                 //Gets the stranger's profile information.
                 strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -184,8 +213,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         Log.d("MainActivity", "on heard signal, failed attempt to D/L profile ");
                     }
                 });
-//                mDisplayText.setText(mFoundId);
-                Toast.makeText(MainActivity.this, mFoundId, Toast.LENGTH_SHORT).show();
 
                 //ToDo: Do a count that adds found users, to keep track of active publishing users.
             }
@@ -193,7 +220,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onLost(Message message) {
                 super.onLost(message);
-//                Toast.makeText(MainActivity.this, "Lost the signal", Toast.LENGTH_SHORT).show();
 
                 //ToDo: Do a count that removes found users, to keep track of active publishing users.
 
@@ -255,10 +281,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
-        //ToDo: Check for logged-in user's chatroom associations.
-        /*  This is going to have to be a constant listener in case a new chatroom/message appears over the course of the session.
-         */
-
         //ToDo: Check for logged-in user's connections list.
         mSelfConnectionsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -299,7 +321,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(profile);
                         int profilesListSize = ConnectionsHelper.getInstance().addProfileToCollection(profile);
                         mProfileRecAdapter.notifyItemInserted(profilesListSize-1);
-
                     }
                 }
 
