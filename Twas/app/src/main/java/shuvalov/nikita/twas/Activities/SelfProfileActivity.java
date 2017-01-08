@@ -69,8 +69,11 @@ import shuvalov.nikita.twas.R;
 
 public class SelfProfileActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,GoogleApiClient.ConnectionCallbacks {
     private ImageView mProfileImage;
-    private Button mAccessGallery, mTakeSelfie, mSoapBoxUpdateButt, mUpdateBirthday;
-    private EditText mName, mBio, mSoapBoxMessage, mBirthdayEntry, mBirthYearEntry;
+    private ImageView mAccessGallery, mTakeSelfie;
+    private Button mUpdateBirthday;
+//    private Button mSoapBoxUpdateButt;
+    private EditText mName, mBio, mBirthdayEntry, mBirthYearEntry;
+//    private EditText mSoapBoxMessage;
     private boolean mUpdatedProfileImage = false;
     private Bitmap mChosenProfileImage, mProfileIconImage;
     private Spinner  mMonthSpinner, mGenderSpinner;
@@ -204,7 +207,7 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
         mProfile = SelfUserProfileUtils.getUsersInfoAsProfile(this);
         mName.setText(mProfile.getName());
         mBio.setText(mProfile.getBio());
-        mSoapBoxMessage.setText(SelfUserProfileUtils.getSoapBoxMessage(this));
+//        mSoapBoxMessage.setText(SelfUserProfileUtils.getSoapBoxMessage(this));
 
         mBirthMonth=0;
         mBirthYear=-1;
@@ -247,13 +250,13 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
 
     public void findViews(){
         mProfileImage = (ImageView)findViewById(R.id.profile_image_view);//Populate this if user already has a profile image.
-
         mGenderSpinner = (Spinner)findViewById(R.id.gender_select);
         mUpdateBirthday = (Button)findViewById(R.id.submit_birthday);
-        mAccessGallery = (Button)findViewById(R.id.upload_image_gallery);
-        mTakeSelfie = (Button)findViewById(R.id.selfie_button);
+        mAccessGallery = (ImageView)findViewById(R.id.upload_image_gallery);
+        mTakeSelfie = (ImageView)findViewById(R.id.selfie_button);
         mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
         setSupportActionBar(mToolbar);
+
         getSupportActionBar().setTitle("My Profile");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -282,8 +285,8 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
         mBirthdayEntry = (EditText)findViewById(R.id.birth_date_entry);
         mBirthYearEntry = (EditText)findViewById(R.id.birth_year_entry);
 
-        mSoapBoxMessage = (EditText)findViewById(R.id.soapbox_status_entry);
-        mSoapBoxUpdateButt = (Button)findViewById(R.id.update_soapbox_message);
+//        mSoapBoxMessage = (EditText)findViewById(R.id.soapbox_status_entry);
+//        mSoapBoxUpdateButt = (Button)findViewById(R.id.update_soapbox_message);
     }
 
     public void initButtons(){
@@ -308,20 +311,20 @@ public class SelfProfileActivity extends AppCompatActivity implements GoogleApiC
         mAccessGallery.setOnClickListener(imageClickerListener);
         mTakeSelfie.setOnClickListener(imageClickerListener);
 
-        mSoapBoxUpdateButt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String soapBoxString = mSoapBoxMessage.getText().toString();
-                if(soapBoxString.isEmpty()){
-                    Toast.makeText(SelfProfileActivity.this, "SoapBox Message was emptied", Toast.LENGTH_SHORT).show();
-                }
-                SelfUserProfileUtils.setNewSoapBoxMessage(SelfProfileActivity.this,soapBoxString);
-                String selfId = SelfUserProfileUtils.getUserId(SelfProfileActivity.this);
-                long timeStamp =SelfUserProfileUtils.getSoapBoxTimeStamp(SelfProfileActivity.this);
-                ChatMessage soapBoxMessage = new ChatMessage(selfId,null,soapBoxString,timeStamp);
-                ConnectionsSQLOpenHelper.getInstance(SelfProfileActivity.this).addSoapBoxMessage(soapBoxMessage);
-            }
-        });
+//        mSoapBoxUpdateButt.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                String soapBoxString = mSoapBoxMessage.getText().toString();
+//                if(soapBoxString.isEmpty()){
+//                    Toast.makeText(SelfProfileActivity.this, "SoapBox Message was emptied", Toast.LENGTH_SHORT).show();
+//                }
+//                SelfUserProfileUtils.setNewSoapBoxMessage(SelfProfileActivity.this,soapBoxString);
+//                String selfId = SelfUserProfileUtils.getUserId(SelfProfileActivity.this);
+//                long timeStamp =SelfUserProfileUtils.getSoapBoxTimeStamp(SelfProfileActivity.this);
+//                ChatMessage soapBoxMessage = new ChatMessage(selfId,null,soapBoxString,timeStamp);
+//                ConnectionsSQLOpenHelper.getInstance(SelfProfileActivity.this).addSoapBoxMessage(soapBoxMessage);
+//            }
+//        });
 
         //FixMe: This only updates the changes locally, you still need to hit the submit button to actually send out the new information to fbdb.
         mUpdateBirthday.setOnClickListener(new View.OnClickListener() {

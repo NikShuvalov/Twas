@@ -23,42 +23,7 @@
     <RelativeLayout
         android:id="@+id/content_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/my_toolbar">
-
-        <EditText
-            android:id="@+id/soapbox_status_entry"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="What's going on?"
-            android:gravity="start"
-            android:lines="3"/>
-        <Button
-            android:id="@+id/update_soapbox_message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/soapbox_status_entry"
-            android:text="update Soapbox message"/>
-
-        <Spinner
-            android:id="@+id/gender_select"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/update_soapbox_message"/>
-
-        <EditText
-            android:id="@+id/name_entry"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/update_soapbox_message"
-            android:hint="Enter Name"
-            android:padding="4dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_toLeftOf="@id/gender_select"
-            android:maxLines="1"/>
-        <!--android:background="@drawable/custom_name_edittext"-->
+        android:layout_height="wrap_content">
 
 
         <android.support.v7.widget.CardView
@@ -68,7 +33,7 @@
             app:cardCornerRadius="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
-            android:layout_below="@id/name_entry">
+            android:layout_marginBottom="10dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -80,111 +45,183 @@
                     android:layout_height="200dp"/>
 
                 <!--Change to Icons for uploading image-->
-                <Button
-                    android:id="@+id/upload_image_gallery"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="get image from gallery"
-                    android:layout_below="@id/profile_image_view"/>
 
-                <Button
-                    android:id="@+id/selfie_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/profile_image_view"
-                    android:layout_alignParentRight="true"
-                    android:text="Take a Selfie"/>
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/profile_image_view"
+                        android:layout_alignRight="@id/profile_image_view"
+                        android:background="#4fbcbcbc"
+                        >
+                        <ImageView
+                            android:id="@+id/upload_image_gallery"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:alpha="0.8"
+                            android:background="@android:drawable/ic_menu_upload"
+                            android:layout_marginRight="20dp"/>
+
+                        <ImageView
+                            android:id="@+id/selfie_button"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:alpha="0.8"
+                            android:background="@android:drawable/ic_menu_camera"
+                            android:scaleType="fitXY"/>
+
+
+                    </LinearLayout>
             </RelativeLayout>
         </android.support.v7.widget.CardView>
 
-
-        <EditText
-            android:id="@+id/about_me_entry"
+        <View
+            android:id="@+id/cards_divider"
             android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#ddd"
+            android:layout_below="@id/profile_pic_card"
+            android:layout_margin="4dp"/>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/basic_info_card"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="About me"
-            android:gravity="start"
+            android:layout_below="@id/cards_divider"
+            app:cardCornerRadius="10dp"
+            android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
-            android:layout_below="@id/profile_pic_card"
-            android:lines="2"/>
+            android:layout_marginBottom="10dp"
+            >
 
-            <android.support.v7.widget.CardView
-                android:id="@+id/birthday_inpput_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/about_me_entry">
-                <RelativeLayout
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/name_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#444"
+                    android:layout_margin="3dp"
+                    android:text="Name:"/>
+                <Spinner
+                    android:id="@+id/gender_select"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@id/name_header"
+                    android:layout_alignParentEnd="true"/>
+
+                <EditText
+                    android:id="@+id/name_entry"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <TextView
-                        android:id="@+id/birthday_prompt"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Name"
+                    android:padding="4dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toLeftOf="@+id/gender_select"
+                    android:layout_toStartOf="@id/gender_select"
+                    android:layout_below="@id/name_header"
+                    android:maxLines="1"
+                    android:maxLength="100"/>
+
+                <View
+                    android:id="@+id/basic_info_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="#777"
+                    android:layout_below="@id/name_entry"
+                    android:layout_margin="4dp"/>
+                <TextView
+                    android:id="@+id/about_me_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="About me:"
+                    android:textSize="16sp"
+                    android:textColor="#444"
+                    android:layout_below="@id/basic_info_divider"
+                    android:layout_margin="3dp"/>
+
+
+                <EditText
+                    android:id="@+id/about_me_entry"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="About me"
+                    android:gravity="start"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_below="@id/about_me_header"
+                    android:lines="2"/>
+                <View
+                    android:id="@+id/birthday_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_below="@id/about_me_entry"
+                    android:layout_margin="4dp"
+                    android:background="#444"
+                    />
+
+
+                <TextView
+                    android:id="@+id/birthday_prompt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Birthday"
+                    android:layout_below="@id/birthday_divider"
+                    android:textColor="#333"
+                    android:textSize="18sp"
+                    android:layout_margin="5dp"
+                    />
+
+                <LinearLayout
+                    android:id="@+id/entry_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/birthday_prompt">
+                    <Spinner
+                        android:id="@+id/month_spinner"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Birthday"
-                        android:textColor="#333"
-                        android:textSize="18sp"
                         />
-                    <LinearLayout
-                        android:id="@+id/entry_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_below="@id/birthday_prompt">
-                        <Spinner
-                            android:id="@+id/month_spinner"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-                        <EditText
-                            android:id="@+id/birth_date_entry"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:ems="2"
-                            android:maxLength="2"
-                            android:inputType="number"
-                            android:hint="dd"
-                            android:gravity="center_horizontal"
-                            android:layout_weight="5"/>
-                        <EditText
-                            android:id="@+id/birth_year_entry"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:ems="4"
-                            android:hint="yyyy"
-                            android:gravity="center_horizontal"
-                            android:maxLength="4"
-                            android:inputType="number"
-                            android:layout_weight="5"/>
-
-                    </LinearLayout>
-                    <Button
-                        android:id="@+id/submit_birthday"
-                        android:text="update birthday"
+                    <EditText
+                        android:id="@+id/birth_date_entry"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/entry_layout"/>
+                        android:ems="2"
+                        android:maxLength="2"
+                        android:inputType="number"
+                        android:hint="dd"
+                        android:gravity="center_horizontal"
+                        android:layout_weight="5"/>
+                    <EditText
+                        android:id="@+id/birth_year_entry"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="4"
+                        android:hint="yyyy"
+                        android:gravity="center_horizontal"
+                        android:maxLength="4"
+                        android:inputType="number"
+                        android:layout_weight="5"/>
 
-                </RelativeLayout>
-            </android.support.v7.widget.CardView>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/submit_birthday"
+                    android:text="update birthday"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/entry_layout"/>
 
 
-        <!--<EditText-->
-            <!--android:id="@+id/date_entry"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:inputType="date"-->
-            <!--android:hint="Enter Birthday"-->
-            <!--android:layout_below="@id/birthday_inpput_container"/>-->
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
 
-        <!--<android.support.design.widget.FloatingActionButton-->
-            <!--android:id="@+id/submit_changes_button"-->
-            <!--app:fabSize="normal"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:layout_alignParentBottom="true"/>-->
 
 
     </RelativeLayout>

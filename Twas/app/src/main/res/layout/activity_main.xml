@@ -18,11 +18,26 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         />
 
+    <EditText
+        android:id="@+id/soapbox_status_entry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/my_toolbar"
+        android:hint="How do you?"
+        android:gravity="start"
+        android:lines="3"/>
+    <Button
+        android:id="@+id/update_soapbox_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/soapbox_status_entry"
+        android:text="update Soapbox message"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/profiles_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/my_toolbar"
+        android:layout_below="@id/update_soapbox_message"
         android:layout_margin="10dp"/>
 
     <!--<RelativeLayout-->
@@ -75,5 +90,7 @@
 
 
     <!--</RelativeLayout>-->
+
+
 
 </RelativeLayout>

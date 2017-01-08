@@ -27,6 +27,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,6 +69,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     Toolbar mToolbar;
     String mFoundId;
+    private Button mSoapBoxUpdateButt;
+    private EditText mSoapBoxMessage;
+
 
     boolean mBackRecentlyPressed;
     RecyclerView mRecyclerView;
@@ -80,7 +84,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     MessageListener mActiveListener;
 
 
-    Profile mProfile;
     DatabaseReference mSelfProfileRef;
     DatabaseReference mSelfConnectionsRef;
 //    DatabaseReference mSelfChatroomsRef;
@@ -242,6 +245,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Log.d("Testing Shots fired", "Please clap");
             }
         };
+        mSoapBoxUpdateButt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String soapBoxString = mSoapBoxMessage.getText().toString();
+
+                SelfUserProfileUtils.setNewSoapBoxMessage(MainActivity.this,soapBoxString);
+                String selfId = SelfUserProfileUtils.getUserId(MainActivity.this);
+                long timeStamp =SelfUserProfileUtils.getSoapBoxTimeStamp(MainActivity.this);
+                ChatMessage soapBoxMessage = new ChatMessage(selfId,null,soapBoxString,timeStamp);
+                ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addSoapBoxMessage(soapBoxMessage);
+                if(soapBoxString.isEmpty()){
+                    Toast.makeText(MainActivity.this, "SoapBox Message was emptied", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MainActivity.this, "Updated SoapBox Message", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 
     //ToDo: Move into splash screen activity. Should only be called a single time upon load.
@@ -387,6 +408,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mToolbar = (Toolbar)findViewById(R.id.my_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Home");
+
+        mSoapBoxMessage = (EditText)findViewById(R.id.soapbox_status_entry);
+        Profile userProfile = SelfUserProfileUtils.getUsersInfoAsProfile(this);
+        String userName= null;
+        if(userProfile!=null){
+            userName = SelfUserProfileUtils.getUsersInfoAsProfile(this).getName();
+        }
+        if(userName==null || userName.isEmpty()){
+            userName="Stranger";
+        }
+        String hint = String.format("How do you, %s?", userName);
+        mSoapBoxMessage.setHint(hint);
+        mSoapBoxUpdateButt = (Button)findViewById(R.id.update_soapbox_message);
     }
 
     public void setUpRecyclerView(){
@@ -556,4 +590,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
+
+
 }
