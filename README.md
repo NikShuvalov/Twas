@@ -38,4 +38,4 @@ Home Activity:
 ![Image1](https://github.com/NikShuvalov/Twas/blob/master/alpha_3_home.png)
 
 Self-Profile Activity:
-![Image2](https://github.com/NikShuvalov/Twas/blob/master/alpha_3_self_profile.png
+![Image2](https://github.com/NikShuvalov/Twas/blob/master/alpha_3_self_profile.png)
