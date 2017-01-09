@@ -33,3 +33,9 @@ FirebaseDatabase/Storage and Google Nearby Messages API does all of the heavy li
 are both set up in firebasedatabase, though there's a backup profile list stored local on an SQLliteDatabase in case user doesn't
 have an internet connection. Unfortunately, images are not stored locally. They are all stored in firebasestorage, so though it
 will load the user's profile it won't load their profile image. 
+
+Home Activity:
+![Image1](https://github.com/NikShuvalov/Twas/blob/master/alpha_3_home.png)
+
+Self-Profile Activity:
+![Image2](https://github.com/NikShuvalov/Twas/blob/master/alpha_3_self_profile.png
