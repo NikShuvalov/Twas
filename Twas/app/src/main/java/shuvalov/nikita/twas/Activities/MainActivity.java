@@ -118,46 +118,45 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }else{//If no internet access, use last synced data.
             retrieveStoredProfiles();
             Toast.makeText(this, "No connection detected", Toast.LENGTH_LONG).show();
-        }
-
-        if(mProfileRecAdapter.getItemCount()==0 && !SelfUserProfileUtils.getAskedForFriendship(this)){
-            new AlertDialog.Builder(this).setTitle("You have no connections yet =(")
-                    .setMessage("That's okay though; I'll be your friend!")
-                    .setPositiveButton("Save me from my solitude!", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            mSelfConnectionsRef.child(AppConstants.MY_USER_ID).setValue(AppConstants.MY_USER_ID);
-                            DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, AppConstants.MY_USER_ID);
-                            SelfUserProfileUtils.setAskedForFriendship(MainActivity.this);
-
-                            strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    Profile strangerProfile = dataSnapshot.getValue(Profile.class);
-                                    if (strangerProfile != null) {
-                                        ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
-                                        ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
-                                        mProfileRecAdapter.notifyDataSetChanged();
+            if(mProfileRecAdapter.getItemCount()==0 && !SelfUserProfileUtils.getAskedForFriendship(this)){
+                new AlertDialog.Builder(this).setTitle("You have no connections yet =(")
+                        .setMessage("That's okay though; I'll be your friend!")
+                        .setPositiveButton("Save me from my solitude!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                mSelfConnectionsRef.child(AppConstants.MY_USER_ID).setValue(AppConstants.MY_USER_ID);
+                                DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, AppConstants.MY_USER_ID);
+                                SelfUserProfileUtils.setAskedForFriendship(MainActivity.this);
+                                strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        Profile strangerProfile = dataSnapshot.getValue(Profile.class);
+                                        if (strangerProfile != null) {
+                                            ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
+                                            ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+                                            mProfileRecAdapter.notifyDataSetChanged();
+                                        }
                                     }
-                                }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
 
-                                }
-                            });
+                                    }
+                                });
 
-                        }
-                    })
-                    .setNegativeButton("No thanks, I prefer an empty screen", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            Toast.makeText(MainActivity.this, "I'm sorry I annoyed you with my friendship", Toast.LENGTH_SHORT).show();
-                            SelfUserProfileUtils.setAskedForFriendship(MainActivity.this);
-                            dialogInterface.dismiss();
-                        }
-                    }).create().show();
+                            }
+                        })
+                        .setNegativeButton("No thanks, I prefer an empty screen", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(MainActivity.this, "Friendship successfully rejected", Toast.LENGTH_SHORT).show();
+                                SelfUserProfileUtils.setAskedForFriendship(MainActivity.this);
+                                dialogInterface.dismiss();
+                            }
+                        }).create().show();
+            }
         }
+
 
         mActiveListener = new MessageListener() {
             @Override
@@ -319,8 +318,45 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     String profileUid = connectionsSnapshot.iterator().next().getKey();
                     Log.d("Connection Retrieval", "Connection UID: "+ profileUid);
                     connectionsList.add(profileUid);
-
                 }
+                if(connectionsList.size()>0 && !SelfUserProfileUtils.getAskedForFriendship(MainActivity.this)){
+                        new AlertDialog.Builder(MainActivity.this).setTitle("You have no connections yet =(")
+                                .setMessage("That's okay though; I'll be your friend!")
+                                .setPositiveButton("Save me from my solitude!", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        mSelfConnectionsRef.child(AppConstants.MY_USER_ID).setValue(AppConstants.MY_USER_ID);
+                                        DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, AppConstants.MY_USER_ID);
+                                        SelfUserProfileUtils.setAskedForFriendship(MainActivity.this);
+                                        strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                Profile strangerProfile = dataSnapshot.getValue(Profile.class);
+                                                if (strangerProfile != null) {
+                                                    ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
+                                                    ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
+                                                    mProfileRecAdapter.notifyDataSetChanged();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+
+                                            }
+                                        });
+
+                                    }
+                                })
+                                .setNegativeButton("No thanks, I prefer an empty screen", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        Toast.makeText(MainActivity.this, "Friendship successfully rejected", Toast.LENGTH_SHORT).show();
+                                        SelfUserProfileUtils.setAskedForFriendship(MainActivity.this);
+                                        dialogInterface.dismiss();
+                                    }
+                                }).create().show();
+
+                    }
                 syncUserProfiles(connectionsList);
 //                //ToDo: Use the list of connections and compare with what we have in the database, then fill in what's missing.
 //                ArrayList<String> missingIds = checkForMissingProfiles(connectionsList);
@@ -490,7 +526,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mNearbyManager.setSubscribing(true);
     }
 
-
     @Override
     protected void onPause() {
         if(mNearbyManager.isPublishing()){
@@ -585,6 +620,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
 
         ConnectionsSQLOpenHelper.getInstance(this).clearDatabase();
+        ConnectionsHelper.getInstance().clearConnectionsHelperList();
         Intent intent = new Intent(MainActivity.this, FirebaseLogInActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);

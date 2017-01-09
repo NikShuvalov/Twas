@@ -52,6 +52,6 @@ public class AppConstants {
 
     public static final String SOAPBOX_MESSAGE_DELIMITER = "Œ&œ§×Å¾¶¤";
 
-    public static final String MY_USER_ID = "kJMkHw25FyPGiRAsW5pGan83GDl2";
+    public static final String MY_USER_ID = "dJijZm50suPGmmErsm79j3EYHnJ3";
 
 }

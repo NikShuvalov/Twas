@@ -40,6 +40,9 @@ public class ConnectionsHelper {
         }
         return mProfileConnections.size();
     }
+    public void clearConnectionsHelperList(){
+        mProfileConnections.clear();
+    }
 
     //Should call this after pulling data from database... But no other time, otherwise it'll end up giving duplicates.
     public void addProfileConnectionsToCollection(ArrayList<Profile> profileList){
