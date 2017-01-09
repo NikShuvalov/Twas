@@ -39,6 +39,19 @@ Have you ever been curious about the lives of strangers?
 Given a chance to join a group of complete strangers in an activity you enjoy, would you?
 Is there any feature that you think should be included that hasn’t already been?
 
+-Research Highlights-
+
+Observations:
+	Users tend to use social media to keep in touch with people they already know and/or talk to. Most other users claim they use Facebook mainly for organizing events or rsvp’ing to events, but those same people also admit they find themselves spending a good deal of time on Facebook just scrolling through their feed. Someone said they would actually look over the member list for events they’re going to in order to refresh their memory in case they forgot any acquittances’ name(s).
+
+Insights:
+	People use Facebook seemingly as an externalized memory so that they don’t have to remember birthdays, event dates, or even at times, names of people they rarely see. And they obviously have to get some kind of joy out of scrolling through Facebook feeds even if they claimed they only use it for event planning.
+
+Design Recommendations:
+	I think this only strengthens my design intent. An app that doesn’t focus on the content that’s posted in a feed, but instead focuses on the people to try to make a social app that’s actively social instead of a waste where people dump memes, advertisements and inspirational quotes.
+
+Were there any new Topics or Open Questions to research further?
+	The amount of people that use it for event planning makes me think I should create an event-planning feature, but that will have to be for after the final project.
 
 -User Personas-
 
@@ -81,8 +94,11 @@ Rebecca comes off as a shy individual due to her quiet demeanor, when in fact if
 For that reason she has trouble striking up conversations with people she doesn’t know because she doesn’t know what to talk to them about because she doesn’t know what her commonalities are with that person.
 
 ---Problem Statements---
+
 How might we allow users to meet their neighbors.
+
 How might help strangers organize.
+
 How might we automate profile sharing.
 
 ——————————————
@@ -116,3 +132,7 @@ Organizers need a way to spontaneously start events with strangers because that 
 Hypothesis:
 I believe with proximity based messaging organizers will be able to get the attention and cooperation of interested individuals who otherwise would have not known of the event. 
 We will know this to be true when people get activities started by using SoapBox Messages.
+
+-Competitive Analysis Spreadsheet-
+
+[Google Spreadsheet competitive feature analysis](https://docs.google.com/spreadsheets/d/1RHZRzhPybZgJKt-5Kf_olZNgVeKdUcUkM4F5U7BqJkQ/edit?usp=sharing)
