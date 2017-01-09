@@ -1,4 +1,43 @@
+Title: Using proximity based technology to look into the lives of strangers
 
+Authors and Stakeholders:
+ Nikita Shuvalov  (NShuvalov89@gmail.com)
+
+Date: 12/15/16
+
+Background:
+There are many social media apps out there, but what all of them, at least out of the major ones, lack, is allowing users to share profiles based on proximity. Some apps, such as happn have emulated using proximity by actually using your previous locations in the behind the scenes and comparing that to other users previous locations. The only true proximity based social sharing actually comes from Nintendo’s 3DS, but even that has limitations in that after sharing a profile there’s no room for further interaction.
+
+Goals:
+Develop an app that:
+Allows users to find out more about users around them based on proximity.
+Allows users to message nearby users without needing to communicate through a server (offline).
+Allows users to interact through a server when they are no longer in proximity of each other.
+
+Research Questions:
+Are people willing to broadcast their profile information to anyone that happens to be nearby?
+Are people even interested in finding out more about the people they see every day on the train or bus?
+
+Methodology
+Competitor analysis
+Interview
+
+Participants
+Social Media users
+Aged 18-35
+Non-social Media users that might be willing to try an alternative
+
+Schedule
+Script:12/16
+Interviews: 12/26
+Results: 01/02
+
+Script
+What kind of things do you expect to see in a user profile?
+What is your main goal for using social media apps?
+Have you ever been curious about the lives of strangers?
+Given a chance to join a group of complete strangers in an activity you enjoy, would you?
+Is there any feature that you think should be included that hasn’t already been?
 
 
 ---User Personas---
@@ -68,5 +107,6 @@ Organizers need a way to spontaneously start events with strangers because that 
 Hypothesis:
 I believe with proximity based messaging organizers will be able to get the attention and cooperation of interested individuals who otherwise would have not known of the event. 
 We will know this to be true when people get activities started by using SoapBox Messages.
+
 
 
