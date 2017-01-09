@@ -1,0 +1,29 @@
+User Profile
+As a User, I can create a new account.
+As a User, I can log into an existing account. 
+As a User, I can update my own profile.
+As a User, I can update my profile picture.
+As a User, I can choose an image from my image gallery.
+As a User, I can take a new photo for my profile picture.
+As a User, I can update my name.
+As a User, I can update my birthdate.
+As a User, I can update my gender.
+As a User, I know whether my information was uploaded or not.
+As a User, I can see what my current profile parameters are.
+
+Nearby Discovery/Publishing
+As a User, I can publish a new soap box message.
+As a User, I can publish my own user id.
+As a User, I can read other user’s soap box messages.
+As a User, I can open up a user’s profile page to reply to a soapbox message by clicking on it.
+
+Interactivity
+As a User, I can view the profiles of those I’ve connected with.
+As a User, I can start chatrooms with users that I’ve connected with.
+As a User, I can send messages to other users.
+As a User, I can read other users messages.
+As a User, I’m notified when I receive a new message. 
+As a User, I can access my chatroom by clicking on a notification.
+As a User, I can start a new chatroom with a user from their profile detail activity.
+As a user, I can continue a chatroom conversation from the chatroomlist activity.
+As a user, I can continue a chatroom conversation the same way I created that chatroom, via profile detail activity.
