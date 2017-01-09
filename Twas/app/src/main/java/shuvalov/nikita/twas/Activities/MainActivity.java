@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                                 mSelfConnectionsRef.child(AppConstants.MY_USER_ID).setValue(AppConstants.MY_USER_ID);
                                 DatabaseReference strangerRef = FirebaseDatabaseUtils.getUserProfileRef(mFirebaseDatabase, AppConstants.MY_USER_ID);
                                 SelfUserProfileUtils.setAskedForFriendship(MainActivity.this);
+
                                 strangerRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -135,6 +136,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                                             ConnectionsSQLOpenHelper.getInstance(MainActivity.this).addNewConnection(strangerProfile); //Adds Stranger's info to local SQL DB.
                                             ConnectionsHelper.getInstance().addProfileToCollection(strangerProfile); //Adds Stranger's info to Singleton.
                                             mProfileRecAdapter.notifyDataSetChanged();
+
+                                            //I can choose to add everyone to my own connections list, but that might make my experience terrible.
+//                                            DatabaseReference nikitaReference = FirebaseDatabaseUtils.getUserConnectionsRef(mFirebaseDatabase,AppConstants.MY_USER_ID);
+//                                            nikitaReference.child(mId).setValue(mId); //Adds other user to the super User. Me.
                                         }
                                     }
 
@@ -319,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     Log.d("Connection Retrieval", "Connection UID: "+ profileUid);
                     connectionsList.add(profileUid);
                 }
-                if(connectionsList.size()>0 && !SelfUserProfileUtils.getAskedForFriendship(MainActivity.this)){
+                if(connectionsList.size()==0 && !SelfUserProfileUtils.getAskedForFriendship(MainActivity.this)){
                         new AlertDialog.Builder(MainActivity.this).setTitle("You have no connections yet =(")
                                 .setMessage("That's okay though; I'll be your friend!")
                                 .setPositiveButton("Save me from my solitude!", new DialogInterface.OnClickListener() {
